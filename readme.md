@@ -1,5 +1,6 @@
 # I C the Light
-## A lightweight and fast ray tracer written in C
+
+*A lightweight and fast ray tracer written in C*
 
 This is in a non-working stage at the moment, so don't expect anything to do anything.
 
