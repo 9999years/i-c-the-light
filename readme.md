@@ -1,3 +1,5 @@
+**This readme has been known to be questionably out of date, and may not be the best place to find information about this project. When in doubt, refer to the source code.**
+
 # I C the Light
 
 *A lightweight and fast ray tracer written in C*
