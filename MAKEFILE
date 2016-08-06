@@ -1,8 +1,11 @@
 CC = gcc
 CFLAGS = -Wall
+SDL_INCLUDE = -IC:\c\include\SDL
+SLD_LIBRARY = -LC:\c\lib64
+SDL_LINKER_FLAGS = -lSDL2main -lSDL2
 
 icthelight.exe: icthelight.c
 	$(CC) $(CFLAGS) $? -o $@
 
 sdlskeleton.exe: sdlskeleton.c
-	$(CC) $(CFLAGS) $? -o $@ -lC:\Users\xyz\Documents\c\i-c-the-light\SDL2-devel-2.0.4-VC\SDL2-2.0.4\lib\x64\SDL2.lib
+	$(CC) $(CFLAGS) $(SDL_INCLUDE) $(SDL_LIBRARY) $(SDL_LINKER_FLAGS) $? -o $@

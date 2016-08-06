@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <math.h>
-//#include <unistd.h>
-//#include <string.h>
+#include <time.h>
+#include <stdbool.h>
 
 #define ARRAYSIZE(arr) (sizeof(arr) / sizeof(arr[0]))
 
@@ -12,6 +12,11 @@ enum {
 };
 
 enum { RED, GREEN, BLUE };
+
+unsigned long int epoch()
+{
+	return time(NULL);
+}
 
 int clamp(
 	int value,
@@ -31,6 +36,31 @@ int clamp(
 	{
 		return value;
 	}
+}
+
+int autoscale(
+	int width,
+	int height,
+	int channels,
+	unsigned char image[width][height][channels],
+	int min,
+	int max
+	)
+{
+	int i = 0, j = 0, k = 0;
+	for(i = 0; i < width; i++)
+	{
+		for(j = 0; j < height; j++)
+		{
+			for(k = 0; k < channels; k++)
+			{
+				image[i][j][k] -= min;
+				image[i][j][k] *= 0xff/(max-min);
+				image[i][j][k] = clamp(image[i][j][k], 0, 0xff);
+			}
+		}
+	}
+	return 0;
 }
 
 int writeppm(
@@ -65,46 +95,38 @@ int writeppm(
 
 int main( int argc, char *argv[] )
 {
+	//printf("time is %lu seconds", (unsigned long)time(NULL));
 	unsigned char image[256][256][3];
-	int i = 0, j = 0;
+	int i = 0, j = 0, k = 0, min = 255, max = 0;
 	for(i = 0; i < ARRAYSIZE(image); i++)
 	{
 		for(j = 0; j < ARRAYSIZE(image[0]); j++)
 		{
 			image[i][j][RED] =
-				clamp(floor(
-				( sin( 5 - (double)j / 32 )
-				+ 1 )
-				* 64),
-				0, 0xff);
+				(i*(j/32))*255;
+				//(i%32) & (j%32);
 
 			image[i][j][GREEN] =
-				clamp(
-				floor(
-				( sin( 16 + (double)j / 32 )
-				+ 1 )
-				* ( cos( 4 + (double)i / 32 )
-				+ 1 )
-				* 64),
-				0, 0xff);
-
+				0;
 			image[i][j][BLUE] =
-				clamp(
-				floor(
-				( sin( 4 + (double)i / 32 )
-				+ 1 )
-				/ ( sin( (double)j / 32 )
-				+ 1 )
-				* 32),
-				0, 0xff);
-				//floor(
-				//( cos( (double)i / 32 )
-				//+ 1 )
-				//* 128);
+				0;
+
+			for(k = 0; k < 3; k++)
+			{
+				min = image[i][j][k] < min ? image[i][j][k] : min;
+				max = image[i][j][k] > min ? image[i][j][k] : max;
+			}
 		}
 	}
-	printf("image initialized!\n");
-	writeppm("image.ppm", PORTABLE_PIXMAP, 256, 256, 3, image);
+
+	printf("min = %d, max = %d\n", min, max);
+
+	autoscale(256, 256, 3, image, min, max);
+
+	char filename[256];
+	sprintf(filename, "output/image%lu.ppm", (unsigned long int)time(NULL));
+	printf("image initialized!\nwriting to %s\n", filename);
+	writeppm(filename, PORTABLE_PIXMAP, 256, 256, 3, image);
 	printf("image written!\n");
 	return 0;
 }
