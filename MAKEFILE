@@ -1,0 +1,5 @@
+CC = gcc
+CFLAGS = -Wall
+
+icthelight.exe: icthelight.c
+	$(CC) $(CFLAGS) $? -o $@
