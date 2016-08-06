@@ -3,3 +3,6 @@ CFLAGS = -Wall
 
 icthelight.exe: icthelight.c
 	$(CC) $(CFLAGS) $? -o $@
+
+sdlskeleton.exe: sdlskeleton.c
+	$(CC) $(CFLAGS) $? -o $@ -lC:\Users\xyz\Documents\c\i-c-the-light\SDL2-devel-2.0.4-VC\SDL2-2.0.4\lib\x64\SDL2.lib
