@@ -1,11 +1,16 @@
 CC = gcc
 CFLAGS = -Wall
 SDL_INCLUDE = -IC:\c\include\SDL
-SLD_LIBRARY = -LC:\c\lib64
+SDL_LIBRARY = -LC:\c\lib64
 SDL_LINKER_FLAGS = -lSDL2main -lSDL2
+# only for windows right now
+NO_CONSOLE = -mwindows
 
 icthelight.exe: icthelight.c
 	$(CC) $(CFLAGS) $? -o $@
 
+uniontest.exe: uniontest.c
+	$(CC) $(CFLAGS) $? -o $@
+
 sdlskeleton.exe: sdlskeleton.c
-	$(CC) $(CFLAGS) $(SDL_INCLUDE) $(SDL_LIBRARY) $(SDL_LINKER_FLAGS) $? -o $@
+	$(CC) $? $(CFLAGS) $(NO_CONSOLE) $(SDL_INCLUDE) $(SDL_LINKER_FLAGS) -o $@
