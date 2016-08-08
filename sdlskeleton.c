@@ -2,49 +2,49 @@
 #include <SDL.h>
 #include <stdio.h>
 #include <math.h>
+#include <time.h>
+#include "color.h"
 
 //Screen dimension constants
-const int SCREEN_WIDTH = 640;
-const int SCREEN_HEIGHT = 480;
+#define SCREEN_WIDTH 640
+#define SCREEN_HEIGHT 480
+#define HALF_SCREEN_WIDTH 320
+#define HALF_SCREEN_HEIGHT 240
 
-int clamp(
-	int value,
-	int min,
-	int max
-	)
-{
-	if(value < min)
-	{
-		return min;
-	}
-	else if(value > max)
-	{
-		return max;
-	}
-	else
-	{
-		return value;
-	}
-}
+enum {
+	PORTABLE_BITMAP = 1,
+	PORTABLE_GRAYMAP = 2,
+	PORTABLE_PIXMAP = 3
+};
 
-int autoscale(
+int writeppm(
+	char *filename,
+	char filetype,
 	int width,
 	int height,
-	unsigned int image[width][height],
-	int min,
-	int max
+	unsigned int image[]
 	)
 {
-	int i = 0, j = 0;
-	for(i = 0; i < width; i++)
+	FILE *file = fopen(filename, "w");
+	if(file == NULL)
 	{
-		for(j = 0; j < height; j++)
+		printf("file open failure!\n");
+		return 1;
+	}
+	fprintf(file, "P%d\n%d %d\n%d\n", filetype, width, height, 0xff);
+	int i = 0, j = 0, k = 0;
+	rgbcolor pixel;
+	for(i = 0; i < height; i++)
+	{
+		for(j = 0; j < width; j++)
 		{
-			image[i][j] -= min;
-			//image[i][j] *= 0xff;
-			image[i][j] *= (double)0xff/(max-min);
-			//image[i][j] = clamp(image[i][j], 0, 0xffffff);
+			inttocolor(pixel, image[i*height+j]);
+			for(k = 0; k < CHANNELS; k++)
+			{
+				fprintf(file, "%d ", pixel[k]);
+			}
 		}
+		fprintf(file, "\n");
 	}
 	return 0;
 }
@@ -63,8 +63,24 @@ int render(SDL_Surface *screenSurface)
 	//get the time
 	int tick = SDL_GetTicks();
 
+	if(tick == 0)
+	{
+		//save
+		char filename[256] = "output/UNINITIALIZED.ppm";
+		sprintf(filename, "output/image%lu", (unsigned long int)time(NULL));
+		if(
+			writeppm(filename, PORTABLE_PIXMAP, SCREEN_WIDTH, SCREEN_HEIGHT, screenSurface->pixels)
+			!= 0
+		  )
+		{
+			printf("problem!!!!!!!\n");
+		}
+	}
+
 	// Declare a couple of
-	int i = 0, j = 0, yofs = 0, ofs = 0, min = 255, max = 0;
+	int i = 0, j = 0, yofs = 0, ofs = 0;
+
+	rgbcolor pixel;
 
 	// Draw to
 	yofs = 0;
@@ -73,23 +89,26 @@ int render(SDL_Surface *screenSurface)
 		for(j = 0, ofs = yofs; j < SCREEN_WIDTH; j++, ofs++)
 		{
 			/*((unsigned int*)screenSurface->pixels)[ofs] = i * i + j * j + tick;*/
+			pixel[BLUE] =
+				(double)(i-HALF_SCREEN_HEIGHT)/8*(double)(j-HALF_SCREEN_WIDTH)/8+(double)tick/32;
+				//(sin((double)i/64)+sin((double)j/64)+(double)tick/512+1)*0xff;
+
+			pixel[GREEN] =
+				pixel[BLUE];
+
+			pixel[RED] =
+				pixel[BLUE];
+
 			((unsigned int*)screenSurface->pixels)[ofs] =
-				(sin((double)i/32+(double)tick/64)+1)*0xf;
+				colortoint(pixel);
 				//(sin((double)i/32) + cos((double)j/32));
 				/*sin((double)i/32)*64 + 0xff00* sin((double)j/32)*64 + tick/4;*/
-			if(((unsigned int*)screenSurface->pixels)[ofs] > max)
-			{
-				max = ((unsigned int*)screenSurface->pixels)[ofs];
-			}
-			else if(((unsigned int*)screenSurface->pixels)[ofs] < min)
-			{
-				min = ((unsigned int*)screenSurface->pixels)[ofs];
-			}
+			//detectminmax(pixel, &min, &max);
 		}
 		yofs += screenSurface->pitch / 4;
 	}
 
-	autoscale(SCREEN_WIDTH, SCREEN_HEIGHT, screenSurface->pixels, min, max);
+	//autoscale(SCREEN_WIDTH, SCREEN_HEIGHT, screenSurface->pixels, min, max);
 
 	// Unlock if
 	if(SDL_MUSTLOCK(screenSurface))
@@ -102,6 +121,7 @@ int render(SDL_Surface *screenSurface)
 
 int WinMain( int argc, char* args[] )
 {
+	printf("hello!\n");
 	//The window we'll be rendering to
 	SDL_Window* window = NULL;
 
@@ -136,9 +156,10 @@ int WinMain( int argc, char* args[] )
 	int quit = 0;
 	while (!quit)
 	{
-		SDL_Delay(16);
+		//SDL_Delay(16);
 		// render
 		render(screenSurface);
+
 		//Update the surface
 		SDL_UpdateWindowSurface( window );
 

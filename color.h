@@ -1,23 +1,25 @@
-typedef struct rgbcolor rgbcolor;
+#define RED 0
+#define GREEN 1
+#define BLUE 2
+#define CHANNELS 3
 
-struct rgbcolor {
-	unsigned char red;
-	unsigned char green;
-	unsigned char blue;
-};
+typedef unsigned char rgbcolor[3];
+
+//struct rgbcolor {
+	//unsigned char red;
+	//unsigned char green;
+	//unsigned char blue;
+//};
 
 unsigned int colortoint(rgbcolor color)
 {
-	return color.blue + color.green*0x100 + color.red*0x10000;
+	return color[BLUE] + color[GREEN]*0x100 + color[RED]*0x10000;
 }
 
-rgbcolor inttocolor(unsigned int color)
+int inttocolor(rgbcolor colorarray, unsigned int color)
 {
-	rgbcolor colorstruct =
-	{
-		.blue  = (color)       & 0xff,
-		.green = (color >> 8)  & 0xff,
-		.red   = (color >> 16) & 0xff
-	};
-	return colorstruct;
+	colorarray[BLUE]  = (color)       & 0xff;
+	colorarray[GREEN] = (color >> 8)  & 0xff;
+	colorarray[RED]   = (color >> 16) & 0xff;
+	return 0;
 }
