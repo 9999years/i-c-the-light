@@ -1,8 +1,12 @@
-//Using SDL and standard IO
-#include <SDL.h>
+//display
+#include "SDL/SDL.h"
+//logging, file out
 #include <stdio.h>
+//sin functions
 #include <math.h>
+//timestamp for file names
 #include <time.h>
+//int / array color conversion
 #include "color.h"
 
 //Screen dimension constants
@@ -38,7 +42,7 @@ int writeppm(
 	{
 		for(j = 0; j < width; j++)
 		{
-			inttocolor(pixel, image[i*height+j]);
+			inttocolor(pixel, image[j + i*width]);
 			for(k = 0; k < CHANNELS; k++)
 			{
 				fprintf(file, "%d ", pixel[k]);
@@ -46,6 +50,7 @@ int writeppm(
 		}
 		fprintf(file, "\n");
 	}
+	printf("write done!\n");
 	return 0;
 }
 
@@ -63,20 +68,6 @@ int render(SDL_Surface *screenSurface)
 	//get the time
 	int tick = SDL_GetTicks();
 
-	if(tick == 0)
-	{
-		//save
-		char filename[256] = "output/UNINITIALIZED.ppm";
-		sprintf(filename, "output/image%lu", (unsigned long int)time(NULL));
-		if(
-			writeppm(filename, PORTABLE_PIXMAP, SCREEN_WIDTH, SCREEN_HEIGHT, screenSurface->pixels)
-			!= 0
-		  )
-		{
-			printf("problem!!!!!!!\n");
-		}
-	}
-
 	// Declare a couple of
 	int i = 0, j = 0, yofs = 0, ofs = 0;
 
@@ -88,27 +79,20 @@ int render(SDL_Surface *screenSurface)
 	{
 		for(j = 0, ofs = yofs; j < SCREEN_WIDTH; j++, ofs++)
 		{
-			/*((unsigned int*)screenSurface->pixels)[ofs] = i * i + j * j + tick;*/
 			pixel[BLUE] =
 				(double)(i-HALF_SCREEN_HEIGHT)/8*(double)(j-HALF_SCREEN_WIDTH)/8+(double)tick/32;
-				//(sin((double)i/64)+sin((double)j/64)+(double)tick/512+1)*0xff;
 
 			pixel[GREEN] =
-				pixel[BLUE];
+				pixel[BLUE]*cos((double)i/32+(double)j/32);
 
 			pixel[RED] =
-				pixel[BLUE];
+				pixel[BLUE]*sin((double)i/32+(double)j/32);
 
 			((unsigned int*)screenSurface->pixels)[ofs] =
 				colortoint(pixel);
-				//(sin((double)i/32) + cos((double)j/32));
-				/*sin((double)i/32)*64 + 0xff00* sin((double)j/32)*64 + tick/4;*/
-			//detectminmax(pixel, &min, &max);
 		}
 		yofs += screenSurface->pitch / 4;
 	}
-
-	//autoscale(SCREEN_WIDTH, SCREEN_HEIGHT, screenSurface->pixels, min, max);
 
 	// Unlock if
 	if(SDL_MUSTLOCK(screenSurface))
@@ -122,6 +106,7 @@ int render(SDL_Surface *screenSurface)
 int WinMain( int argc, char* args[] )
 {
 	printf("hello!\n");
+	char filename[256] = "output/UNINITIALIZED.ppm";
 	//The window we'll be rendering to
 	SDL_Window* window = NULL;
 
@@ -146,11 +131,12 @@ int WinMain( int argc, char* args[] )
 			//Get window surface
 			screenSurface = SDL_GetWindowSurface( window );
 
-			//Fill the surface white
-			//SDL_FillRect( screenSurface, NULL, SDL_MapRGB( screenSurface->format, 0xFF, 0xFF, 0xFF ) );
-
-			//Wait two seconds
-			//SDL_Delay( 2000 );
+			//save
+			render(screenSurface);
+			sprintf(filename, "output/image%lu.ppm", (unsigned long int)time(NULL));
+			if(writeppm(filename, PORTABLE_PIXMAP, SCREEN_WIDTH, SCREEN_HEIGHT, screenSurface->pixels)
+				!= 0)
+				printf("image write error!\n");
 		}
 	}
 	int quit = 0;
@@ -170,15 +156,18 @@ int WinMain( int argc, char* args[] )
 			switch (event.type)
 			{
 				case SDL_KEYUP:
-					// ifescape is pressed, return (and thus, quit)
+					// if escape is pressed, quit
 					if(event.key.keysym.sym == SDLK_ESCAPE)
 					{
 						quit = 1;
 					}
-					/*else if(event.key.keysym.sym == SLDK_s)*/
-					/*{*/
-
-					/*}*/
+					else if(event.key.keysym.sym == SDLK_s)
+					{
+						sprintf(filename, "output/image%lu.ppm", (unsigned long int)time(NULL));
+						if(writeppm(filename, PORTABLE_PIXMAP, SCREEN_WIDTH, SCREEN_HEIGHT, screenSurface->pixels)
+							!= 0)
+							printf("image write error!\n");
+					}
 					break;
 
 				case SDL_QUIT:

@@ -5,12 +5,6 @@
 
 typedef unsigned char rgbcolor[3];
 
-//struct rgbcolor {
-	//unsigned char red;
-	//unsigned char green;
-	//unsigned char blue;
-//};
-
 unsigned int colortoint(rgbcolor color)
 {
 	return color[BLUE] + color[GREEN]*0x100 + color[RED]*0x10000;
