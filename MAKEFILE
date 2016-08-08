@@ -9,8 +9,8 @@ NO_CONSOLE = -mwindows
 icthelight.exe: icthelight.c
 	$(CC) $(CFLAGS) $? -o $@
 
-uniontest.exe: uniontest.c
-	$(CC) $(CFLAGS) $? -o $@
+test.exe: test.c
+	$(CC) $(CFLAGS) $< -o $@
 
 sdlskeleton.exe: sdlskeleton.c
 	$(CC) $? $(CFLAGS) $(NO_CONSOLE) $(SDL_INCLUDE) $(SDL_LINKER_FLAGS) -o $@
