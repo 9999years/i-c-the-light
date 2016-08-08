@@ -45,6 +45,15 @@ Super simple makefile, crafted by hand.
 `readme.md`:
 This file.
 
+`output/`:
+Output will be written here, e.g. `image1470681018.ppm`, stamped with the [Unix epoch](https://en.wikipedia.org/wiki/Unix_time).
+
+## Compiling
+
+You’ll need SDL2 files in the SDL folder and a copy of SDL2.dll
+
+As of August 2016, I C the Light is compiled with SDL 2.0.4, which can be downloaded [here](https://www.libsdl.org/download-2.0.php).
+
 ## Branches
 
 Approximately ordered from most to least stable.
