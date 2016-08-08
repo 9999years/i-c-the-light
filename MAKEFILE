@@ -4,7 +4,7 @@ SDL_INCLUDE = -IC:\c\include\SDL
 SDL_LIBRARY = -LC:\c\lib64
 SDL_LINKER_FLAGS = -lSDL2main -lSDL2
 # only for windows right now
-NO_CONSOLE = -mwindows
+NO_CONSOLE = #-mwindows
 
 icthelight.exe: icthelight.c
 	$(CC) $(CFLAGS) $? -o $@
@@ -14,3 +14,13 @@ test.exe: test.c
 
 sdlskeleton.exe: sdlskeleton.c
 	$(CC) $? $(CFLAGS) $(NO_CONSOLE) $(SDL_INCLUDE) $(SDL_LINKER_FLAGS) -o $@
+
+#requires imagemagick and curl
+#converts images to png and uploads to my server
+#this doesnt work
+upload:
+	cd output
+	-mogrify -format png *.ppm
+	del *.ppm
+	dir *.png | curl --ftp-port 22 --upload-file - --ftp-ssl --user user --verbose sftp://becca.ooo:22/i-c-the-light/output/
+	cd ../
