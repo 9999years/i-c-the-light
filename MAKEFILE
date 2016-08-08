@@ -4,7 +4,7 @@ SDL_INCLUDE = -IC:\c\include\SDL
 SDL_LIBRARY = -LC:\c\lib64
 SDL_LINKER_FLAGS = -lSDL2main -lSDL2
 # only for windows right now
-NO_CONSOLE = -mwindows
+NO_CONSOLE = #-mwindows
 
 icthelight.exe: icthelight.c
 	$(CC) $(CFLAGS) $? -o $@
