@@ -19,51 +19,30 @@
 #define HALF_SCREEN_WIDTH 320
 #define HALF_SCREEN_HEIGHT 240
 
+int lastx = HALF_SCREEN_WIDTH, lasty = HALF_SCREEN_HEIGHT;
 
-int render(SDL_Surface *screenSurface)
+int render(SDL_Surface *screenSurface, unsigned int width, unsigned int height)
 {
-	// Lock surface if
-	if(SDL_MUSTLOCK(screenSurface))
-	{
-		if(SDL_LockSurface(screenSurface) < 0)
-		{
-			return 1;
-		}
-	}
 
-	//get the time
 	int tick = SDL_GetTicks();
 
-	// Declare a couple of
-	int i = 0, j = 0;
+	rgbcolor color = {0xff, 0x00, 0x00}, newcolor;
+	shifthue(newcolor, color, (float)tick/4);
 
-	rgbcolor pixel;
+	int newx = HALF_SCREEN_WIDTH+ ((double)tick/128)*cos((double)tick/256);
+	int newy = HALF_SCREEN_HEIGHT+((double)tick/128)*sin((double)tick/256);
 
-	// Draw to
-	for(i = 0; i < SCREEN_HEIGHT; i++)
-	{
-		for(j = 0; j < SCREEN_WIDTH; j++)
-		{
-			pixel[BLUE] =
-				(double)(i-HALF_SCREEN_HEIGHT)/8*(double)(j-HALF_SCREEN_WIDTH)/8+(double)tick/32;
-
-			pixel[GREEN] =
-				pixel[BLUE]*cos((double)i/32+(double)j/32);
-
-			pixel[RED] =
-				pixel[BLUE]*sin((double)i/32+(double)j/32);
-
-			((unsigned int*)screenSurface->pixels)[j + i*SCREEN_WIDTH] =
-				colortoint(pixel);
-		}
-	}
-
-	// Unlock if
-	if(SDL_MUSTLOCK(screenSurface))
-	{
-		SDL_UnlockSurface(screenSurface);
-	}
-
+	drawline(screenSurface,
+		width, height,
+		//50, 100,
+		//HALF_SCREEN_WIDTH, HALF_SCREEN_HEIGHT,
+		lastx, lasty,
+		//400, 200,
+		newx, newy,
+		colortoint(newcolor)
+		);
+	lastx = newx;
+	lasty = newy;
 	return 0;
 }
 
@@ -93,10 +72,13 @@ int WinMain( int argc, char* args[] )
 		else
 		{
 			//Get window surface
-			screenSurface = SDL_GetWindowSurface( window );
+			screenSurface = SDL_GetWindowSurface(window);
+			//color it black just to be safe
+			SDL_FillRect(screenSurface, NULL, 0x000000);
 
 			//save
-			render(screenSurface);
+			render(screenSurface, SCREEN_WIDTH, SCREEN_HEIGHT);
+
 			sprintf(filename, "../output/image%lu.ppm", (unsigned long int)time(NULL));
 			if(writeppm(filename, PORTABLE_PIXMAP, SCREEN_WIDTH, SCREEN_HEIGHT, screenSurface->pixels)
 				!= 0)
@@ -106,9 +88,9 @@ int WinMain( int argc, char* args[] )
 	int quit = 0;
 	while (!quit)
 	{
-		//SDL_Delay(16);
+		SDL_Delay(16);
 		// render
-		render(screenSurface);
+		render(screenSurface, SCREEN_WIDTH, SCREEN_HEIGHT);
 
 		//Update the surface
 		SDL_UpdateWindowSurface( window );
