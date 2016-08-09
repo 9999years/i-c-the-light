@@ -1,0 +1,3 @@
+Fix color.h code (spec. functions I got from SO)
+Replace unsigned int with uint project wide or something
+Ditto for unsigned char and BYTE

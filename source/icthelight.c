@@ -19,30 +19,46 @@
 #define HALF_SCREEN_WIDTH 320
 #define HALF_SCREEN_HEIGHT 240
 
-int lastx = HALF_SCREEN_WIDTH, lasty = HALF_SCREEN_HEIGHT;
+#define HALF_PI 1.57079632675
+
+#define BOX_WIDTH 200
+#define BOX_HEIGHT 100
 
 int render(SDL_Surface *screenSurface, unsigned int width, unsigned int height)
 {
 
 	int tick = SDL_GetTicks();
 
-	rgbcolor color = {0xff, 0x00, 0x00}, newcolor;
-	shifthue(newcolor, color, (float)tick/4);
+	SDL_FillRect(screenSurface, NULL, 0x000000);
 
-	int newx = HALF_SCREEN_WIDTH+ ((double)tick/128)*cos((double)tick/256);
-	int newy = HALF_SCREEN_HEIGHT+((double)tick/128)*sin((double)tick/256);
+	int i = 0;
+	for(i = 0; i < 4; i++)
+	{
+		int ax, ay, bx, by;
+		ax = HALF_SCREEN_WIDTH  + BOX_WIDTH*sin(  i*HALF_PI + (double)tick/512);
+		ay = HALF_SCREEN_HEIGHT + BOX_HEIGHT*cos(  i*HALF_PI + (double)tick/512) + 100;
+		bx = HALF_SCREEN_WIDTH  + BOX_WIDTH*sin((i-1)*HALF_PI + (double)tick/512);
+		by = HALF_SCREEN_HEIGHT + BOX_HEIGHT*cos((i-1)*HALF_PI + (double)tick/512) + 100;
+		drawline(screenSurface,
+			width, height,
+			ax, ay,
+			bx, by,
+			0xffffff
+			);
+		drawline(screenSurface,
+			width, height,
+			ax, ay-BOX_WIDTH,
+			bx, by-BOX_WIDTH,
+			0xffffff
+			);
+		drawline(screenSurface,
+			width, height,
+			ax, ay,
+			ax, ay-BOX_WIDTH,
+			0xffffff
+			);
+	}
 
-	drawline(screenSurface,
-		width, height,
-		//50, 100,
-		//HALF_SCREEN_WIDTH, HALF_SCREEN_HEIGHT,
-		lastx, lasty,
-		//400, 200,
-		newx, newy,
-		colortoint(newcolor)
-		);
-	lastx = newx;
-	lasty = newy;
 	return 0;
 }
 
@@ -73,8 +89,6 @@ int WinMain( int argc, char* args[] )
 		{
 			//Get window surface
 			screenSurface = SDL_GetWindowSurface(window);
-			//color it black just to be safe
-			SDL_FillRect(screenSurface, NULL, 0x000000);
 
 			//save
 			render(screenSurface, SCREEN_WIDTH, SCREEN_HEIGHT);

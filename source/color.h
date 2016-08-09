@@ -1,3 +1,5 @@
+#include <math.h>
+
 #define RED 0
 #define GREEN 1
 #define BLUE 2
@@ -12,7 +14,7 @@ unsigned int colortoint(rgbcolor color)
 	return color[BLUE] + color[GREEN]*0x100 + color[RED]*0x10000;
 }
 
-void inttocolor(rgbcolor colorarray, BYTE color)
+void inttocolor(rgbcolor colorarray, unsigned int color)
 {
 	colorarray[BLUE]  = (color)       & 0xff;
 	colorarray[GREEN] = (color >> 8)  & 0xff;

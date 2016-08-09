@@ -13,5 +13,9 @@ test.exe: test.c
 	$(CC) $(CFLAGS) $< -o $@
 
 convert:
-	mogrify -format png output/*.ppm
-	del output/*.ppm
+	mogrify -format png ../output/*.ppm
+	del ..\output\*.ppm
+
+clean:
+	del *.exe
+	del TEST_PPM.ppm
