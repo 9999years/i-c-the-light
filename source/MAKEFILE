@@ -7,10 +7,11 @@ SDL_LINKER_FLAGS = -lSDL2main -lSDL2
 NO_CONSOLE = #-mwindows
 
 icthelight.exe: icthelight.c
-	$(CC) $(CFLAGS) $? -o $@
+	$(CC) $? $(CFLAGS) $(SDL_LIBRARY) $(NO_CONSOLE) $(SDL_INCLUDE) $(SDL_LINKER_FLAGS) -o $@
 
 test.exe: test.c
 	$(CC) $(CFLAGS) $< -o $@
 
-sdlskeleton.exe: sdlskeleton.c
-	$(CC) $? $(CFLAGS) $(SDL_LIBRARY) $(NO_CONSOLE) $(SDL_INCLUDE) $(SDL_LINKER_FLAGS) -o $@
+convert:
+	mogrify -format png output/*.ppm
+	del output/*.ppm

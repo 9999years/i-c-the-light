@@ -2,4 +2,5 @@
 *.dll
 output/*
 ftpinfo.txt
-SDL/*
+**/SDL/*
+**/TEST_PPM.ppm

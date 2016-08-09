@@ -1,5 +1,5 @@
 //display
-#include "SDL/SDL.h"
+#include <SDL/SDL.h>
 //logging, file out
 #include <stdio.h>
 //sin functions
@@ -8,6 +8,10 @@
 #include <time.h>
 //int / array color conversion
 #include "color.h"
+//ppm handling
+#include "ppm.h"
+//line drawing
+#include "line.h"
 
 //Screen dimension constants
 #define SCREEN_WIDTH 640
@@ -15,44 +19,6 @@
 #define HALF_SCREEN_WIDTH 320
 #define HALF_SCREEN_HEIGHT 240
 
-enum {
-	PORTABLE_BITMAP = 1,
-	PORTABLE_GRAYMAP = 2,
-	PORTABLE_PIXMAP = 3
-};
-
-int writeppm(
-	char *filename,
-	char filetype,
-	int width,
-	int height,
-	unsigned int image[]
-	)
-{
-	FILE *file = fopen(filename, "w");
-	if(file == NULL)
-	{
-		printf("file open failure!\n");
-		return 1;
-	}
-	fprintf(file, "P%d\n%d %d\n%d\n", filetype, width, height, 0xff);
-	int i = 0, j = 0, k = 0;
-	rgbcolor pixel;
-	for(i = 0; i < height; i++)
-	{
-		for(j = 0; j < width; j++)
-		{
-			inttocolor(pixel, image[j + i*width]);
-			for(k = 0; k < CHANNELS; k++)
-			{
-				fprintf(file, "%d ", pixel[k]);
-			}
-		}
-		fprintf(file, "\n");
-	}
-	printf("write done!\n");
-	return 0;
-}
 
 int render(SDL_Surface *screenSurface)
 {
@@ -69,15 +35,14 @@ int render(SDL_Surface *screenSurface)
 	int tick = SDL_GetTicks();
 
 	// Declare a couple of
-	int i = 0, j = 0, yofs = 0, ofs = 0;
+	int i = 0, j = 0;
 
 	rgbcolor pixel;
 
 	// Draw to
-	yofs = 0;
 	for(i = 0; i < SCREEN_HEIGHT; i++)
 	{
-		for(j = 0, ofs = yofs; j < SCREEN_WIDTH; j++, ofs++)
+		for(j = 0; j < SCREEN_WIDTH; j++)
 		{
 			pixel[BLUE] =
 				(double)(i-HALF_SCREEN_HEIGHT)/8*(double)(j-HALF_SCREEN_WIDTH)/8+(double)tick/32;
@@ -88,10 +53,9 @@ int render(SDL_Surface *screenSurface)
 			pixel[RED] =
 				pixel[BLUE]*sin((double)i/32+(double)j/32);
 
-			((unsigned int*)screenSurface->pixels)[ofs] =
+			((unsigned int*)screenSurface->pixels)[j + i*SCREEN_WIDTH] =
 				colortoint(pixel);
 		}
-		yofs += screenSurface->pitch / 4;
 	}
 
 	// Unlock if
@@ -133,7 +97,7 @@ int WinMain( int argc, char* args[] )
 
 			//save
 			render(screenSurface);
-			sprintf(filename, "output/image%lu.ppm", (unsigned long int)time(NULL));
+			sprintf(filename, "../output/image%lu.ppm", (unsigned long int)time(NULL));
 			if(writeppm(filename, PORTABLE_PIXMAP, SCREEN_WIDTH, SCREEN_HEIGHT, screenSurface->pixels)
 				!= 0)
 				printf("image write error!\n");
@@ -163,7 +127,7 @@ int WinMain( int argc, char* args[] )
 					}
 					else if(event.key.keysym.sym == SDLK_s)
 					{
-						sprintf(filename, "output/image%lu.ppm", (unsigned long int)time(NULL));
+						sprintf(filename, "../output/image%lu.ppm", (unsigned long int)time(NULL));
 						if(writeppm(filename, PORTABLE_PIXMAP, SCREEN_WIDTH, SCREEN_HEIGHT, screenSurface->pixels)
 							!= 0)
 							printf("image write error!\n");

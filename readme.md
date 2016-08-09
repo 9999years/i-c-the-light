@@ -24,28 +24,48 @@ On ray marching (from [Syntopia](http://blog.hvidtfeldts.net/index.php/2011/06/d
 
 ### Code
 
-`color.h`:
-Micro-library for converting colors between `(unsigned int) 0xFFFFFF` and `unsigned char *{0xFF, 0xFF, 0xFF}` formats.
+The code lives in `source/`, and includes:
 
-`test.c`:
+#### `color.h`
+
+Functions for converting colors between `(unsigned int) 0xFFFFFF` and `unsigned char *{0xFF, 0xFF, 0xFF}` formats.
+
+Exposes `rgbcolor`, `colortoint(rgbcolor color)`, and `inttocolor(rgbcolor colorarray, unsigned int color)`
+
+Is it inconsistent that `colortoint()` returns the int color but `inttocolor()` requires a pointer to an existing `rgbcolor`?
+Maybe.
+Will it change in the future?
+Probably.
+
+#### `test.c`
+
 Unit tests. Currently only tests `color.h`.
 
-`icthelight.c`:
+#### `icthelight.c`
+
 The beef of the code lives here.
-Can be redirected to a log file for some supplementary (but non-essential) output.
+Can be redirected to a log file for some supplementary output.
+
+#### `ppm.h`
+
+Code for writing [ppm images](https://en.m.wikipedia.org/wiki/Netpbm_format).
 
 ### Misc
 
-`license.txt`:
+#### `license.txt`
+
 A copy of the MIT license; see below.
 
-`Makefile`:
+#### `Makefile`
+
 Super simple makefile, crafted by hand.
 
-`readme.md`:
+#### `readme.md`
+
 This file.
 
-`output/`:
+#### `output/`
+
 Output will be written here, e.g. `image1470681018.ppm`, stamped with the [Unix epoch](https://en.wikipedia.org/wiki/Unix_time).
 
 ## Compiling
