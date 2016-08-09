@@ -1,6 +1,8 @@
 # I C the Light
 
-*a distance estimating ray marcher written in C*
+### *a distance estimating ray marcher written in C**
+
+\*(none of the ray marching functionality has been written yet)
 
 On ray marching (from [Syntopia](http://blog.hvidtfeldts.net/index.php/2011/06/distance-estimated-3d-fractals-part-i/)):
 
@@ -20,6 +22,8 @@ On ray marching (from [Syntopia](http://blog.hvidtfeldts.net/index.php/2011/06/d
 > estimator tells you how large a step you are allowed to march along the ray,
 > since you are guaranteed not to hit anything within this radius.
 
+Some supplimentary information and reference links can be found at [becca.ooo/i-c-the-light](https://becca.ooo/i-c-the-light/).
+
 ## Directory
 
 ### Code
@@ -30,16 +34,9 @@ The code lives in `source/`, and includes:
 
 Functions for converting colors between `(unsigned int) 0xFFFFFF` and `unsigned char *{0xFF, 0xFF, 0xFF}` formats.
 
-Exposes `rgbcolor`, `colortoint(rgbcolor color)`, and `inttocolor(rgbcolor colorarray, unsigned int color)`
-
-Is it inconsistent that `colortoint()` returns the int color but `inttocolor()` requires a pointer to an existing `rgbcolor`?
-Maybe.
-Will it change in the future?
-Probably.
-
 #### `test.c`
 
-Unit tests. Currently only tests `color.h`.
+Unit tests. Currently only tests `color.h` and `ppm.h`.
 
 #### `icthelight.c`
 
@@ -49,6 +46,17 @@ Can be redirected to a log file for some supplementary output.
 #### `ppm.h`
 
 Code for writing [ppm images](https://en.m.wikipedia.org/wiki/Netpbm_format).
+
+#### `line.h`
+
+`drawline()`, which does more or less what you’d expect.
+Uses [Bresenham’s algorithm](https://en.m.wikipedia.org/wiki/Bresenham%27s_line_algorithm).
+
+#### `plot.h`
+
+`plot()`, which sets a point to a given color.
+
+Might support an alpha channel in the future.
 
 ### Misc
 
@@ -67,6 +75,8 @@ This file.
 #### `output/`
 
 Output will be written here, e.g. `image1470681018.ppm`, stamped with the [Unix epoch](https://en.wikipedia.org/wiki/Unix_time).
+
+Run `make convert` in, uh, `source/` to convert these images to `.png`s and then delete the `.ppm`s.
 
 ## Compiling
 
@@ -89,10 +99,9 @@ Will generally be far ahead from `master`.
 Commits almost certainly guaranteed not to work.
 Do not check these out; they’re just for me to store work for later.
 
-## Coming soon...
+## Todo
 
-* Binary downloads of the SDL DLLs from my website
-* Gallery of output on my website
+Check `source/todo.txt` for some shorter term goals.
 
 ## License
 

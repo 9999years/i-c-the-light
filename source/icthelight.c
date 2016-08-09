@@ -6,11 +6,10 @@
 #include <math.h>
 //timestamp for file names
 #include <time.h>
-//int / array color conversion
+
+//my headers
 #include "color.h"
-//ppm handling
 #include "ppm.h"
-//line drawing
 #include "line.h"
 
 //Screen dimension constants
@@ -19,10 +18,13 @@
 #define HALF_SCREEN_WIDTH 320
 #define HALF_SCREEN_HEIGHT 240
 
+#define PI 3.1415926535
+#define TAU 6.2831853071
 #define HALF_PI 1.57079632675
 
 #define BOX_WIDTH 200
 #define BOX_HEIGHT 100
+#define WIGGLE_AMP 20
 
 int render(SDL_Surface *screenSurface, unsigned int width, unsigned int height)
 {
@@ -32,29 +34,54 @@ int render(SDL_Surface *screenSurface, unsigned int width, unsigned int height)
 	SDL_FillRect(screenSurface, NULL, 0x000000);
 
 	int i = 0;
-	for(i = 0; i < 4; i++)
+	int sides = 5;
+	for(i = 0; i < sides; i++)
 	{
-		int ax, ay, bx, by;
-		ax = HALF_SCREEN_WIDTH  + BOX_WIDTH*sin(  i*HALF_PI + (double)tick/512);
-		ay = HALF_SCREEN_HEIGHT + BOX_HEIGHT*cos(  i*HALF_PI + (double)tick/512) + 100;
-		bx = HALF_SCREEN_WIDTH  + BOX_WIDTH*sin((i-1)*HALF_PI + (double)tick/512);
-		by = HALF_SCREEN_HEIGHT + BOX_HEIGHT*cos((i-1)*HALF_PI + (double)tick/512) + 100;
+		int ax, ay, bx, by, ox, oy;
+
+		ox = WIGGLE_AMP * sin((double)tick/256 + 2);
+		oy = WIGGLE_AMP * cos((double)tick/256 + 2);
+
+		ax = HALF_SCREEN_WIDTH
+			+ BOX_WIDTH *sin(
+				i*(TAU/sides)
+				+ (double)tick/512
+			);
+
+		ay = HALF_SCREEN_HEIGHT
+			+ BOX_HEIGHT*cos(
+				i*(TAU/sides)
+				+ (double)tick/512
+			) * sin((double)tick/512) + BOX_HEIGHT;
+
+		bx = HALF_SCREEN_WIDTH
+			+ BOX_WIDTH *sin(
+				(i-1)*(TAU/sides)
+				+ (double)tick/512
+			);
+
+		by = HALF_SCREEN_HEIGHT
+			+ BOX_HEIGHT*cos(
+				(i-1)*(TAU/sides)
+				+ (double)tick/512
+			) * sin((double)tick/512) + BOX_HEIGHT;
+
 		drawline(screenSurface,
 			width, height,
-			ax, ay,
-			bx, by,
+			ax + ox, ay + oy,
+			bx + ox, by + oy,
 			0xffffff
 			);
 		drawline(screenSurface,
 			width, height,
-			ax, ay-BOX_WIDTH,
-			bx, by-BOX_WIDTH,
+			ax + ox, ay + oy - BOX_WIDTH,
+			bx + ox, by + oy - BOX_WIDTH,
 			0xffffff
 			);
 		drawline(screenSurface,
 			width, height,
-			ax, ay,
-			ax, ay-BOX_WIDTH,
+			ax + ox, ay + oy,
+			ax + ox, ay + oy - BOX_WIDTH,
 			0xffffff
 			);
 	}
