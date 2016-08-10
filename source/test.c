@@ -5,9 +5,8 @@
 
 int main( int argc, char *argv[] )
 {
-	printf( "\n\n"
-		"TESTING color.h\n"
-		"---------------\n");
+	printf( "TESTING color.h\n"
+		"---------------\n\n");
 	rgbcolor c =
 	{
 		0xdd,
@@ -27,15 +26,54 @@ int main( int argc, char *argv[] )
 		"int   = 0xdd12ab\n"
 		"red   = 0x%x (expected: 0xdd)\n"
 		"green = 0x%x (expected: 0x12)\n"
-		"blue  = 0x%x (expected: 0xab)\n",
+		"blue  = 0x%x (expected: 0xab)\n\n",
 		d[RED], d[GREEN], d[BLUE]);
-	assert(d[RED] == 0xdd);
+	assert(d[RED]   == 0xdd);
 	assert(d[GREEN] == 0x12);
-	assert(d[BLUE] == 0xab);
+	assert(d[BLUE]  == 0xab);
 
-	printf( "\n\n"
-		"TESTING ppm.h\n"
-		"-------------\n");
+	//this is really a misuse of the color type
+	d[RED]   = clamp(400.4);
+	d[GREEN] = clamp(-21.4959);
+	d[BLUE]  = clamp(0x40);
+	c[RED]   = clamp(0);
+	c[GREEN] = clamp(0xff);
+
+	printf( "TESTING clamp:\n"
+		"400.4:    %d (expected: 255)\n"
+		"-21.4959: %d (expected: 0)\n"
+		"0x40:     %x (expected: 40)\n"
+		"0:        %d (expected: 0)\n"
+		"0xff:     %x (expected: 0)\n\n",
+		d[RED], d[GREEN], d[BLUE], c[RED], c[GREEN]
+		);
+	assert(d[RED]   == 0xff);
+	assert(d[GREEN] == 0);
+	assert(d[BLUE]  == 0x40);
+	assert(c[RED]   == 0x0);
+	assert(c[GREEN] == 0xff);
+
+	c[GREEN] = 0x11;
+	shifthue(d, c, 10);
+	printf( "TESTING shifthue:\n"
+		"IN:  %x %x %x\n"
+		"OUT: %x %x %X\n\n",
+		c[RED], c[GREEN], c[BLUE],
+		d[RED], d[GREEN], d[BLUE]
+		);
+
+	c[RED]   = 0xff;
+	c[GREEN] = 0x00;
+	c[BLUE]  = 0x00;
+	shifthue(d, c, 180);
+	printf( "IN:  %x %x %x\n"
+		"OUT: %x %x %X\n\n",
+		c[RED], c[GREEN], c[BLUE],
+		d[RED], d[GREEN], d[BLUE]
+		);
+
+	printf( "TESTING ppm.h\n"
+		"-------------\n\n");
 
 	char *filename = "TEST_PPM.ppm";
 	char filetype = PORTABLE_PIXMAP;
@@ -78,8 +116,7 @@ int main( int argc, char *argv[] )
 	}
 	printf("\n%s wrote as expected!\n", filename);
 
-	printf( "\n\n"
-		"---------------\n"
+	printf( "\n---------------\n"
 		"ALL TESTS PASSED\n"
 		"consider running `make clean` to delete generated test files\n");
 	return 0;

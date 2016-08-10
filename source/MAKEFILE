@@ -6,10 +6,10 @@ SDL_LINKER_FLAGS = -lSDL2main -lSDL2
 # only for windows right now
 NO_CONSOLE = #-mwindows
 
-icthelight.exe: icthelight.c
+icthelight: icthelight.c
 	$(CC) $? $(CFLAGS) $(SDL_LIBRARY) $(NO_CONSOLE) $(SDL_INCLUDE) $(SDL_LINKER_FLAGS) -o $@
 
-test.exe: test.c
+test: test.c
 	$(CC) $(CFLAGS) $< -o $@
 
 convert:
@@ -19,3 +19,6 @@ convert:
 clean:
 	del *.exe
 	del TEST_PPM.ppm
+
+run:
+	.\icthelight

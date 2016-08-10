@@ -33,10 +33,16 @@ int render(SDL_Surface *screenSurface, unsigned int width, unsigned int height)
 
 	SDL_FillRect(screenSurface, NULL, 0x000000);
 
+	rgbcolor red = {0xff, 0x11, 0x11};
+	rgbcolor rot;
+	/*shifthue(rot, red, (double)tick/128);*/
+
 	int i = 0;
 	int sides = 5;
 	for(i = 0; i < sides; i++)
 	{
+		shifthue(rot, red, (double)i*(double)tick/32);
+		unsigned int color = colortoint(rot);
 		int ax, ay, bx, by, ox, oy;
 
 		ox = WIGGLE_AMP * sin((double)tick/256 + 2);
@@ -70,19 +76,19 @@ int render(SDL_Surface *screenSurface, unsigned int width, unsigned int height)
 			width, height,
 			ax + ox, ay + oy,
 			bx + ox, by + oy,
-			0xffffff
+			color
 			);
 		drawline(screenSurface,
 			width, height,
 			ax + ox, ay + oy - BOX_WIDTH,
 			bx + ox, by + oy - BOX_WIDTH,
-			0xffffff
+			color
 			);
 		drawline(screenSurface,
 			width, height,
 			ax + ox, ay + oy,
 			ax + ox, ay + oy - BOX_WIDTH,
-			0xffffff
+			color
 			);
 	}
 
