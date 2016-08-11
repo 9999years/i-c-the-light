@@ -73,19 +73,16 @@ int render(SDL_Surface *screenSurface, unsigned int width, unsigned int height)
 			) * sin((double)tick/512) + BOX_HEIGHT;
 
 		drawline(screenSurface,
-			width, height,
 			ax + ox, ay + oy,
 			bx + ox, by + oy,
 			color
 			);
 		drawline(screenSurface,
-			width, height,
 			ax + ox, ay + oy - BOX_WIDTH,
 			bx + ox, by + oy - BOX_WIDTH,
 			color
 			);
 		drawline(screenSurface,
-			width, height,
 			ax + ox, ay + oy,
 			ax + ox, ay + oy - BOX_WIDTH,
 			color
@@ -95,7 +92,7 @@ int render(SDL_Surface *screenSurface, unsigned int width, unsigned int height)
 	return 0;
 }
 
-int WinMain( int argc, char* args[] )
+int WinMain(int argc, char* args[])
 {
 	printf("hello!\n");
 	char filename[256] = "output/UNINITIALIZED.ppm";
@@ -106,17 +103,17 @@ int WinMain( int argc, char* args[] )
 	SDL_Surface* screenSurface = NULL;
 
 	//Initialize SDL
-	if( SDL_Init( SDL_INIT_VIDEO ) < 0 )
+	if(SDL_Init(SDL_INIT_VIDEO) < 0)
 	{
-		printf( "SDL could not initialize! SDL_Error: %s\n", SDL_GetError() );
+		printf("SDL could not initialize! SDL_Error: %s\n", SDL_GetError());
 	}
 	else
 	{
 		//Create window
-		window = SDL_CreateWindow( "I C the Light", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN );
-		if( window == NULL )
+		window = SDL_CreateWindow("I C the Light", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN);
+		if(window == NULL)
 		{
-			printf( "Window could not be created! SDL_Error: %s\n", SDL_GetError() );
+			printf("Window could not be created! SDL_Error: %s\n", SDL_GetError());
 		}
 		else
 		{
@@ -140,7 +137,7 @@ int WinMain( int argc, char* args[] )
 		render(screenSurface, SCREEN_WIDTH, SCREEN_HEIGHT);
 
 		//Update the surface
-		SDL_UpdateWindowSurface( window );
+		SDL_UpdateWindowSurface(window);
 
 		// poll forevents, and handle the ones we care about.
 		SDL_Event event;
@@ -171,7 +168,7 @@ int WinMain( int argc, char* args[] )
 	}
 
 	//Destroy window
-	SDL_DestroyWindow( window );
+	SDL_DestroyWindow(window);
 
 	//Quit SDL subsystems
 	SDL_Quit();

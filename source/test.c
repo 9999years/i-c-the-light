@@ -1,9 +1,11 @@
+#include <SDL/SDL.h>
 #include <stdio.h>
 #include <assert.h>
 #include "color.h"
+#include "plot.h"
 #include "ppm.h"
 
-int main( int argc, char *argv[] )
+int main(int argc, char *argv[])
 {
 	printf( "TESTING color.h\n"
 		"---------------\n\n");
@@ -15,8 +17,8 @@ int main( int argc, char *argv[] )
 	};
 	unsigned int a = colortoint(c);
 	printf( "TESTING colortoint:\n"
-		"red = 0xdd, green = 0x12, blue = 0xab\n"
-		"a =       0x%x\n"
+		"color =   {0xdd, 0x12, 0xab}\n"
+		"int =     0x%x\n"
 		"expected: 0xdd12ab\n\n", a);
 	assert(a == 0xdd12ab);
 
@@ -40,11 +42,11 @@ int main( int argc, char *argv[] )
 	c[GREEN] = clamp(0xff);
 
 	printf( "TESTING clamp:\n"
-		"400.4:    %d (expected: 255)\n"
-		"-21.4959: %d (expected: 0)\n"
-		"0x40:     %x (expected: 40)\n"
-		"0:        %d (expected: 0)\n"
-		"0xff:     %x (expected: 0)\n\n",
+		"400.4:    %3d (expected: 255)\n"
+		"-21.4959: %3d (expected: 0)\n"
+		"0x40:     %3x (expected: 40)\n"
+		"0:        %3d (expected: 0)\n"
+		"0xff:     %3x (expected: 0)\n\n",
 		d[RED], d[GREEN], d[BLUE], c[RED], c[GREEN]
 		);
 	assert(d[RED]   == 0xff);
@@ -56,20 +58,32 @@ int main( int argc, char *argv[] )
 	c[GREEN] = 0x11;
 	shifthue(d, c, 10);
 	printf( "TESTING shifthue:\n"
-		"IN:  %x %x %x\n"
-		"OUT: %x %x %X\n\n",
+		"in:       0x%2.2x%2.2x%2.2x\n"
+		"out:      0x%2.2x%2.2x%2.2x\n"
+		"expected: 0x1000ab\n\n",
 		c[RED], c[GREEN], c[BLUE],
 		d[RED], d[GREEN], d[BLUE]
+		);
+	assert(
+		   d[RED] == 0x10
+		&& d[GREEN] == 0x00
+		&& d[BLUE] == 0xab
 		);
 
 	c[RED]   = 0xff;
 	c[GREEN] = 0x00;
 	c[BLUE]  = 0x00;
 	shifthue(d, c, 180);
-	printf( "IN:  %x %x %x\n"
-		"OUT: %x %x %X\n\n",
+	printf( "in:       0x%2.2x%2.2x%2.2x\n"
+		"out:      0x%2.2x%2.2x%2.2x\n"
+		"expected: 0x00a9aa\n\n",
 		c[RED], c[GREEN], c[BLUE],
 		d[RED], d[GREEN], d[BLUE]
+		);
+	assert(
+		   d[RED]   == 0x00
+		&& d[GREEN] == 0xa9
+		&& d[BLUE]  == 0xaa
 		);
 
 	printf( "TESTING ppm.h\n"
@@ -115,6 +129,32 @@ int main( int argc, char *argv[] )
 		assert(readchar == expected[i]);
 	}
 	printf("\n%s wrote as expected!\n", filename);
+
+	printf( "TESTING plot.h\n"
+		"--------------\n\n"
+		);
+
+	SDL_Surface *screenSurface;
+	unsigned int rmask, gmask, bmask, amask;
+
+	//i had no clue this was even a thing. what's the amask for my code?
+	//i dont understand anything
+#if SDL_BYTEORDER == SDL_BIG_ENDIAN
+	rmask = 0xff000000;
+	gmask = 0x00ff0000;
+	bmask = 0x0000ff00;
+	amask = 0x000000ff;
+#else
+	rmask = 0x000000ff;
+	gmask = 0x0000ff00;
+	bmask = 0x00ff0000;
+	amask = 0xff000000;
+#endif
+	screenSurface->w = 4;
+	screenSurface->h = 3;
+	screenSurface->pixels = &image;
+
+	plot(screenSurface, 0, 0, 0xffffff);
 
 	printf( "\n---------------\n"
 		"ALL TESTS PASSED\n"

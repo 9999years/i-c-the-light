@@ -3,8 +3,6 @@
 
 int drawline(
 	SDL_Surface *screenSurface,
-	unsigned int width,
-	unsigned int height,
 	int x,
 	int y,
 	int endx,
@@ -20,7 +18,7 @@ int drawline(
 
 	while(x != endx || y != endy)
 	{
-		plot(screenSurface, x, y, width, height, color);
+		plot(screenSurface, x, y, color);
 		errorcompare = error;
 		if(errorcompare > -deltax) { error -= deltay; x += signx; }
 		if(errorcompare <  deltay) { error += deltax; y += signy; }

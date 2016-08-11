@@ -3,24 +3,22 @@
 int plot(
 	SDL_Surface *screenSurface,
 	int x, int y,
-	int width, int height,
 	unsigned int color
 	)
 {
-	//printf( "x,y: (%d, %d)\n"
-		//"w,h: (%d, %d)\n",
-		//x, y, width, height);
 	if(
-		   x >= width
+		   x >= screenSurface->w
 		|| x < 0
-		|| y >= height
+		|| y >= screenSurface->h
 		|| y < 0
 		)
 	{
 		//out of bounds
 		return 1;
 	}
-	((unsigned int*)screenSurface->pixels)[x + y*width] =
+
+	((unsigned int*)screenSurface->pixels)[x + y*screenSurface->w] =
 		color;
+
 	return 0;
 }
