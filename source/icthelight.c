@@ -28,7 +28,7 @@
 
 void drawgrid(SDL_Surface *screenSurface, int xgap, int ygap, unsigned int color)
 {
-	int x = 0, y = 0;
+	int x = xgap, y = ygap;
 	//printf("w = %d\n", screenSurface->w);
 	//printf("h = %d\n", screenSurface->h);
 	while(x < screenSurface->w)
