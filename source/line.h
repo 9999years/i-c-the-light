@@ -11,6 +11,8 @@ int drawline(
 	)
 {
 	//code from https://rosettacode.org/wiki/Bitmap/Bresenham%27s_line_algorithm#C
+	//changed to suck a lot less but the implementation is from there
+	//who writes `for(;;)`????
 
 	int deltax = abs(endx-x), signx = x < endx ? 1 : -1;
 	int deltay = abs(endy-y), signy = y < endy ? 1 : -1;

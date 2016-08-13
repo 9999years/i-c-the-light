@@ -36,7 +36,9 @@ Functions for converting colors between `(unsigned int) 0xFFFFFF` and `unsigned 
 
 #### `test.c`
 
-Unit tests. Currently only tests `color.h` and `ppm.h`.
+Unit tests.
+
+I have a tentative 100% test coverage, in that 100% of the functions are covered—there’s definitely the chance that edge cases are not covered.
 
 #### `icthelight.c`
 

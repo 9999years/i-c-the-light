@@ -26,12 +26,41 @@
 #define BOX_HEIGHT 100
 #define WIGGLE_AMP 20
 
-int render(SDL_Surface *screenSurface, unsigned int width, unsigned int height)
+void drawgrid(SDL_Surface *screenSurface, int xgap, int ygap, unsigned int color)
+{
+	int x = 0, y = 0;
+	//printf("w = %d\n", screenSurface->w);
+	//printf("h = %d\n", screenSurface->h);
+	while(x < screenSurface->w)
+	{
+		//printf("x = %d\n", x);
+		drawline(screenSurface,
+			x, 0,
+			x, screenSurface->h,
+			color
+			);
+		x += xgap;
+	}
+	while(y < screenSurface->h)
+	{
+		//printf("y = %d\n", y);
+		drawline(screenSurface,
+			0, y,
+			screenSurface->w, y,
+			color
+			);
+		y += ygap;
+	}
+	return;
+}
+
+int render(SDL_Surface *screenSurface)
 {
 
 	int tick = SDL_GetTicks();
 
 	SDL_FillRect(screenSurface, NULL, 0x000000);
+	drawgrid(screenSurface, 50, 50, 0x222255);
 
 	rgbcolor red = {0xff, 0x11, 0x11};
 	rgbcolor rot;
@@ -121,7 +150,7 @@ int WinMain(int argc, char* args[])
 			screenSurface = SDL_GetWindowSurface(window);
 
 			//save
-			render(screenSurface, SCREEN_WIDTH, SCREEN_HEIGHT);
+			render(screenSurface);
 
 			sprintf(filename, "../output/image%lu.ppm", (unsigned long int)time(NULL));
 			if(writeppm(filename, PORTABLE_PIXMAP, SCREEN_WIDTH, SCREEN_HEIGHT, screenSurface->pixels)
@@ -134,7 +163,7 @@ int WinMain(int argc, char* args[])
 	{
 		SDL_Delay(16);
 		// render
-		render(screenSurface, SCREEN_WIDTH, SCREEN_HEIGHT);
+		render(screenSurface);
 
 		//Update the surface
 		SDL_UpdateWindowSurface(window);
