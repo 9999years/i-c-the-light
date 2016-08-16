@@ -113,21 +113,65 @@ int render(SDL_Surface *screenSurface)
 	b.x = random(-100, 100);
 	b.y = random(-100, 100);
 	vec2 c;
-	c = add(a, b);
+	c = add2(a, b);
 
 	drawvector(screenSurface, center, a, COLOR_BLUE);
 	drawvector(screenSurface, center, b, COLOR_RED);
 	drawvector(screenSurface, center, c, COLOR_PURPLE);
-	drawdottedvector(screenSurface, add(center, a), b, COLOR_PINK, 5);
-	drawdottedvector(screenSurface, add(center, b), a, COLOR_PINK, 5);
+	drawdottedvector(screenSurface, add2(center, a), b, COLOR_PINK, 5);
+	drawdottedvector(screenSurface, add2(center, b), a, COLOR_PINK, 5);
 
+	return 0;
+}
+
+void saveframe(SDL_Surface *screenSurface)
+{
+	char filename[256] = "output/UNINITIALIZED.ppm";
+	sprintf(
+		filename, "../output/image%lu.ppm",
+		(unsigned long int)time(NULL)
+		);
+	if(
+		writeppm(
+			filename,
+			PORTABLE_PIXMAP,
+			SCREEN_WIDTH,
+			SCREEN_HEIGHT,
+			screenSurface->pixels
+			) != 0
+		)
+		printf("image write error!\n");
+	return;
+}
+
+int handleevents()
+{
+	SDL_Event event;
+	while((SDL_PollEvent(&event)))
+	{
+		switch(event.type)
+		{
+		case SDL_KEYUP:
+			// if escape is pressed, quit
+			if(event.key.keysym.sym == SDLK_ESCAPE)
+			{
+				return 1;
+			}
+			else if(event.key.keysym.sym == SDLK_s)
+			{
+			}
+			break;
+
+		case SDL_QUIT:
+			return 1;
+		}
+	}
 	return 0;
 }
 
 int WinMain(int argc, char* args[])
 {
 	printf("hello!\n");
-	char filename[256] = "output/UNINITIALIZED.ppm";
 	//The window we'll be rendering to
 	SDL_Window* window = NULL;
 
@@ -155,10 +199,7 @@ int WinMain(int argc, char* args[])
 			//save
 			render(screenSurface);
 
-			sprintf(filename, "../output/image%lu.ppm", (unsigned long int)time(NULL));
-			if(writeppm(filename, PORTABLE_PIXMAP, SCREEN_WIDTH, SCREEN_HEIGHT, screenSurface->pixels)
-				!= 0)
-				printf("image write error!\n");
+			saveframe(screenSurface);
 		}
 	}
 	int quit = 0, frame = 0;
@@ -175,31 +216,7 @@ int WinMain(int argc, char* args[])
 		SDL_UpdateWindowSurface(window);
 
 		// poll for events, and handle the ones we care about.
-		SDL_Event event;
-		while (SDL_PollEvent(&event))
-		{
-			switch (event.type)
-			{
-				case SDL_KEYUP:
-					// if escape is pressed, quit
-					if(event.key.keysym.sym == SDLK_ESCAPE)
-					{
-						quit = 1;
-					}
-					else if(event.key.keysym.sym == SDLK_s)
-					{
-						sprintf(filename, "../output/image%lu.ppm", (unsigned long int)time(NULL));
-						if(writeppm(filename, PORTABLE_PIXMAP, SCREEN_WIDTH, SCREEN_HEIGHT, screenSurface->pixels)
-							!= 0)
-							printf("image write error!\n");
-					}
-					break;
-
-				case SDL_QUIT:
-					quit = 1;
-					break;
-			}
-		}
+		handleevents();
 	}
 
 	//Destroy window

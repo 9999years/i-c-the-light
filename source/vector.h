@@ -1,3 +1,4 @@
+#include <math.h>
 //dealing with 2 and 3 dimensional vectors
 
 #define max(a,b) \
@@ -26,10 +27,34 @@ struct vec3
 	float z;
 };
 
-vec2 add(vec2 a, vec2 b)
+vec2 add2(vec2 a, vec2 b)
 {
 	vec2 result;
 	result.x = a.x + b.x;
 	result.y = a.y + b.y;
+	return result;
+}
+
+float magnitude2(vec2 a)
+{
+	return sqrt((a.x*a.x) + (a.y*a.y));
+}
+
+vec2 unit2(vec2 a)
+{
+	float magnitude_a = magnitude2(a);
+	return (vec2)
+	{
+		.x = a.x/magnitude_a,
+		.y = a.y/magnitude_a
+	};
+}
+
+vec3 add3(vec3 a, vec3 b)
+{
+	vec3 result;
+	result.x = a.x + b.x;
+	result.y = a.y + b.y;
+	result.z = a.z + b.z;
 	return result;
 }
