@@ -6,6 +6,7 @@
 #include "color.h"
 #include "line.h"
 #include "ppm.h"
+#include "vector.h"
 
 #define COLOR_RED 0xff0000
 #define COLOR_BLACK 0x000000
@@ -335,13 +336,30 @@ int WinMain(int argc, char *argv[])
 				printf("image write error!\n");
 			//printscreen(screenSurface, 0x000000);
 			SDL_UpdateWindowSurface(window);
-			printf("5 sec delay\n");
-			SDL_Delay(5000);
-			printf("done!\n");
+			//printf("5 sec delay\n");
+			//SDL_Delay(5000);
+			//printf("done!\n");
 		}
 	}
 	SDL_DestroyWindow(window);
 	SDL_Quit();
+
+	testsection("vector.h");
+
+	TESTING("2d vector functions");
+	vec2 veca = {.x =  10, .y = 14};
+	vec2 vecb = {.x = -13, .y = 2};
+	TESTING("add");
+	vec2 vecc = add(veca, vecb);
+	printf(
+		"a     = {%.0f, %.0f}\n"
+		"b     = {%.0f, %.0f}\n"
+		"a + b = {%.0f, %.0f} ({-3, 16} expected)\n",
+		veca.x, veca.y,
+		vecb.x, vecb.y,
+		vecc.x, vecc.y
+		);
+	assert((vecc.x == -3) && (vecc.y == 16));
 
 	printf( "\n"
 		"---------------\n"
