@@ -2,15 +2,19 @@
 #include <SDL/SDL.h>
 //logging, file out
 #include <stdio.h>
+//rand
+#include <stdlib.h>
 //sin functions
 #include <math.h>
 //timestamp for file names
 #include <time.h>
 
-//my headers
+//project files
 #include "color.h"
 #include "ppm.h"
 #include "line.h"
+#include "vector.h"
+#include "xkcdrgb.h"
 
 //Screen dimension constants
 #define SCREEN_WIDTH 640
@@ -25,6 +29,20 @@
 #define BOX_WIDTH 200
 #define BOX_HEIGHT 100
 #define WIGGLE_AMP 20
+
+//i might replace this with sfmt one day
+//but not today
+//shamelessly pilfered from
+//https://stackoverflow.com/questions/2999075/generate-a-random-number-within-range/2999130#2999130
+int random(int min, int max) {
+	int range = max - min;
+	int divisor = RAND_MAX/(range+1);
+	int retval;
+	do {
+		retval = rand() / divisor;
+	} while (retval > range);
+	return retval + min;
+}
 
 void drawgrid(SDL_Surface *screenSurface, int xgap, int ygap, unsigned int color)
 {
@@ -54,69 +72,54 @@ void drawgrid(SDL_Surface *screenSurface, int xgap, int ygap, unsigned int color
 	return;
 }
 
+void drawdottedvector(SDL_Surface *screenSurface, vec2 a, vec2 b, unsigned int color, short dots)
+{
+	drawdottedline(
+		screenSurface,
+		a.x, a.y,
+		a.x + b.x, a.y + b.y,
+		color,
+		dots
+		);
+	return;
+}
+
+void drawvector(SDL_Surface *screenSurface, vec2 a, vec2 b, unsigned int color)
+{
+	drawline(
+		screenSurface,
+		a.x, a.y,
+		a.x + b.x, a.y + b.y,
+		color
+		);
+	return;
+}
+
 int render(SDL_Surface *screenSurface)
 {
 
-	int tick = SDL_GetTicks();
+	//int tick = SDL_GetTicks();
 
 	SDL_FillRect(screenSurface, NULL, 0x000000);
-	drawgrid(screenSurface, 50, 50, 0x222255);
 
-	rgbcolor red = {0xff, 0x11, 0x11};
-	rgbcolor rot;
-	/*shifthue(rot, red, (double)tick/128);*/
+	vec2 center;
+	center.x = screenSurface->w/2;
+	center.y = screenSurface->h/2;
 
-	int i = 0;
-	int sides = 5;
-	for(i = 0; i < sides; i++)
-	{
-		shifthue(rot, red, (double)i*(double)tick/32);
-		unsigned int color = colortoint(rot);
-		int ax, ay, bx, by, ox, oy;
+	vec2 a;
+	a.x = random(-100, 100);
+	a.y = random(-100, 100);
+	vec2 b;
+	b.x = random(-100, 100);
+	b.y = random(-100, 100);
+	vec2 c;
+	c = add(a, b);
 
-		ox = WIGGLE_AMP * sin((double)tick/256 + 2);
-		oy = WIGGLE_AMP * cos((double)tick/256 + 2);
-
-		ax = HALF_SCREEN_WIDTH
-			+ BOX_WIDTH *sin(
-				i*(TAU/sides)
-				+ (double)tick/512
-			);
-
-		ay = HALF_SCREEN_HEIGHT
-			+ BOX_HEIGHT*cos(
-				i*(TAU/sides)
-				+ (double)tick/512
-			) * sin((double)tick/512) + BOX_HEIGHT;
-
-		bx = HALF_SCREEN_WIDTH
-			+ BOX_WIDTH *sin(
-				(i-1)*(TAU/sides)
-				+ (double)tick/512
-			);
-
-		by = HALF_SCREEN_HEIGHT
-			+ BOX_HEIGHT*cos(
-				(i-1)*(TAU/sides)
-				+ (double)tick/512
-			) * sin((double)tick/512) + BOX_HEIGHT;
-
-		drawline(screenSurface,
-			ax + ox, ay + oy,
-			bx + ox, by + oy,
-			color
-			);
-		drawline(screenSurface,
-			ax + ox, ay + oy - BOX_WIDTH,
-			bx + ox, by + oy - BOX_WIDTH,
-			color
-			);
-		drawline(screenSurface,
-			ax + ox, ay + oy,
-			ax + ox, ay + oy - BOX_WIDTH,
-			color
-			);
-	}
+	drawvector(screenSurface, center, a, COLOR_BLUE);
+	drawvector(screenSurface, center, b, COLOR_RED);
+	drawvector(screenSurface, center, c, COLOR_PURPLE);
+	drawdottedvector(screenSurface, add(center, a), b, COLOR_PINK, 5);
+	drawdottedvector(screenSurface, add(center, b), a, COLOR_PINK, 5);
 
 	return 0;
 }
@@ -158,17 +161,20 @@ int WinMain(int argc, char* args[])
 				printf("image write error!\n");
 		}
 	}
-	int quit = 0;
+	int quit = 0, frame = 0;
 	while (!quit)
 	{
+		frame++;
+
 		SDL_Delay(16);
 		// render
-		render(screenSurface);
+		if(frame%30 == 0)
+			render(screenSurface);
 
 		//Update the surface
 		SDL_UpdateWindowSurface(window);
 
-		// poll forevents, and handle the ones we care about.
+		// poll for events, and handle the ones we care about.
 		SDL_Event event;
 		while (SDL_PollEvent(&event))
 		{

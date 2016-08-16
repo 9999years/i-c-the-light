@@ -60,6 +60,10 @@ Uses [Bresenham’s algorithm](https://en.m.wikipedia.org/wiki/Bresenham%27s_lin
 
 Might support an alpha channel in the future.
 
+#### `vector.h`
+
+Various functions for doing math with vectors. Notably exposes `vec2` and `vec3`.
+
 ### Misc
 
 #### `license.txt`

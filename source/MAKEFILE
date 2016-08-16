@@ -1,5 +1,5 @@
 CC = gcc
-CFLAGS = -Wall
+CFLAGS = -Wall -Wextra
 SDL_INCLUDE = -IC:\c\include\SDL
 SDL_LIBRARY = -LC:\c\lib64
 SDL_LINKER_FLAGS = -lSDL2main -lSDL2
@@ -11,6 +11,9 @@ icthelight: icthelight.c
 
 test: test.c
 	$(CC) $? $(CFLAGS) $(SDL_LIBRARY) $(NO_CONSOLE) $(SDL_INCLUDE) $(SDL_LINKER_FLAGS) -o $@
+
+incrementbuildversion: incrementbuildversion.c
+	$(CC) $? $(CFLAGS) -o $@
 
 convert:
 	mogrify -format png ../output/*.ppm

@@ -36,8 +36,8 @@ int plot(
 		)
 	{
 		//out of bounds
-		printf("OOB\n");
-		printf("x: %d\ny: %d\nw: %d\nh: %d\n", x, y, screenSurface->w, screenSurface->h);
+		//printf("OOB\n");
+		//printf("x: %d\ny: %d\nw: %d\nh: %d\n", x, y, screenSurface->w, screenSurface->h);
 		return 1;
 	}
 
