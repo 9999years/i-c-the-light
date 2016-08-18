@@ -1,5 +1,7 @@
 #include <math.h>
 //dealing with 2 and 3 dimensional vectors
+//functions for 2d vectors end with 2
+//functions for 3d vectors end with 3
 
 #define max(a,b) \
 ({ __typeof__ (a) _a = (a); \
@@ -26,6 +28,13 @@ struct vec3
 	float y;
 	float z;
 };
+
+vec2 frompoints2(vec2 a, vec2 b)
+{
+	vec2 result
+	return result
+	areionstoie
+}
 
 vec2 add2(vec2 a, vec2 b)
 {

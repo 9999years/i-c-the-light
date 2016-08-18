@@ -169,7 +169,7 @@ int handleevents()
 	return 0;
 }
 
-int WinMain(int argc, char* args[])
+int WinMain(/*int argc, char* args[]*/)
 {
 	printf("hello!\n");
 	//The window we'll be rendering to
