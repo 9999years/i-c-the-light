@@ -31,9 +31,8 @@ struct vec3
 
 vec2 frompoints2(vec2 a, vec2 b)
 {
-	vec2 result
-	return result
-	areionstoie
+	vec2 result;
+	return result;
 }
 
 vec2 add2(vec2 a, vec2 b)

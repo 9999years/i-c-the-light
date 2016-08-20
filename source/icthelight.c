@@ -26,8 +26,8 @@
 #define TAU 6.2831853071
 #define HALF_PI 1.57079632675
 
-#define BOX_WIDTH 200
-#define BOX_HEIGHT 100
+#define BOX_WIDTH 50
+#define BOX_HEIGHT 50
 #define WIGGLE_AMP 20
 
 //i might replace this with sfmt one day
@@ -95,10 +95,25 @@ void drawvector(SDL_Surface *screenSurface, vec2 a, vec2 b, unsigned int color)
 	return;
 }
 
+void starfield(SDL_Surface *screenSurface)
+{
+	int i, j;
+	rgbcolor color;
+	for(i = 0; i < screenSurface->h; i++)
+	{
+		for(j = 0; j < screenSurface->w; j++)
+		{
+			color = graytocolor(random(0, 0xff));
+			plot(screenSurface, j, i, colortoint(color));
+		}
+	}
+	return;
+}
+
 int render(SDL_Surface *screenSurface)
 {
 
-	//int tick = SDL_GetTicks();
+	int tick = SDL_GetTicks();
 
 	SDL_FillRect(screenSurface, NULL, 0x000000);
 
@@ -106,12 +121,30 @@ int render(SDL_Surface *screenSurface)
 	center.x = screenSurface->w/2;
 	center.y = screenSurface->h/2;
 
-	vec2 a;
-	a.x = random(-100, 100);
-	a.y = random(-100, 100);
-	vec2 b;
-	b.x = random(-100, 100);
-	b.y = random(-100, 100);
+	vec2 a, b;
+
+	a.x =
+		BOX_WIDTH * sin(
+			2
+			+ (double)tick/512
+		);
+
+	a.y =
+		BOX_HEIGHT * cos(
+			2
+			+ (double)tick/512
+		) * sin((double)tick/450) + BOX_HEIGHT;
+
+	b.x =
+		BOX_WIDTH  *sin(
+			+ (double)tick/400
+		);
+
+	b.y =
+		BOX_HEIGHT * cos(
+			+ (double)tick/400
+		) * sin((double)tick/450) + BOX_HEIGHT;
+
 	vec2 c;
 	c = add2(a, b);
 
@@ -209,14 +242,14 @@ int WinMain(/*int argc, char* args[]*/)
 
 		SDL_Delay(16);
 		// render
-		if(frame%30 == 0)
+		//if(frame%30 == 0)
 			render(screenSurface);
 
 		//Update the surface
 		SDL_UpdateWindowSurface(window);
 
 		// poll for events, and handle the ones we care about.
-		handleevents();
+		quit = handleevents();
 	}
 
 	//Destroy window

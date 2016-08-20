@@ -24,6 +24,15 @@ void inttocolor(rgbcolor colorarray, unsigned int color)
 	return;
 }
 
+rgbcolor graytocolor(BYTE gray)
+{
+	rgbcolor result;
+	result[RED]   = gray;
+	result[GREEN] = gray;
+	result[BLUE]  = gray;
+	return *result;
+}
+
 BYTE clamp(float value)
 {
 	if(value < 0)
