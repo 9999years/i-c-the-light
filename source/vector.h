@@ -29,18 +29,37 @@ struct vec3
 	float z;
 };
 
-vec2 frompoints2(vec2 a, vec2 b)
+//i really probably don't need this
+//vec2 frompoints2(vec2 a, vec2 b)
+//{
+	//vec2 ret;
+	//return ret;
+//}
+
+vec2 fromdirection2(float radians)
 {
-	vec2 result;
-	return result;
+	vec2 ret;
+	ret.x = cos(radians);
+	ret.y = sin(radians);
+	return ret;
+}
+
+//returns the point a given distance along an input vector
+//as an offset from the initial vector
+vec2 dist2(vec2 in, float distance)
+{
+	vec2 ret;
+	ret.x = distance * in.x;
+	ret.y = distance * in.y;
+	return ret;
 }
 
 vec2 add2(vec2 a, vec2 b)
 {
-	vec2 result;
-	result.x = a.x + b.x;
-	result.y = a.y + b.y;
-	return result;
+	vec2 ret;
+	ret.x = a.x + b.x;
+	ret.y = a.y + b.y;
+	return ret;
 }
 
 float magnitude2(vec2 a)
@@ -60,9 +79,9 @@ vec2 unit2(vec2 a)
 
 vec3 add3(vec3 a, vec3 b)
 {
-	vec3 result;
-	result.x = a.x + b.x;
-	result.y = a.y + b.y;
-	result.z = a.z + b.z;
-	return result;
+	vec3 ret;
+	ret.x = a.x + b.x;
+	ret.y = a.y + b.y;
+	ret.z = a.z + b.z;
+	return ret;
 }

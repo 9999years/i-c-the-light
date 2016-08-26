@@ -68,7 +68,7 @@ Various functions for doing math with vectors. Notably exposes `vec2` and `vec3`
 
 #### `license.txt`
 
-A copy of the MIT license; see below.
+A copy of the MIT/expat license; see below.
 
 #### `Makefile`
 
@@ -111,4 +111,4 @@ Check `source/todo.txt` for some shorter term goals.
 
 ## License
 
-I C the Light is licensed under the MIT license, a copy of which is included in `license.txt`.
+I C the Light is licensed under the MIT/expat license, a copy of which is included in `license.txt`.

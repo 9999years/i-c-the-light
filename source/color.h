@@ -1,51 +1,55 @@
 #include <math.h>
 
-#define RED 0
-#define GREEN 1
-#define BLUE 2
 #define CHANNELS 3
 
-typedef unsigned char BYTE;
+typedef unsigned char byte;
 
-typedef BYTE rgbcolor[3];
+struct rgbcolor {
+	byte r;
+	byte g;
+	byte b;
+} rgbcolor;
 
-typedef short hslcolor[3];
-
-unsigned int colortoint(rgbcolor color)
+unsigned int colortoint(struct rgbcolor color)
 {
-	return color[BLUE] + color[GREEN]*0x100 + color[RED]*0x10000;
+	return color.b + color.g * 0x100 + color.r * 0x10000;
 }
 
-void inttocolor(rgbcolor colorarray, unsigned int color)
+struct rgbcolor inttocolor(unsigned int color)
 {
-	colorarray[BLUE]  = (color)       & 0xff;
-	colorarray[GREEN] = (color >> 8)  & 0xff;
-	colorarray[RED]   = (color >> 16) & 0xff;
-	return;
+	struct rgbcolor ret;
+	ret.b = (color)       & 0xff;
+	ret.g = (color >> 8)  & 0xff;
+	ret.r = (color >> 16) & 0xff;
+	return ret;
 }
 
-rgbcolor graytocolor(BYTE gray)
+struct rgbcolor graytocolor(byte gray)
 {
-	rgbcolor result;
-	result[RED]   = gray;
-	result[GREEN] = gray;
-	result[BLUE]  = gray;
-	return *result;
+	struct rgbcolor ret;
+	ret.r = gray;
+	ret.g = gray;
+	ret.b = gray;
+	return ret;
 }
 
-BYTE clamp(float value)
+byte clamp(float value)
 {
 	if(value < 0)
 		return 0;
 	else if(value > 0xff)
 		return 0xff;
-	return (BYTE)value;
+	return (byte)value;
 }
 
-void shifthue(rgbcolor out, const rgbcolor in, const float fHue)
+//this function only *approximates* a hue shift
+//don't use it for anything exact
+//it's also not associative
+struct rgbcolor shifthue(struct rgbcolor in, const float fHue)
 {
-	const float cosA = cos(fHue*3.14159265f/180);
-	const float sinA = sin(fHue*3.14159265f/180);
+	struct rgbcolor ret;
+	float cosA = cos(fHue*3.14159265f/180);
+	float sinA = sin(fHue*3.14159265f/180);
 	//printf("cos: %f\nsin: %f\nhue: %f\n", cosA, sinA, fHue);
 	//calculate the rotation matrix, only depends on Hue
 	float matrix[CHANNELS][CHANNELS] =
@@ -68,23 +72,25 @@ void shifthue(rgbcolor out, const rgbcolor in, const float fHue)
 	};
 
 	//Use the rotation matrix to convert the RGB directly
-	out[RED] = clamp(
-		  in[RED]   * matrix[RED][RED]
-		+ in[GREEN] * matrix[RED][GREEN]
-		+ in[BLUE]  * matrix[RED][BLUE]
+	//this was prettier when rgbcolors were matricies and not structs
+	//just substitute 0 = red etc in your head
+	ret.r = clamp(
+		  in.r * matrix[0][0]
+		+ in.g * matrix[0][1]
+		+ in.b * matrix[0][2]
 		);
 
-	out[GREEN] = clamp(
-		  in[RED]   * matrix[GREEN][RED]
-		+ in[GREEN] * matrix[GREEN][GREEN]
-		+ in[BLUE]  * matrix[GREEN][BLUE]
+	ret.g = clamp(
+		  in.r * matrix[1][0]
+		+ in.g * matrix[1][1]
+		+ in.b * matrix[1][2]
 		);
 
-	out[BLUE] = clamp(
-		  in[RED]   * matrix[BLUE][RED]
-		+ in[GREEN] * matrix[BLUE][GREEN]
-		+ in[BLUE]  * matrix[BLUE][BLUE]
+	ret.b = clamp(
+		  in.r * matrix[2][0]
+		+ in.g * matrix[2][1]
+		+ in.b * matrix[2][2]
 		);
 
-	return;
+	return ret;
 }

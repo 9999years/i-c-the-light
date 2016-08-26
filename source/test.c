@@ -147,13 +147,13 @@ void sdltests(SDL_Surface *screenSurface, SDL_Window *window, int width, int hei
 	//yes please! they're seeded with a constant, so they're
 	//the same each run!
 	int x, y;
-	rgbcolor a;
+	struct rgbcolor a;
 	srand(1471103252);
 	for(i = 0; i < 25; i++)
 	{
-		a[RED]   = rand()%0xff;
-		a[GREEN] = rand()%0xff;
-		a[BLUE]  = rand()%0xff;
+		a.r = rand()%0xff;
+		a.g = rand()%0xff;
+		a.b = rand()%0xff;
 		x = rand()%width;
 		y = rand()%height;
 		plot(screenSurface, x, y, colortoint(a));
@@ -177,11 +177,11 @@ void sdltests(SDL_Surface *screenSurface, SDL_Window *window, int width, int hei
 	//printf("done!\n");
 }
 
-int WinMain(int argc, char *argv[])
+int WinMain(/*int argc, char *argv[]*/)
 {
 	testsection("color.h");
 	{
-		rgbcolor c =
+		struct rgbcolor c =
 		{
 			0xdd,
 			0x12,
@@ -195,25 +195,25 @@ int WinMain(int argc, char *argv[])
 			"expected: 0xdd12ab\n\n", a);
 		assert(a == 0xdd12ab);
 
-		rgbcolor d;
-		inttocolor(d, a);
+		struct rgbcolor d;
+		d = inttocolor(a);
 		TESTING("inttocolor");
 		printf(
 			"int   = 0xdd12ab\n"
 			"red   = 0x%x (expected: 0xdd)\n"
 			"green = 0x%x (expected: 0x12)\n"
 			"blue  = 0x%x (expected: 0xab)\n\n",
-			d[RED], d[GREEN], d[BLUE]);
-		assert(d[RED]   == 0xdd);
-		assert(d[GREEN] == 0x12);
-		assert(d[BLUE]  == 0xab);
+			d.r, d.g, d.b);
+		assert(d.r   == 0xdd);
+		assert(d.g == 0x12);
+		assert(d.b  == 0xab);
 
 		//this is really a misuse of the color type
-		d[RED]   = clamp(400.4);
-		d[GREEN] = clamp(-21.4959);
-		d[BLUE]  = clamp(0x40);
-		c[RED]   = clamp(0);
-		c[GREEN] = clamp(0xff);
+		d.r = clamp(400.4);
+		d.g = clamp(-21.4959);
+		d.b = clamp(0x40);
+		c.r = clamp(0);
+		c.g = clamp(0xff);
 
 		TESTING("clamp");
 		printf(
@@ -222,16 +222,16 @@ int WinMain(int argc, char *argv[])
 			"0x40:     %3x (expected: 40)\n"
 			"0:        %3d (expected: 0)\n"
 			"0xff:     %3x (expected: 0)\n\n",
-			d[RED], d[GREEN], d[BLUE], c[RED], c[GREEN]
+			d.r, d.g, d.b, c.r, c.g
 			);
-		assert(d[RED]   == 0xff);
-		assert(d[GREEN] == 0);
-		assert(d[BLUE]  == 0x40);
-		assert(c[RED]   == 0x0);
-		assert(c[GREEN] == 0xff);
+		assert(d.r == 0xff);
+		assert(d.g == 0);
+		assert(d.b == 0x40);
+		assert(c.r == 0x0);
+		assert(c.g == 0xff);
 
-		c[GREEN] = 0x11;
-		shifthue(d, c, 10);
+		c.g = 0x11;
+		d = shifthue(c, 10);
 
 		//the expected results here might not be what youd think
 		//that's because the matrix transform im using only approximates
@@ -242,29 +242,29 @@ int WinMain(int argc, char *argv[])
 			"in:       0x%2.2x%2.2x%2.2x\n"
 			"out:      0x%2.2x%2.2x%2.2x\n"
 			"expected: 0x1000ab\n\n",
-			c[RED], c[GREEN], c[BLUE],
-			d[RED], d[GREEN], d[BLUE]
+			c.r, c.g, c.b,
+			d.r, d.g, d.b
 			);
 		assert(
-			d[RED] == 0x10
-			&& d[GREEN] == 0x00
-			&& d[BLUE] == 0xab
+			   d.r == 0x10
+			&& d.g == 0x00
+			&& d.b == 0xab
 			);
 
-		c[RED]   = 0xff;
-		c[GREEN] = 0x00;
-		c[BLUE]  = 0x00;
-		shifthue(d, c, 180);
+		c.r = 0xff;
+		c.g = 0x00;
+		c.b = 0x00;
+		d = shifthue(c, 180);
 		printf( "in:       0x%2.2x%2.2x%2.2x\n"
 			"out:      0x%2.2x%2.2x%2.2x\n"
 			"expected: 0x00a9aa\n",
-			c[RED], c[GREEN], c[BLUE],
-			d[RED], d[GREEN], d[BLUE]
+			c.r, c.g, c.b,
+			d.r, d.g, d.b
 			);
 		assert(
-			d[RED]   == 0x00
-			&& d[GREEN] == 0xa9
-			&& d[BLUE]  == 0xaa
+			   d.r == 0x00
+			&& d.g == 0xa9
+			&& d.b == 0xaa
 			);
 	}
 
@@ -369,8 +369,10 @@ int WinMain(int argc, char *argv[])
 	}
 
 	printf( "\n"
-		"---------------\n"
+		"================\n"
 		"ALL TESTS PASSED\n"
+		"if you're reading this, it means you didn't break the build!\n"
+		"congrats! :-)"
 		"consider running `make clean` to delete generated test files\n");
 	return 0;
 }

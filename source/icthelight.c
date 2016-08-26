@@ -98,7 +98,7 @@ void drawvector(SDL_Surface *screenSurface, vec2 a, vec2 b, unsigned int color)
 void starfield(SDL_Surface *screenSurface)
 {
 	int i, j;
-	rgbcolor color;
+	struct rgbcolor color;
 	for(i = 0; i < screenSurface->h; i++)
 	{
 		for(j = 0; j < screenSurface->w; j++)

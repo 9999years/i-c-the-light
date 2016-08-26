@@ -21,17 +21,16 @@ int writeppm(
 		return 1;
 	}
 	fprintf(file, "P%d\n%d %d\n%d\n", filetype, width, height, 0xff);
-	int i = 0, j = 0, k = 0;
-	rgbcolor pixel;
+	int i = 0, j = 0;
+	struct rgbcolor pixel;
 	for(i = 0; i < height; i++)
 	{
 		for(j = 0; j < width; j++)
 		{
-			inttocolor(pixel, image[j + i*width]);
-			for(k = 0; k < CHANNELS; k++)
-			{
-				fprintf(file, "%d ", pixel[k]);
-			}
+			pixel = inttocolor(image[j + i*width]);
+			fprintf(file, "%d ", pixel.r);
+			fprintf(file, "%d ", pixel.g);
+			fprintf(file, "%d ", pixel.b);
 		}
 		fprintf(file, "\n");
 	}
