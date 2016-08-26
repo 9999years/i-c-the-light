@@ -15,18 +15,15 @@ int writeppm(
 	)
 {
 	FILE *file = fopen(filename, "w");
-	if(file == NULL)
-	{
+	if(file == NULL) {
 		printf("file open failure!\n");
 		return 1;
 	}
 	fprintf(file, "P%d\n%d %d\n%d\n", filetype, width, height, 0xff);
 	int i = 0, j = 0;
 	struct rgbcolor pixel;
-	for(i = 0; i < height; i++)
-	{
-		for(j = 0; j < width; j++)
-		{
+	for(i = 0; i < height; i++) {
+		for(j = 0; j < width; j++) {
 			pixel = inttocolor(image[j + i*width]);
 			fprintf(file, "%d ", pixel.r);
 			fprintf(file, "%d ", pixel.g);

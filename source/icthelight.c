@@ -1,3 +1,9 @@
+//I C the Light: a distance-estimating ray marcher
+//repo here: https://github.com/9999years/i-c-the-light
+//MIT/expat license
+//rebecca turner
+//consult ../readme.md
+
 //display
 #include <SDL/SDL.h>
 //logging, file out
@@ -49,8 +55,7 @@ void drawgrid(SDL_Surface *screenSurface, int xgap, int ygap, unsigned int color
 	int x = xgap, y = ygap;
 	//printf("w = %d\n", screenSurface->w);
 	//printf("h = %d\n", screenSurface->h);
-	while(x < screenSurface->w)
-	{
+	while(x < screenSurface->w) {
 		//printf("x = %d\n", x);
 		drawline(screenSurface,
 			x, 0,
@@ -59,8 +64,7 @@ void drawgrid(SDL_Surface *screenSurface, int xgap, int ygap, unsigned int color
 			);
 		x += xgap;
 	}
-	while(y < screenSurface->h)
-	{
+	while(y < screenSurface->h) {
 		//printf("y = %d\n", y);
 		drawline(screenSurface,
 			0, y,
@@ -106,18 +110,20 @@ void render(SDL_Surface *screenSurface)
 	center.x = screenSurface->w/2;
 	center.y = screenSurface->h/2;
 
-	vec2 direction;
-	float theta;
-	for(theta = 0; theta < TAU; theta += 0.017F)
-	{
-		direction = dist2(fromdirection2(theta), 100.0F);
-		plot(screenSurface,
-			center.x + direction.x,
-			center.y + direction.y,
-			COLOR_WHITE
-			);
-			//x y color
+	vec2 p;
+
+	int i, j;
+	for(i = 0; i < screenSurface->h; i++) {
+		for(j = 0; j < screenSurface->w; j++) {
+			p.x = j;
+			p.y = i;
+			plot(screenSurface,
+				j, i,
+				colortoint(graytocolor(1000/dist2(p, center)))
+				);
+		}
 	}
+	//plot surface x y color
 
 	return;
 }
@@ -145,18 +151,14 @@ void saveframe(SDL_Surface *screenSurface)
 int handleevents()
 {
 	SDL_Event event;
-	while((SDL_PollEvent(&event)))
-	{
-		switch(event.type)
-		{
+	while((SDL_PollEvent(&event))) {
+		switch(event.type) {
 		case SDL_KEYUP:
 			// if escape is pressed, quit
-			if(event.key.keysym.sym == SDLK_ESCAPE)
-			{
+			if(event.key.keysym.sym == SDLK_ESCAPE) {
 				return 1;
-			}
-			else if(event.key.keysym.sym == SDLK_s)
-			{
+			} else if(event.key.keysym.sym == SDLK_s) {
+				saveframe(screenSurface);
 			}
 			break;
 
@@ -177,20 +179,14 @@ int WinMain(/*int argc, char* args[]*/)
 	SDL_Surface* screenSurface = NULL;
 
 	//Initialize SDL
-	if(SDL_Init(SDL_INIT_VIDEO) < 0)
-	{
+	if(SDL_Init(SDL_INIT_VIDEO) < 0) {
 		printf("SDL could not initialize! SDL_Error: %s\n", SDL_GetError());
-	}
-	else
-	{
+	} else {
 		//Create window
 		window = SDL_CreateWindow("I C the Light", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN);
-		if(window == NULL)
-		{
+		if(window == NULL) {
 			printf("Window could not be created! SDL_Error: %s\n", SDL_GetError());
-		}
-		else
-		{
+		} else {
 			//Get window surface
 			screenSurface = SDL_GetWindowSurface(window);
 
@@ -200,10 +196,10 @@ int WinMain(/*int argc, char* args[]*/)
 			saveframe(screenSurface);
 		}
 	}
-	int quit = 0, frame = 0;
-	while (!quit)
-	{
-		frame++;
+	int quit = 0;
+	//int frame = 0;
+	while (!quit) {
+		//frame++;
 
 		SDL_Delay(16);
 		// render

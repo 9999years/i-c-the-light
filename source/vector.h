@@ -46,12 +46,20 @@ vec2 fromdirection2(float radians)
 
 //returns the point a given distance along an input vector
 //as an offset from the initial vector
-vec2 dist2(vec2 in, float distance)
+vec2 distalong2(vec2 in, float distance)
 {
 	vec2 ret;
 	ret.x = distance * in.x;
 	ret.y = distance * in.y;
 	return ret;
+}
+
+//distance between two points.
+//i mean vectors. haha
+//this code is ugly but i didnt want to use extra memory
+float dist2(vec2 a, vec2 b)
+{
+	return sqrt(((b.x - a.x) * (b.x - a.x)) + ((b.y - a.y) * (b.y - a.y)));
 }
 
 vec2 add2(vec2 a, vec2 b)
@@ -69,12 +77,11 @@ float magnitude2(vec2 a)
 
 vec2 unit2(vec2 a)
 {
-	float magnitude_a = magnitude2(a);
-	return (vec2)
-	{
-		.x = a.x/magnitude_a,
-		.y = a.y/magnitude_a
-	};
+	float magnitude = magnitude2(a);
+	vec2 ret;
+	ret.x = a.x/magnitude;
+	ret.y = a.y/magnitude;
+	return ret;
 }
 
 vec3 add3(vec3 a, vec3 b)

@@ -10,8 +10,7 @@ unsigned int getpixel(
 		|| x < 0
 		|| y >= screenSurface->h
 		|| y < 0
-		)
-	{
+	) {
 		//out of bounds
 		//returning negative or 0 wouldnt work
 		//so let's just wrap around the edges
@@ -33,8 +32,7 @@ int plot(
 		|| x < 0
 		|| y >= screenSurface->h
 		|| y < 0
-		)
-	{
+	) {
 		//out of bounds
 		//printf("OOB\n");
 		//printf("x: %d\ny: %d\nw: %d\nh: %d\n", x, y, screenSurface->w, screenSurface->h);

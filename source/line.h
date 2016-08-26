@@ -18,8 +18,7 @@ int drawline(
 	int deltay = abs(endy-y), signy = y < endy ? 1 : -1;
 	int error = (deltax > deltay ? deltax : -deltay)/2, errorcompare;
 
-	while(x != endx || y != endy)
-	{
+	while(x != endx || y != endy) {
 		plot(screenSurface, x, y, color);
 		errorcompare = error;
 		if(errorcompare > -deltax) { error -= deltay; x += signx; }
@@ -48,8 +47,7 @@ int drawdottedline(
 	int error = (deltax > deltay ? deltax : -deltay)/2, errorcompare;
 
 	int i = 0;
-	while(x != endx || y != endy)
-	{
+	while(x != endx || y != endy) {
 		if(i%dots == 0)
 			plot(screenSurface, x, y, color);
 		errorcompare = error;

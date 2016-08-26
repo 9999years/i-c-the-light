@@ -19,12 +19,9 @@ void printscreen(SDL_Surface *screenSurface, unsigned int exclude)
 {
 	int i, j;
 	unsigned int color;
-	for(i = 0; i < screenSurface->h; i++)
-	{
-		for(j = 0; j < screenSurface->w; j++)
-		{
-			if((color = getpixel(screenSurface, j, i)) != exclude)
-			{
+	for(i = 0; i < screenSurface->h; i++) {
+		for(j = 0; j < screenSurface->w; j++) {
+			if((color = getpixel(screenSurface, j, i)) != exclude) {
 				printf("(%d, %d): 0x%6.6x\n",
 					j, i, color);
 			}
@@ -79,8 +76,7 @@ void sdltests(SDL_Surface *screenSurface, SDL_Window *window, int width, int hei
 	int ncoords = ARRAYSIZE(xcoords);
 	int i = 0;
 	unsigned int color;
-	for(i = 0; i < ncoords; i++)
-	{
+	for(i = 0; i < ncoords; i++) {
 		sprintf(coords, "(%d, %d)", xcoords[i], ycoords[i]);
 		printf(
 			"%9s = 0x%6.6x (0xff0000 expected)\n",
@@ -99,8 +95,7 @@ void sdltests(SDL_Surface *screenSurface, SDL_Window *window, int width, int hei
 	xcoords[5] = 120; ycoords[5] = 12;
 	xcoords[6] = -55; ycoords[6] = 0;
 	ncoords = 7;
-	for(i = 0; i < ncoords; i++)
-	{
+	for(i = 0; i < ncoords; i++) {
 		sprintf(coords, "(%d, %d)", xcoords[i], ycoords[i]);
 		printf(
 			"%9s = 0x%6.6x (0xffffff expected)\n",
@@ -115,8 +110,7 @@ void sdltests(SDL_Surface *screenSurface, SDL_Window *window, int width, int hei
 	xcoords[1] = 6; ycoords[1] = 5;
 	xcoords[2] = 6; ycoords[2] = 8;
 	ncoords = 3;
-	for(i = 0; i < ncoords; i++)
-	{
+	for(i = 0; i < ncoords; i++) {
 		sprintf(coords, "(%d, %d)", xcoords[i], ycoords[i]);
 		printf(
 			"%9s = 0x%6.6x (0x000000 expected)\n",
@@ -132,8 +126,7 @@ void sdltests(SDL_Surface *screenSurface, SDL_Window *window, int width, int hei
 	xcoords[2] = 24;  ycoords[2] = 5;
 	xcoords[3] = 118; ycoords[3] = 5;
 	ncoords = 4;
-	for(i = 0; i < ncoords; i++)
-	{
+	for(i = 0; i < ncoords; i++) {
 		sprintf(coords, "(%d, %d)", xcoords[i], ycoords[i]);
 		printf(
 			"%9s = 0x%6.6x (0x0000ff expected)\n",
@@ -149,8 +142,7 @@ void sdltests(SDL_Surface *screenSurface, SDL_Window *window, int width, int hei
 	int x, y;
 	struct rgbcolor a;
 	srand(1471103252);
-	for(i = 0; i < 25; i++)
-	{
+	for(i = 0; i < 25; i++) {
 		a.r = rand()%0xff;
 		a.g = rand()%0xff;
 		a.b = rand()%0xff;
@@ -181,8 +173,7 @@ int WinMain(/*int argc, char *argv[]*/)
 {
 	testsection("color.h");
 	{
-		struct rgbcolor c =
-		{
+		struct rgbcolor c = {
 			0xdd,
 			0x12,
 			0xab
@@ -274,8 +265,7 @@ int WinMain(/*int argc, char *argv[]*/)
 		char filetype = PORTABLE_PIXMAP;
 		int width = 4;
 		int height = 3;
-		unsigned int image[12] =
-		{
+		unsigned int image[12] = {
 			0x002244, 0x446688, 0x88aabb, 0xbbaaff,
 			0x123456, 0x789abc, 0xdef012, 0x456789,
 			0xbbbbbb, 0x888888, 0x444444, 0x000000
@@ -305,8 +295,7 @@ int WinMain(/*int argc, char *argv[]*/)
 
 		char readchar;
 		int i = 0;
-		for(i = 0; (readchar = fgetc(imagein)) != EOF; i++)
-		{
+		for(i = 0; (readchar = fgetc(imagein)) != EOF; i++) {
 			assert(readchar == expected[i]);
 		}
 		printf("\n%s wrote as expected!\n", filename);
@@ -318,27 +307,21 @@ int WinMain(/*int argc, char *argv[]*/)
 
 		SDL_Window* window = NULL;
 		SDL_Surface* screenSurface = NULL;
-		if(SDL_Init(SDL_INIT_VIDEO) < 0)
-		{
+		if(SDL_Init(SDL_INIT_VIDEO) < 0) {
 			printf( "SDL could not initialize!\n"
 				"Note that this is probably a problem with your environment rather than a failed test.\n"
 				"SDL_Error: %s\n",
 				SDL_GetError());
-		}
-		else
-		{
+		} else {
 			//Create window
 			int width = 120, height = 10;
 			window = SDL_CreateWindow("Unit Tests", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, width, height, SDL_WINDOW_SHOWN);
-			if(window == NULL)
-			{
+			if(window == NULL) {
 				printf( "Window could not be initialized!\n"
 					"Note that this is probably a problem with your environment rather than a failed test.\n"
 					"SDL_Error: %s\n",
 					SDL_GetError());
-			}
-			else
-			{
+			} else {
 				//Get window surface
 				screenSurface = SDL_GetWindowSurface(window);
 				sdltests(screenSurface, window, width, height);
