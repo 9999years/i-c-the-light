@@ -95,22 +95,7 @@ void drawvector(SDL_Surface *screenSurface, vec2 a, vec2 b, unsigned int color)
 	return;
 }
 
-void starfield(SDL_Surface *screenSurface)
-{
-	int i, j;
-	struct rgbcolor color;
-	for(i = 0; i < screenSurface->h; i++)
-	{
-		for(j = 0; j < screenSurface->w; j++)
-		{
-			color = graytocolor(random(0, 0xff));
-			plot(screenSurface, j, i, colortoint(color));
-		}
-	}
-	return;
-}
-
-int render(SDL_Surface *screenSurface)
+void render(SDL_Surface *screenSurface)
 {
 
 	int tick = SDL_GetTicks();
@@ -121,40 +106,20 @@ int render(SDL_Surface *screenSurface)
 	center.x = screenSurface->w/2;
 	center.y = screenSurface->h/2;
 
-	vec2 a, b;
+	vec2 direction;
+	float theta;
+	for(theta = 0; theta < TAU; theta += 0.017F)
+	{
+		direction = dist2(fromdirection2(theta), 100.0F);
+		plot(screenSurface,
+			center.x + direction.x,
+			center.y + direction.y,
+			COLOR_WHITE
+			);
+			//x y color
+	}
 
-	a.x =
-		BOX_WIDTH * sin(
-			2
-			+ (double)tick/512
-		);
-
-	a.y =
-		BOX_HEIGHT * cos(
-			2
-			+ (double)tick/512
-		) * sin((double)tick/450) + BOX_HEIGHT;
-
-	b.x =
-		BOX_WIDTH  *sin(
-			+ (double)tick/400
-		);
-
-	b.y =
-		BOX_HEIGHT * cos(
-			+ (double)tick/400
-		) * sin((double)tick/450) + BOX_HEIGHT;
-
-	vec2 c;
-	c = add2(a, b);
-
-	drawvector(screenSurface, center, a, COLOR_BLUE);
-	drawvector(screenSurface, center, b, COLOR_RED);
-	drawvector(screenSurface, center, c, COLOR_PURPLE);
-	drawdottedvector(screenSurface, add2(center, a), b, COLOR_PINK, 5);
-	drawdottedvector(screenSurface, add2(center, b), a, COLOR_PINK, 5);
-
-	return 0;
+	return;
 }
 
 void saveframe(SDL_Surface *screenSurface)
