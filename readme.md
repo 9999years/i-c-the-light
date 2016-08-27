@@ -1,8 +1,10 @@
 # I C the Light
 
-### *a distance estimating ray marcher written in C**
+### a distance estimating ray marcher written in C*
 
-\*(none of the ray marching functionality has been written yet)
+*“it’s a ray marcher!”*
+
+*guarenteed to work in at least two dimensions or your money back!*
 
 On ray marching (from [Syntopia](http://blog.hvidtfeldts.net/index.php/2011/06/distance-estimated-3d-fractals-part-i/)):
 
@@ -62,7 +64,7 @@ Might support an alpha channel in the future.
 
 #### `vector.h`
 
-Various functions for doing math with vectors. Notably exposes `vec2` and `vec3`.
+Various functions for doing math with vectors as well as the `vec2` and `vec3` types.
 
 #### `distance.h`
 
