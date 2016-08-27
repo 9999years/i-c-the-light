@@ -8,6 +8,7 @@
 #include <SDL/SDL.h>
 //logging, file out
 #include <stdio.h>
+#include <io.h>
 //rand
 #include <stdlib.h>
 //sin functions
@@ -113,13 +114,18 @@ void render(SDL_Surface *screenSurface)
 	vec2 p;
 
 	int i, j;
+	float o, a, h, D;
 	for(i = 0; i < screenSurface->h; i++) {
 		for(j = 0; j < screenSurface->w; j++) {
 			p.x = j;
 			p.y = i;
+			o = p.y - center.y;
+			a = p.x - center.x;
+			h = sqrt((o*o)+(a*a));
+			D = h - 100;
 			plot(screenSurface,
 				j, i,
-				colortoint(graytocolor(1000/dist2(p, center)))
+				colortoint(graytocolor(clamp(abs(100/D))))
 				);
 		}
 	}
@@ -131,10 +137,8 @@ void render(SDL_Surface *screenSurface)
 void saveframe(SDL_Surface *screenSurface)
 {
 	char filename[256] = "output/UNINITIALIZED.ppm";
-	sprintf(
-		filename, "../output/image%lu.ppm",
-		(unsigned long int)time(NULL)
-		);
+	unsigned long int timeint = time(NULL);
+	sprintf(filename, "../output/image%lu.ppm", timeint);
 	if(
 		writeppm(
 			filename,
@@ -143,12 +147,46 @@ void saveframe(SDL_Surface *screenSurface)
 			SCREEN_HEIGHT,
 			screenSurface->pixels
 			) != 0
-		)
+	) {
 		printf("image write error!\n");
+		return;
+	}
+	char shacmd[256];
+	sprintf(shacmd, "sha256sum %s", filename);
+	FILE *file;
+	file = popen(shacmd, "r");
+	if(file == NULL) {
+		printf("failed to get image hash!\n");
+		return;
+	}
+	//the hash is 64 characters but we need a 0 at the end too
+	char sha[65];
+	int i;
+	char c;
+	for(i = 0; (i < 64) && (c != EOF); i++) {
+		sha[i] = c = fgetc(file);
+	}
+	pclose(file);
+
+	char hashfilename[256];
+	sprintf(hashfilename, "../output/hash/%s", sha);
+
+	if(_access(hashfilename, 0) != -1) {
+		//file exists, delete img
+		if(unlink(filename) != 0) {
+			printf("image delete error!\n");
+		}
+	} else {
+		FILE *hashfile;
+		hashfile = fopen(hashfilename, "w");
+		if(hashfile == NULL)
+			printf("hash file write error!");
+		fclose(hashfile);
+	}
 	return;
 }
 
-int handleevents()
+int handleevents(SDL_Surface *screenSurface)
 {
 	SDL_Event event;
 	while((SDL_PollEvent(&event))) {
@@ -210,7 +248,7 @@ int WinMain(/*int argc, char* args[]*/)
 		SDL_UpdateWindowSurface(window);
 
 		// poll for events, and handle the ones we care about.
-		quit = handleevents();
+		quit = handleevents(screenSurface);
 	}
 
 	//Destroy window
