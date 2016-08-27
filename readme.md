@@ -98,18 +98,12 @@ As of August 2016, I C the Light is compiled with SDL 2.0.4, which can be downlo
 
 ## Branches
 
-Approximately ordered from most to least stable.
-
 `master`:
-(Usually) stable builds and major progress.
-
-(Maybe some day) `beta`:
-Unstable builds but not necessarily a horrible mess.
-Will generally be far ahead from `master`.
+Anything generally stable that represents more than incremental progress.
 
 `mess`:
-Commits almost certainly guaranteed not to work.
-Do not check these out; they’re just for me to store work for later.
+Alpha work in various states of disrepair.
+Do not check these out unless you know what you’re doing.
 
 ## Todo
 
