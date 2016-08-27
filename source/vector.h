@@ -1,17 +1,7 @@
-#include <math.h>
-//dealing with 2 and 3 dimensional vectors
+//functions for dealing with 2 and 3 dimensional vectors
 //functions for 2d vectors end with 2
 //functions for 3d vectors end with 3
-
-#define max(a,b) \
-({ __typeof__ (a) _a = (a); \
-__typeof__ (b) _b = (b); \
-_a > _b ? _a : _b; })
-
-#define min(a,b) \
-({ __typeof__ (a) _a = (a); \
-__typeof__ (b) _b = (b); \
-_a < _b ? _a : _b; })
+#include <math.h>
 
 typedef struct vec2 vec2;
 typedef struct vec3 vec3;
@@ -34,6 +24,16 @@ vec2 fromdirection2(float radians)
 	vec2 ret;
 	ret.x = cos(radians);
 	ret.y = sin(radians);
+	return ret;
+}
+
+vec3 fromdirection3(float xy, float xz)
+{
+	vec3 ret;
+	ret.x = cos(xy);
+	ret.y = sin(xy);
+	//3d is basically 2d so this is fine
+	ret.z = 0.0F;
 	return ret;
 }
 

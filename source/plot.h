@@ -1,3 +1,5 @@
+//functions for plotting points on an sdl surface
+
 #include <SDL/SDL.h>
 
 unsigned int getpixel(

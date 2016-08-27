@@ -78,18 +78,6 @@ void drawgrid(SDL_Surface *screenSurface, int xgap, int ygap, unsigned int color
 	return;
 }
 
-void drawdottedvector(SDL_Surface *screenSurface, vec2 a, vec2 b, unsigned int color, short dots)
-{
-	drawdottedline(
-		screenSurface,
-		a.x, a.y,
-		a.x + b.x, a.y + b.y,
-		color,
-		dots
-		);
-	return;
-}
-
 void drawvector(SDL_Surface *screenSurface, vec2 a, vec2 b, unsigned int color)
 {
 	drawline(
@@ -108,7 +96,7 @@ void render(SDL_Surface *screenSurface)
 
 	SDL_FillRect(screenSurface, NULL, 0x000000);
 
-	vec2 ca, cb;
+	vec2 ca, cb, p;
 	ca.x = screenSurface->w/2 + 50 * cos((float)tick/512);
 	ca.y = screenSurface->h/2 + 50 * sin((float)tick/512 + 1.0F);
 	cb.x = screenSurface->w/2 - 50 * cos((float)tick/450 + 0.5F);
@@ -118,14 +106,17 @@ void render(SDL_Surface *screenSurface)
 	float A, B, D;
 	for(i = 0; i < screenSurface->h; i++) {
 		for(j = 0; j < screenSurface->w; j++) {
-			A = distcircle((vec2){.x = i, .y = j}, ca, 100.0F);
-			B = distcircle((vec2){.x = i, .y = j}, cb, 75.0F);
-			D = opi(B, A);
-			if(abs(D) < 2)
+			p.x = i;
+			p.y = j;
+			A = distcircle(p, ca, 100.0F);
+			B = distcircle(p, cb, 75.0F);
+			D = opu(B, A);
+			D = sindisplace2(p, D, 25, 40);
+			/*if(abs(D) < 2)*/
 			plot(screenSurface,
 				j, i,
 				//0xffffff
-				colortoint(graytocolor(clamp(abs(100/D))))
+				colortoint(graytocolor(clamp(abs(1000/D))))
 				);
 		}
 	}
@@ -142,7 +133,6 @@ void saveframe(SDL_Surface *screenSurface)
 	if(
 		writeppm(
 			filename,
-			PORTABLE_PIXMAP,
 			SCREEN_WIDTH,
 			SCREEN_HEIGHT,
 			screenSurface->pixels
@@ -159,12 +149,14 @@ void saveframe(SDL_Surface *screenSurface)
 		return;
 	}
 	//the hash is 64 characters but we need a 0 at the end too
-	char sha[96];
+	char sha[68];
 	int i;
 	char c;
-	for(i = 0; (i < 64) && (c != EOF) && (c != 0x32); i++) {
+	for(i = 0; (i < 64) && (c != EOF) && (c != 0x20); i++) {
 		sha[i] = c = fgetc(file);
 	}
+	sha[i++] = 0;
+	printf("sha: %s\n", sha);
 	pclose(file);
 
 	char hashfilename[256];

@@ -1,14 +1,9 @@
-#include <stdio.h>
+//writing ppm images
 
-enum {
-	PORTABLE_BITMAP = 1,
-	PORTABLE_GRAYMAP = 2,
-	PORTABLE_PIXMAP = 3
-};
+#include <stdio.h>
 
 int writeppm(
 	char *filename,
-	char filetype,
 	int width,
 	int height,
 	unsigned int image[]
@@ -19,7 +14,7 @@ int writeppm(
 		printf("file open failure!\n");
 		return 1;
 	}
-	fprintf(file, "P%d\n%d %d\n%d\n", filetype, width, height, 0xff);
+	fprintf(file, "P3\n%d %d\n%d\n", width, height, 0xff);
 	int i = 0, j = 0;
 	struct rgbcolor pixel;
 	for(i = 0; i < height; i++) {

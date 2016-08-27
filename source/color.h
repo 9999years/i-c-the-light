@@ -1,3 +1,6 @@
+//functions for converting colors from uint format (0x123456)
+//to rgbcolor format ({.r = 0x12, .g = 0x34, .b = 0x56})
+
 #include <math.h>
 
 #define CHANNELS 3
