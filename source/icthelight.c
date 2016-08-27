@@ -108,15 +108,19 @@ void render(SDL_Surface *screenSurface)
 
 	SDL_FillRect(screenSurface, NULL, 0x000000);
 
-	vec2 center;
-	center.x = screenSurface->w/2 + 50 * cos((float)tick/512);
-	center.y = screenSurface->h/2 + 50 * sin((float)tick/512 + 1.0F);
+	vec2 ca, cb;
+	ca.x = screenSurface->w/2 + 50 * cos((float)tick/512);
+	ca.y = screenSurface->h/2 + 50 * sin((float)tick/512 + 1.0F);
+	cb.x = screenSurface->w/2 - 50 * cos((float)tick/450 + 0.5F);
+	cb.y = screenSurface->h/2 - 50 * sin((float)tick/450 + 1.5F);
 
 	int i, j;
-	float D;
+	float A, B, D;
 	for(i = 0; i < screenSurface->h; i++) {
 		for(j = 0; j < screenSurface->w; j++) {
-			D = distcircle((vec2){.x = i, .y = j}, center, 100.0F);
+			A = distcircle((vec2){.x = i, .y = j}, ca, 100.0F);
+			B = distcircle((vec2){.x = i, .y = j}, cb, 75.0F);
+			D = opi(B, A);
 			if(abs(D) < 2)
 			plot(screenSurface,
 				j, i,
@@ -149,17 +153,16 @@ void saveframe(SDL_Surface *screenSurface)
 	}
 	char shacmd[256];
 	sprintf(shacmd, "sha256sum %s", filename);
-	FILE *file;
-	file = popen(shacmd, "r");
+	FILE *file = popen(shacmd, "r");
 	if(file == NULL) {
 		printf("failed to get image hash!\n");
 		return;
 	}
 	//the hash is 64 characters but we need a 0 at the end too
-	char sha[65];
+	char sha[96];
 	int i;
 	char c;
-	for(i = 0; (i < 64) && (c != EOF); i++) {
+	for(i = 0; (i < 64) && (c != EOF) && (c != 0x32); i++) {
 		sha[i] = c = fgetc(file);
 	}
 	pclose(file);
@@ -173,10 +176,9 @@ void saveframe(SDL_Surface *screenSurface)
 			printf("image delete error!\n");
 		}
 	} else {
-		FILE *hashfile;
-		hashfile = fopen(hashfilename, "w");
+		FILE *hashfile = fopen(hashfilename, "w");
 		if(hashfile == NULL)
-			printf("hash file write error!");
+			printf("hash file write error!\nfilename: %s\n", hashfilename);
 		fclose(hashfile);
 	}
 	return;
@@ -189,7 +191,7 @@ int handleevents(SDL_Surface *screenSurface)
 		switch(event.type) {
 		case SDL_KEYUP:
 			// if escape is pressed, quit
-			if(event.key.keysym.sym == SDLK_ESCAPE) {
+			if((event.key.keysym.sym == SDLK_ESCAPE) || (event.key.keysym.sym == SDLK_q)) {
 				return 1;
 			} else if(event.key.keysym.sym == SDLK_s) {
 				saveframe(screenSurface);
