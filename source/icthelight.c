@@ -21,6 +21,7 @@
 #include "ppm.h"
 #include "line.h"
 #include "vector.h"
+#include "distance.h"
 #include "xkcdrgb.h"
 
 //Screen dimension constants
@@ -108,23 +109,18 @@ void render(SDL_Surface *screenSurface)
 	SDL_FillRect(screenSurface, NULL, 0x000000);
 
 	vec2 center;
-	center.x = screenSurface->w/2;
-	center.y = screenSurface->h/2;
-
-	vec2 p;
+	center.x = screenSurface->w/2 + 50 * cos((float)tick/512);
+	center.y = screenSurface->h/2 + 50 * sin((float)tick/512 + 1.0F);
 
 	int i, j;
-	float o, a, h, D;
+	float D;
 	for(i = 0; i < screenSurface->h; i++) {
 		for(j = 0; j < screenSurface->w; j++) {
-			p.x = j;
-			p.y = i;
-			o = p.y - center.y;
-			a = p.x - center.x;
-			h = sqrt((o*o)+(a*a));
-			D = h - 100;
+			D = distcircle((vec2){.x = i, .y = j}, center, 100.0F);
+			if(abs(D) < 2)
 			plot(screenSurface,
 				j, i,
+				//0xffffff
 				colortoint(graytocolor(clamp(abs(100/D))))
 				);
 		}
@@ -235,14 +231,14 @@ int WinMain(/*int argc, char* args[]*/)
 		}
 	}
 	int quit = 0;
-	//int frame = 0;
+	int frame = 0;
 	while (!quit) {
-		//frame++;
+		frame++;
 
 		SDL_Delay(16);
 		// render
 		//if(frame%30 == 0)
-			render(screenSurface);
+		render(screenSurface);
 
 		//Update the surface
 		SDL_UpdateWindowSurface(window);

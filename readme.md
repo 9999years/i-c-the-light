@@ -64,6 +64,10 @@ Might support an alpha channel in the future.
 
 Various functions for doing math with vectors. Notably exposes `vec2` and `vec3`.
 
+#### `distance.h`
+
+Distance functions. Start with `dist`.
+
 ### Misc
 
 #### `license.txt`

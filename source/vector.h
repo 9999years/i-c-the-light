@@ -29,13 +29,6 @@ struct vec3
 	float z;
 };
 
-//i really probably don't need this
-//vec2 frompoints2(vec2 a, vec2 b)
-//{
-	//vec2 ret;
-	//return ret;
-//}
-
 vec2 fromdirection2(float radians)
 {
 	vec2 ret;
