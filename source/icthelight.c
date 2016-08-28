@@ -24,6 +24,8 @@
 #include "distance.h"
 #include "xkcdrgb.h"
 
+#include "complex.h"
+
 //Screen dimension constants
 #define SCREEN_WIDTH 640
 #define SCREEN_HEIGHT 480
@@ -91,37 +93,57 @@ void drawvector(SDL_Surface *screenSurface, vec2 a, vec2 b, unsigned int color)
 
 void render(SDL_Surface *screenSurface)
 {
+	//complex a;
+	//complexadd(&a, (complex){.a = 3, .b = 2}, (complex){.a = 1, .b = 7});
+	//printf("(3+2i) * (1+7i) = %f + %fi\n", a.a, a.b);
 
-	int tick = SDL_GetTicks();
+	float scale = (float)SDL_GetTicks()*10;
 
 	SDL_FillRect(screenSurface, NULL, 0x000000);
 
-	vec2 ca, cb, p;
-	ca.x = screenSurface->w/2 + 50 * cos((float)tick/512);
-	ca.y = screenSurface->h/2 + 50 * sin((float)tick/512 + 1.0F);
-	cb.x = screenSurface->w/2 - 50 * cos((float)tick/450 + 0.5F);
-	cb.y = screenSurface->h/2 - 50 * sin((float)tick/450 + 1.5F);
+	complex c;
+	c.a = -0.19F;
+	c.b = -0.85F;
+	vec2 ofs;
+	ofs.x = screenSurface->w/2;
+	ofs.y = screenSurface->h/2;
 
-	int i, j;
-	float A, B, D;
+	int i, j, k, l;
+	double V;
+	complex z;
+	const int sampcount = 2; //its actually this^2
+	double fk, fl;
+	int sum;
 	for(i = 0; i < screenSurface->h; i++) {
 		for(j = 0; j < screenSurface->w; j++) {
-			p.x = i;
-			p.y = j;
-			A = distcircle(p, ca, 100.0F);
-			B = distcircle(p, cb, 75.0F);
-			D = opu(B, A);
-			D = sindisplace2(p, D, 25, 40);
-			/*if(abs(D) < 2)*/
+			sum = 0;
+			for(k = 0; k < sampcount; k++) {
+				for(l = 0; l < sampcount; l++) {
+					fk = (double)k / sampcount;
+					fl = (double)l / sampcount;
+					z.a = c.a + (double)(j - ofs.y + fl) / scale;
+					z.b = c.b + (double)(i - ofs.x + fk) / scale;
+					sum += mandlebrot(z, 50);
+					//if(i == 297)
+						//printf("a = %f\nb = %f\nsum: %d\n\n", z.a, z.b, sum);
+				}
+			}
+			V = sum / (float)(sampcount * sampcount) * 0xff;
+			//printf("V = %f\n", V);
+			//if(!isfinite(V))
+				//V = 255;
+			//if(V > 10)
+				//printf("V = %f\n", V);
+			//if(V > 1)
 			plot(screenSurface,
 				j, i,
 				//0xffffff
-				colortoint(graytocolor(clamp(abs(1000/D))))
+				colortoint(graytocolor(clamp(V)))
 				);
 		}
 	}
-	//plot surface x y color
-
+	//if(tick > 0)
+	//printf("tick: %f\nV: %f\n", tick, V);
 	return;
 }
 
@@ -217,22 +239,19 @@ int WinMain(/*int argc, char* args[]*/)
 		} else {
 			//Get window surface
 			screenSurface = SDL_GetWindowSurface(window);
-
-			//save
-			render(screenSurface);
-
-			saveframe(screenSurface);
 		}
 	}
 	int quit = 0;
 	int frame = 0;
 	while (!quit) {
 		frame++;
+		// render
+		render(screenSurface);
+		if(frame == 0)
+			saveframe(screenSurface);
+		//if(frame%30 == 0)
 
 		SDL_Delay(16);
-		// render
-		//if(frame%30 == 0)
-		render(screenSurface);
 
 		//Update the surface
 		SDL_UpdateWindowSurface(window);
