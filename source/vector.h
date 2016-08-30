@@ -6,12 +6,14 @@
 typedef struct vec2 vec2;
 typedef struct vec3 vec3;
 
+//2d vector
 struct vec2
 {
 	float x;
 	float y;
 };
 
+//3d vector
 struct vec3
 {
 	float x;
@@ -19,6 +21,23 @@ struct vec3
 	float z;
 };
 
+//sqrt function
+//dont ask me why or how this works
+unsigned int root(unsigned int x)
+{
+	unsigned int a, b;
+	b = x;
+	a = x = 0x3f;
+	x = b / x;
+	a = x = (x + a) >> 1;
+	x = b / x;
+	a = x = (x + a) >> 1;
+	x = b / x;
+	x = (x + a) >> 1;
+	return x;
+}
+
+//returns a unit director pointing in a given direction
 vec2 fromdirection2(float radians)
 {
 	vec2 ret;
@@ -27,6 +46,9 @@ vec2 fromdirection2(float radians)
 	return ret;
 }
 
+//returns a unit vector pointing in a given direction
+//takes an angle in the xy plane and an angle in the
+//xz plane
 vec3 fromdirection3(float xy, float xz)
 {
 	vec3 ret;
@@ -49,31 +71,18 @@ vec2 distalong2(vec2 in, float distance)
 
 //distance between two points.
 //i mean vectors. haha
-//this code is ugly but i didnt want to use extra memory
+//this code is ugly but acceptable
 float dist2(vec2 a, vec2 b)
 {
 	return sqrt(((b.x - a.x) * (b.x - a.x)) + ((b.y - a.y) * (b.y - a.y)));
 }
 
+//adds 2 vectors
 vec2 add2(vec2 a, vec2 b)
 {
 	vec2 ret;
 	ret.x = a.x + b.x;
 	ret.y = a.y + b.y;
-	return ret;
-}
-
-float magnitude2(vec2 a)
-{
-	return sqrt((a.x*a.x) + (a.y*a.y));
-}
-
-vec2 unit2(vec2 a)
-{
-	float magnitude = magnitude2(a);
-	vec2 ret;
-	ret.x = a.x/magnitude;
-	ret.y = a.y/magnitude;
 	return ret;
 }
 
@@ -85,3 +94,20 @@ vec3 add3(vec3 a, vec3 b)
 	ret.z = a.z + b.z;
 	return ret;
 }
+
+//returns the magnitude of a vector
+float magnitude2(vec2 a)
+{
+	return sqrt((a.x*a.x) + (a.y*a.y));
+}
+
+//returns the unit vector for any given vector
+vec2 unit2(vec2 a)
+{
+	float magnitude = magnitude2(a);
+	vec2 ret;
+	ret.x = a.x/magnitude;
+	ret.y = a.y/magnitude;
+	return ret;
+}
+
