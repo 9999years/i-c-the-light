@@ -13,11 +13,13 @@ struct rgbcolor {
 	byte b;
 } rgbcolor;
 
+//converts an rgbcolor to a uint
 unsigned int colortoint(struct rgbcolor color)
 {
 	return color.b + color.g * 0x100 + color.r * 0x10000;
 }
 
+//converts a uint to an rgbcolor
 struct rgbcolor inttocolor(unsigned int color)
 {
 	struct rgbcolor ret;
@@ -27,6 +29,7 @@ struct rgbcolor inttocolor(unsigned int color)
 	return ret;
 }
 
+//returns the equivalent gray for any byte value 0-0xff
 struct rgbcolor graytocolor(byte gray)
 {
 	struct rgbcolor ret;
@@ -36,6 +39,7 @@ struct rgbcolor graytocolor(byte gray)
 	return ret;
 }
 
+//clamps a float to 0-0xff
 byte clamp(float value)
 {
 	if(value < 0)
@@ -51,11 +55,10 @@ byte clamp(float value)
 struct rgbcolor shifthue(struct rgbcolor in, const float fHue)
 {
 	struct rgbcolor ret;
-	float cosA = cos(fHue*3.14159265f/180);
-	float sinA = sin(fHue*3.14159265f/180);
-	//printf("cos: %f\nsin: %f\nhue: %f\n", cosA, sinA, fHue);
+	const float cosA = cos(fHue*3.14159265f/180);
+	const float sinA = sin(fHue*3.14159265f/180);
 	//calculate the rotation matrix, only depends on Hue
-	float matrix[CHANNELS][CHANNELS] =
+	const float matrix[CHANNELS][CHANNELS] =
 	{
 		{
 			     cosA + (1.0f - cosA) / 3.0f,

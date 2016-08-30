@@ -1,5 +1,5 @@
 CC = gcc
-CFLAGS = -Wall -Wextra --std=c99
+CFLAGS = -Wall -Wextra --std=c99 #-fdiagnostics-color
 SDL_INCLUDE = -IC:\c\include\SDL
 SDL_LIBRARY = -LC:\c\lib64
 SDL_LINKER_FLAGS = -lSDL2main -lSDL2
@@ -25,3 +25,8 @@ clean:
 
 run:
 	.\icthelight
+
+trig: trig.c
+	$(CC) $? $(CFLAGS) -o $@
+	.\trig
+	gnuplot -e "plot 'sin.dat', cos(x)" -p

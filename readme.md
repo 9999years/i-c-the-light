@@ -1,8 +1,6 @@
 # I C the Light
 
-### a distance estimating ray marcher written in C*
-
-*“it’s a ray marcher!”*
+### a distance estimating ray marcher written in C
 
 *guarenteed to work in at least two dimensions or your money back!*
 
