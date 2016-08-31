@@ -26,35 +26,35 @@ int random(int min, int max) {
 
 int main(int argc, char *argv[])
 {
-	//char *filename = "./sin.dat";
-	//FILE *file = fopen(filename, "w");
-	//if(file == NULL) {
-		//printf("file open failure!\n");
-		//return 1;
-	//}
+	char *filename = "./sintest.dat";
+	FILE *file = fopen(filename, "w");
+	if(file == NULL) {
+		printf("file open failure!\n");
+		return 1;
+	}
 	clock_t start, end;
 	double total;
 	int i;
 	float theta, sinval;
-#define DATA_POINTS 921600
-	printf("testing 921,600 (1280*720) values of sin()\n");
+//#define DATA_POINTS 921600
+#define DATA_POINTS 64
+	//printf("testing 460,800 (1280*720/2) values of sin()\n");
 	start = clock();
-	for(i = 0; i < DATA_POINTS; i++) {
+	for(i = -DATA_POINTS; i < DATA_POINTS; i++) {
 		//-4 to 4
-		theta = ((float)random(-1024, 1024) / 256) * HALF_PI;
-		//theta = ((long double)i / DATA_POINTS) * HALF_PI;
-		sinval += fsin(theta);
+		//theta = ((float)random(-1024, 1024) / 256) * HALF_PI;
+		theta = ((long double)i / DATA_POINTS) * TAU;
+		//sinval += fsin(theta);
 		//printf("sin(%.8f) = %.8f\n", theta, sinval);
-		//fprintf(
-			//file,
+		fprintf(
+			file,
+			"%.20f "
+			"%.20f"
 			//"%.20f "
-			//"%.20f "
-			////"%.20f "
-			//"\n",
-			//theta,
-			////fcos(theta)
-			//sin(theta)
-			//);
+			"\n",
+			theta,
+			fsin(theta)
+			);
 	}
 	end = clock();
 	total = (double)(end - start) / CLOCKS_PER_SEC;

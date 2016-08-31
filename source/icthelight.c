@@ -68,7 +68,7 @@ void render(SDL_Surface *screenSurface)
 			A = distcircle(p, ca, 250.0F);
 			B = distcircle(p, cb, 150.0F);
 			D = ops(B, A);
-			//D = sindisplace2(p, D, 25, 40);
+			D = sindisplace2(p, D, 25, 40);
 			if(abs(D) < 10)
 			plot(screenSurface,
 				j, i,
@@ -183,19 +183,28 @@ int WinMain(/*int argc, char* args[]*/)
 	}
 	int quit = 0;
 	int frame = 0;
+	clock_t start, end;
+	double total;
 	while (!quit) {
+		start = clock();
 		frame++;
 
 		SDL_Delay(16);
 		// render
-		//if(frame%30 == 0)
 		render(screenSurface);
+
 
 		//Update the surface
 		SDL_UpdateWindowSurface(window);
 
 		// poll for events, and handle the ones we care about.
 		quit = handleevents(screenSurface);
+
+		end = clock();
+		if(frame%30 == 0) {
+			total = (double)(end - start) / CLOCKS_PER_SEC;
+			printf("%.4f FPS\n", 1 / total);
+		}
 	}
 
 	//Destroy window
