@@ -29,4 +29,4 @@ run:
 trig: trig.c
 	$(CC) $? $(CFLAGS) -o $@
 	.\trig
-	gnuplot -e "plot 'sin.dat', cos(x)" -p
+#gnuplot -e "plot 'sin.dat', cos(x)" -p
