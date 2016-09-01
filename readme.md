@@ -4,6 +4,8 @@
 
 *guarenteed to work in at least two dimensions or your money back!*
 
+*everything you hated about vector math in precalculus but worse!*
+
 On ray marching (from [Syntopia](http://blog.hvidtfeldts.net/index.php/2011/06/distance-estimated-3d-fractals-part-i/)):
 
 > Classic raytracing shoots one (or more) rays per pixel and calculates where the

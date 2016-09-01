@@ -37,25 +37,22 @@ unsigned int root(unsigned int x)
 	return x;
 }
 
-//returns a unit director pointing in a given direction
-vec2 fromdirection2(float radians)
+//returns a vector in a given direction
+//takes in an angle and a magnitude
+vec2 fromdirection2(float xy, float magn)
 {
 	vec2 ret;
-	ret.x = cos(radians);
-	ret.y = sin(radians);
+	ret.x = magn * cos(xy);
+	ret.y = magn * sin(xy);
 	return ret;
 }
 
-//returns a unit vector pointing in a given direction
-//takes an angle in the xy plane and an angle in the
-//xz plane
-vec3 fromdirection3(float xy, float xz)
+vec3 fromdirection3(float xy, float yz, float magn)
 {
 	vec3 ret;
-	ret.x = cos(xy);
-	ret.y = sin(xy);
-	//3d is basically 2d so this is fine
-	ret.z = 0.0F;
+	ret.x = magn * sin(xy) * cos(yz);
+	ret.y = magn * cos(xy) * cos(xz);
+	ret.z = magn * sin(yz);
 	return ret;
 }
 
@@ -69,12 +66,28 @@ vec2 distalong2(vec2 in, float distance)
 	return ret;
 }
 
+vec3 distalong3(vec3 in, float distance)
+{
+
+}
+
 //distance between two points.
 //i mean vectors. haha
-//this code is ugly but acceptable
 float dist2(vec2 a, vec2 b)
 {
-	return sqrt(((b.x - a.x) * (b.x - a.x)) + ((b.y - a.y) * (b.y - a.y)));
+	return sqrt(
+		  ((b.x - a.x) * (b.x - a.x))
+		+ ((b.y - a.y) * (b.y - a.y))
+		);
+}
+
+float dist3(vec3 a, vec3 b)
+{
+	return sqrt(
+		  ((b.x - a.x) * (b.x - a.x))
+		+ ((b.y - a.y) * (b.y - a.y))
+		+ ((b.z - a.z) * (b.z - a.z))
+		);
 }
 
 //adds 2 vectors

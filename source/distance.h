@@ -13,7 +13,7 @@ float max(float a, float b) {
 //displace a point by a wobbly sine shape
 float sindisplace2(vec2 point, float orig, float freq, float amp)
 {
-	return amp * fsin((float)point.x / freq) * fsin((float)point.y / freq) + orig;
+	return amp * sin((float)point.x / freq) * sin((float)point.y / freq) + orig;
 }
 
 //distance from a circle
