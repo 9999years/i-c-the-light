@@ -15,13 +15,13 @@
 #define ARRAYSIZE(arr) (sizeof(arr) / sizeof(arr[0]))
 #define TESTING(function) printf("\nTESTING %s:\n", function);
 
-void printscreen(SDL_Surface *screenSurface, unsigned int exclude)
+void printscreen(SDL_Surface *screen, unsigned int exclude)
 {
 	int i, j;
 	unsigned int color;
-	for(i = 0; i < screenSurface->h; i++) {
-		for(j = 0; j < screenSurface->w; j++) {
-			if((color = getpixel(screenSurface, j, i)) != exclude) {
+	for(i = 0; i < screen->h; i++) {
+		for(j = 0; j < screen->w; j++) {
+			if((color = getpixel(screen, j, i)) != exclude) {
 				printf("(%d, %d): 0x%6.6x\n",
 					j, i, color);
 			}
@@ -42,9 +42,9 @@ void testsection(char name[])
 		);
 }
 
-void sdltests(SDL_Surface *screenSurface, SDL_Window *window, int width, int height)
+void sdltests(SDL_Surface *screen, SDL_Window *window, int width, int height)
 {
-	SDL_FillRect(screenSurface, NULL, COLOR_WHITE);
+	SDL_FillRect(screen, NULL, COLOR_WHITE);
 
 	char coords[9];
 
@@ -53,7 +53,7 @@ void sdltests(SDL_Surface *screenSurface, SDL_Window *window, int width, int hei
 		);
 
 	TESTING("getpixel (single test)");
-	printf("(1,2) = %d (0xffffff expected)\n", getpixel(screenSurface, 1, 2));
+	printf("(1,2) = %d (0xffffff expected)\n", getpixel(screen, 1, 2));
 
 	TESTING("drawline (line.h) and getpixel (plot.h)");
 	printf(
@@ -62,14 +62,14 @@ void sdltests(SDL_Surface *screenSurface, SDL_Window *window, int width, int hei
 		"fail, good luck debugging!\n\n"
 		);
 
-	drawline(screenSurface, 1, 1, 12, 8, COLOR_RED);
+	drawline(screen, 1, 1, 12, 8, COLOR_RED);
 
 	printf(
 		"line drawn.\n"
 		"asserting (1, 1), (2, 2), (2, 3), (3, 4), (4, 5), (4, 6),\n"
 		"(5, 7), (5, 8), (6, 9), (7, 10), and (7, 11) are red\n"
 		);
-	//printscreen(screenSurface, COLOR_WHITE);
+	//printscreen(screen, COLOR_WHITE);
 
 	int xcoords[11] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11};
 	int ycoords[11] = {1, 2, 2, 3, 4, 4, 5, 5, 6,  7,  7};
@@ -80,7 +80,7 @@ void sdltests(SDL_Surface *screenSurface, SDL_Window *window, int width, int hei
 		sprintf(coords, "(%d, %d)", xcoords[i], ycoords[i]);
 		printf(
 			"%9s = 0x%6.6x (0xff0000 expected)\n",
-			coords, color = getpixel(screenSurface, xcoords[i], ycoords[i])
+			coords, color = getpixel(screen, xcoords[i], ycoords[i])
 			);
 		assert(color == COLOR_RED);
 	}
@@ -99,13 +99,13 @@ void sdltests(SDL_Surface *screenSurface, SDL_Window *window, int width, int hei
 		sprintf(coords, "(%d, %d)", xcoords[i], ycoords[i]);
 		printf(
 			"%9s = 0x%6.6x (0xffffff expected)\n",
-			coords, color = getpixel(screenSurface, xcoords[i], ycoords[i])
+			coords, color = getpixel(screen, xcoords[i], ycoords[i])
 			);
 		assert(color == COLOR_WHITE);
 	}
 
 	printf("\ntesting a vertical line\n");
-	drawline(screenSurface, 6, 0, 6, 9, COLOR_BLACK);
+	drawline(screen, 6, 0, 6, 9, COLOR_BLACK);
 	xcoords[0] = 6; ycoords[0] = 0;
 	xcoords[1] = 6; ycoords[1] = 5;
 	xcoords[2] = 6; ycoords[2] = 8;
@@ -114,13 +114,13 @@ void sdltests(SDL_Surface *screenSurface, SDL_Window *window, int width, int hei
 		sprintf(coords, "(%d, %d)", xcoords[i], ycoords[i]);
 		printf(
 			"%9s = 0x%6.6x (0x000000 expected)\n",
-			coords, color = getpixel(screenSurface, xcoords[i], ycoords[i])
+			coords, color = getpixel(screen, xcoords[i], ycoords[i])
 			);
 		assert(color == COLOR_BLACK);
 	}
 
 	printf("\ntesting a horizontal line\n");
-	drawline(screenSurface, 0, 5, 119, 5, COLOR_BLUE);
+	drawline(screen, 0, 5, 119, 5, COLOR_BLUE);
 	xcoords[0] = 0;   ycoords[0] = 5;
 	xcoords[1] = 6;   ycoords[1] = 5;
 	xcoords[2] = 24;  ycoords[2] = 5;
@@ -130,7 +130,7 @@ void sdltests(SDL_Surface *screenSurface, SDL_Window *window, int width, int hei
 		sprintf(coords, "(%d, %d)", xcoords[i], ycoords[i]);
 		printf(
 			"%9s = 0x%6.6x (0x0000ff expected)\n",
-			coords, color = getpixel(screenSurface, xcoords[i], ycoords[i])
+			coords, color = getpixel(screen, xcoords[i], ycoords[i])
 			);
 		assert(color == COLOR_BLUE);
 	}
@@ -148,21 +148,21 @@ void sdltests(SDL_Surface *screenSurface, SDL_Window *window, int width, int hei
 		a.b = rand()%0xff;
 		x = rand()%width;
 		y = rand()%height;
-		plot(screenSurface, x, y, colortoint(a));
+		plot(screen, x, y, colortoint(a));
 		sprintf(coords, "(%d, %d)", x, y);
 		printf(
 			"%9s = 0x%6.6x (0x%6.6x expected)\n",
-			coords, getpixel(screenSurface, x, y), colortoint(a)
+			coords, getpixel(screen, x, y), colortoint(a)
 			);
 
 	}
 
 	char filename[256] = "output/UNINITIALIZED.ppm";
 	sprintf(filename, "../output/image%lu.ppm", (unsigned long int)time(NULL));
-	if(writeppm(filename, PORTABLE_PIXMAP, width, height, screenSurface->pixels)
+	if(writeppm(filename, PORTABLE_PIXMAP, width, height, screen->pixels)
 		!= 0)
 		printf("image write error!\n");
-	//printscreen(screenSurface, 0x000000);
+	//printscreen(screen, 0x000000);
 	SDL_UpdateWindowSurface(window);
 	//printf("5 sec delay\n");
 	//SDL_Delay(5000);
@@ -306,7 +306,7 @@ int WinMain(/*int argc, char *argv[]*/)
 		printf("initializing SDL --- a window may appear\n");
 
 		SDL_Window* window = NULL;
-		SDL_Surface* screenSurface = NULL;
+		SDL_Surface* screen = NULL;
 		if(SDL_Init(SDL_INIT_VIDEO) < 0) {
 			printf( "SDL could not initialize!\n"
 				"Note that this is probably a problem with your environment rather than a failed test.\n"
@@ -323,9 +323,9 @@ int WinMain(/*int argc, char *argv[]*/)
 					SDL_GetError());
 			} else {
 				//Get window surface
-				screenSurface = SDL_GetWindowSurface(window);
-				sdltests(screenSurface, window, width, height);
-				//printf("width: %d\nheight: %d\n", screenSurface->w, screenSurface->h);
+				screen = SDL_GetWindowSurface(window);
+				sdltests(screen, window, width, height);
+				//printf("width: %d\nheight: %d\n", screen->w, screen->h);
 				//fill black
 			}
 		}

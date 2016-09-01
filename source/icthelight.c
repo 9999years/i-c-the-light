@@ -46,46 +46,30 @@ int random(int min, int max) {
 	return retval + min;
 }
 
-void render(SDL_Surface *screenSurface)
+void render(SDL_Surface *screen)
 {
 
 	int tick = SDL_GetTicks();
 	float time = (float)tick/200;
 
-	SDL_FillRect(screenSurface, NULL, 0x000000);
+	SDL_FillRect(screen, NULL, 0x000000);
 
 	vec2 c, a, b;
-	//c.x = screenSurface->w/2;
-	//c.y = screenSurface->h/2;// + 150 * sin((float)tick/512);
+	//c.x = screen->w/2;
+	//c.y = screen->h/2;// + 150 * sin((float)tick/512);
 	c.x = 80  + 15 * cos(time);
 	c.y = 120 + 15 * sin(time);
 	time += 1;
 	a.x = 375 + 35 * cos(time);
 	a.y = 400 + 35 * sin(time);
 
-	//a = fromdirection2((float)tick/400, 1);
-	//b = add2(c, distalong2(a, (float)tick/50));
-
-	//vec3 x, y, z;
-	//x = fromdirection3(0, 0, 100);
-	//y = fromdirection3(1, 0, 100);
-	//z = fromdirection3(0, 1, 100);
-
-	//cb.x = screenSurface->w/2;// - 150 * cos((float)tick/450 + 0.5F);
-	//cb.y = screenSurface->h/2;// - 150 * sin((float)tick/450 + 1.5F);
 	int i, j;
 	float dist;
-	for(i = 0; i < screenSurface->h; i++) {
-		for(j = 0; j < screenSurface->w; j++) {
-			dist = //fmod(
-				distline2(a, c, (vec2){.x = j, .y = i});
-				//255
-			//);
-			//dist = fabsf(distcircle((vec2){.x = j, .y = i}, c, 300));
-			//if(i % 50 == 0 && j % 50 == 0)
-				//printf("%f\n", dist);
+	for(i = 0; i < screen->h; i++) {
+		for(j = 0; j < screen->w; j++) {
+			dist = distline2(a, c, (vec2){.x = j, .y = i});
 			plot(
-				screenSurface,
+				screen,
 				j, i,
 				colortoint(graytocolor(clamp(
 				100/dist
@@ -93,18 +77,10 @@ void render(SDL_Surface *screenSurface)
 				);
 		}
 	}
-	//drawline(
-		//screenSurface,
-		//a.x, a.y,
-		//c.x, c.y,
-		//0xFF3333
-		//);
-
-
 	return;
 }
 
-void saveframe(SDL_Surface *screenSurface)
+void saveframe(SDL_Surface *screen)
 {
 	char filename[256] = "output/UNINITIALIZED.ppm";
 	unsigned long int timeint = time(NULL);
@@ -114,7 +90,7 @@ void saveframe(SDL_Surface *screenSurface)
 			filename,
 			SCREEN_WIDTH,
 			SCREEN_HEIGHT,
-			screenSurface->pixels
+			screen->pixels
 			) != 0
 	) {
 		printf("image write error!\n");
@@ -155,7 +131,7 @@ void saveframe(SDL_Surface *screenSurface)
 	return;
 }
 
-int handleevents(SDL_Surface *screenSurface)
+int handleevents(SDL_Surface *screen)
 {
 	SDL_Event event;
 	while((SDL_PollEvent(&event))) {
@@ -165,7 +141,7 @@ int handleevents(SDL_Surface *screenSurface)
 			if((event.key.keysym.sym == SDLK_ESCAPE) || (event.key.keysym.sym == SDLK_q)) {
 				return 1;
 			} else if(event.key.keysym.sym == SDLK_s) {
-				saveframe(screenSurface);
+				saveframe(screen);
 			}
 			break;
 
@@ -183,7 +159,7 @@ int WinMain(/*int argc, char* args[]*/)
 	SDL_Window* window = NULL;
 
 	//The surface contained by the window
-	SDL_Surface* screenSurface = NULL;
+	SDL_Surface* screen = NULL;
 
 	//Initialize SDL
 	if(SDL_Init(SDL_INIT_VIDEO) < 0) {
@@ -195,12 +171,12 @@ int WinMain(/*int argc, char* args[]*/)
 			printf("Window could not be created! SDL_Error: %s\n", SDL_GetError());
 		} else {
 			//Get window surface
-			screenSurface = SDL_GetWindowSurface(window);
+			screen = SDL_GetWindowSurface(window);
 
 			//save
-			render(screenSurface);
+			render(screen);
 
-			saveframe(screenSurface);
+			saveframe(screen);
 		}
 	}
 	int quit = 0;
@@ -213,14 +189,14 @@ int WinMain(/*int argc, char* args[]*/)
 
 		//SDL_Delay(16);
 		// render
-		render(screenSurface);
+		render(screen);
 
 
 		//Update the surface
 		SDL_UpdateWindowSurface(window);
 
 		// poll for events, and handle the ones we care about.
-		quit = handleevents(screenSurface);
+		quit = handleevents(screen);
 
 		end = clock();
 		if(frame%30 == 0) {
