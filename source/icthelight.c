@@ -68,11 +68,13 @@ void render(SDL_Surface *screen)
 	for(i = 0; i < screen->h; i++) {
 		for(j = 0; j < screen->w; j++) {
 			dist = distline2(a, c, (vec2){.x = j, .y = i});
+			if(dist > 100)
+				continue;
 			plot(
 				screen,
 				j, i,
 				colortoint(graytocolor(clamp(
-				100/dist
+				0xff-dist
 				)))
 				);
 		}
