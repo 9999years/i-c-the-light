@@ -73,7 +73,11 @@ vec2 distalong2(vec2 in, float distance)
 
 vec3 distalong3(vec3 in, float distance)
 {
-
+	vec3 ret;
+	ret.x = distance * in.x;
+	ret.y = distance * in.y;
+	ret.z = distance * in.z;
+	return ret;
 }
 
 //distance between two points.
@@ -95,6 +99,7 @@ float dist3(vec3 a, vec3 b)
 		);
 }
 
+//useful for avoiding spurious sqrt() calls
 float distsqr2(vec2 a, vec2 b)
 {
 	return
@@ -220,6 +225,11 @@ vec3 div3scalar(vec3 a, float s)
 float dot2(vec2 a, vec2 b)
 {
 	return (a.x * b.x) + (a.y * b.y);
+}
+
+float dot3(vec3 a, vec3 b)
+{
+	return (a.x * b.x) + (a.y * b.y) + (a.z * b.z);
 }
 
 //returns the magnitude of a vector
