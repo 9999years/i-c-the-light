@@ -40,7 +40,7 @@ struct rgbcolor graytocolor(byte gray)
 }
 
 //clamps a float to 0-0xff
-byte clamp(float value)
+byte bclamp(float value)
 {
 	if(value < 0)
 		return 0;
@@ -80,19 +80,19 @@ struct rgbcolor shifthue(struct rgbcolor in, const float fHue)
 	//Use the rotation matrix to convert the RGB directly
 	//this was prettier when rgbcolors were matricies and not structs
 	//just substitute 0 = red etc in your head
-	ret.r = clamp(
+	ret.r = bclamp(
 		  in.r * matrix[0][0]
 		+ in.g * matrix[0][1]
 		+ in.b * matrix[0][2]
 		);
 
-	ret.g = clamp(
+	ret.g = bclamp(
 		  in.r * matrix[1][0]
 		+ in.g * matrix[1][1]
 		+ in.b * matrix[1][2]
 		);
 
-	ret.b = clamp(
+	ret.b = bclamp(
 		  in.r * matrix[2][0]
 		+ in.g * matrix[2][1]
 		+ in.b * matrix[2][2]

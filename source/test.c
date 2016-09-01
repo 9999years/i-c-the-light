@@ -200,13 +200,13 @@ int WinMain(/*int argc, char *argv[]*/)
 		assert(d.b  == 0xab);
 
 		//this is really a misuse of the color type
-		d.r = clamp(400.4);
-		d.g = clamp(-21.4959);
-		d.b = clamp(0x40);
-		c.r = clamp(0);
-		c.g = clamp(0xff);
+		d.r = bclamp(400.4);
+		d.g = bclamp(-21.4959);
+		d.b = bclamp(0x40);
+		c.r = bclamp(0);
+		c.g = bclamp(0xff);
 
-		TESTING("clamp");
+		TESTING("bclamp");
 		printf(
 			"400.4:    %3d (expected: 255)\n"
 			"-21.4959: %3d (expected: 0)\n"
