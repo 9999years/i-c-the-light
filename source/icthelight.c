@@ -24,8 +24,8 @@
 #include "distance.h"
 
 //Screen dimension constants
-#define SCREEN_WIDTH 1280
-#define SCREEN_HEIGHT 720
+#define SCREEN_WIDTH 500
+#define SCREEN_HEIGHT 500
 
 #define PI_SQ   9.86960440108F
 #define TAU     6.28318530717F
@@ -50,34 +50,56 @@ void render(SDL_Surface *screenSurface)
 {
 
 	int tick = SDL_GetTicks();
+	float time = (float)tick/200;
 
 	SDL_FillRect(screenSurface, NULL, 0x000000);
 
-	vec2 ca, cb, p;
-	ca.x = screenSurface->w/2 + 150 * cos((float)tick/512);
-	ca.y = screenSurface->h/2 + 150 * sin((float)tick/512);
-	cb.x = screenSurface->w/2 - 150 * cos((float)tick/450 + 0.5F);
-	cb.y = screenSurface->h/2 - 150 * sin((float)tick/450 + 1.5F);
+	vec2 c, a, b;
+	//c.x = screenSurface->w/2;
+	//c.y = screenSurface->h/2;// + 150 * sin((float)tick/512);
+	c.x = 80  + 15 * cos(time);
+	c.y = 120 + 15 * sin(time);
+	time += 1;
+	a.x = 375 + 35 * cos(time);
+	a.y = 400 + 35 * sin(time);
 
+	//a = fromdirection2((float)tick/400, 1);
+	//b = add2(c, distalong2(a, (float)tick/50));
+
+	//vec3 x, y, z;
+	//x = fromdirection3(0, 0, 100);
+	//y = fromdirection3(1, 0, 100);
+	//z = fromdirection3(0, 1, 100);
+
+	//cb.x = screenSurface->w/2;// - 150 * cos((float)tick/450 + 0.5F);
+	//cb.y = screenSurface->h/2;// - 150 * sin((float)tick/450 + 1.5F);
 	int i, j;
-	float A, B, D;
+	float dist;
 	for(i = 0; i < screenSurface->h; i++) {
 		for(j = 0; j < screenSurface->w; j++) {
-			p.x = j;
-			p.y = i;
-			A = distcircle(p, ca, 250.0F);
-			B = distcircle(p, cb, 150.0F);
-			D = ops(B, A);
-			D = sindisplace2(p, D, 25, 40);
-			if(abs(D) < 10)
-			plot(screenSurface,
+			dist = //fmod(
+				distline2(a, c, (vec2){.x = j, .y = i});
+				//255
+			//);
+			//dist = fabsf(distcircle((vec2){.x = j, .y = i}, c, 300));
+			//if(i % 50 == 0 && j % 50 == 0)
+				//printf("%f\n", dist);
+			plot(
+				screenSurface,
 				j, i,
-				//0xffffff
-				colortoint(graytocolor(clamp(abs(100/D))))
+				colortoint(graytocolor(clamp(
+				100/dist
+				)))
 				);
 		}
 	}
-	//plot surface x y color
+	//drawline(
+		//screenSurface,
+		//a.x, a.y,
+		//c.x, c.y,
+		//0xFF3333
+		//);
+
 
 	return;
 }
@@ -189,7 +211,7 @@ int WinMain(/*int argc, char* args[]*/)
 		start = clock();
 		frame++;
 
-		SDL_Delay(16);
+		//SDL_Delay(16);
 		// render
 		render(screenSurface);
 

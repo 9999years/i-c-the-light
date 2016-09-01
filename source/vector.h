@@ -47,17 +47,22 @@ vec2 fromdirection2(float xy, float magn)
 	return ret;
 }
 
+//from x to y, y to z
+//eg pointing straight along y-axis would be
+//xy = 1, yz = 0
 vec3 fromdirection3(float xy, float yz, float magn)
 {
 	vec3 ret;
 	ret.x = magn * sin(xy) * cos(yz);
-	ret.y = magn * cos(xy) * cos(xz);
+	ret.y = magn * cos(xy) * cos(yz);
 	ret.z = magn * sin(yz);
 	return ret;
 }
 
 //returns the point a given distance along an input vector
 //as an offset from the initial vector
+//IMPORTANT: if `in` is't a unit vector you're not
+//guarenteed ret will be `distance` long!!!!!
 vec2 distalong2(vec2 in, float distance)
 {
 	vec2 ret;
@@ -90,7 +95,22 @@ float dist3(vec3 a, vec3 b)
 		);
 }
 
-//adds 2 vectors
+float distsqr2(vec2 a, vec2 b)
+{
+	return
+		  ((b.x - a.x) * (b.x - a.x))
+		+ ((b.y - a.y) * (b.y - a.y));
+}
+
+float distsqr3(vec3 a, vec3 b)
+{
+	return
+		  ((b.x - a.x) * (b.x - a.x))
+		+ ((b.y - a.y) * (b.y - a.y))
+		+ ((b.z - a.z) * (b.z - a.z));
+}
+
+//addition
 vec2 add2(vec2 a, vec2 b)
 {
 	vec2 ret;
@@ -108,16 +128,115 @@ vec3 add3(vec3 a, vec3 b)
 	return ret;
 }
 
+//subtraction
+vec2 sub2(vec2 a, vec2 b)
+{
+	vec2 ret;
+	ret.x = a.x - b.x;
+	ret.y = a.y - b.y;
+	return ret;
+}
+
+vec3 sub3(vec3 a, vec3 b)
+{
+	vec3 ret;
+	ret.x = a.x - b.x;
+	ret.y = a.y - b.y;
+	ret.z = a.z - b.z;
+	return ret;
+}
+
+//multiplication
+vec2 mult2(vec2 a, vec2 b)
+{
+	vec2 ret;
+	ret.x = a.x * b.x;
+	ret.y = a.y * b.y;
+	return ret;
+}
+
+vec2 mult2scalar(vec2 a, float s)
+{
+	vec2 ret;
+	ret.x = a.x * s;
+	ret.y = a.y * s;
+	return ret;
+}
+
+vec3 mult3(vec3 a, vec3 b)
+{
+	vec3 ret;
+	ret.x = a.x * b.x;
+	ret.y = a.y * b.y;
+	ret.z = a.z * b.z;
+	return ret;
+}
+
+vec3 mult3scalar(vec3 a, float s)
+{
+	vec3 ret;
+	ret.x = a.x * s;
+	ret.y = a.y * s;
+	ret.z = a.z * s;
+	return ret;
+}
+
+//division
+vec2 div2(vec2 a, vec2 b)
+{
+	vec2 ret;
+	ret.x = a.x / b.x;
+	ret.y = a.y / b.y;
+	return ret;
+}
+
+vec2 div2scalar(vec2 a, float s)
+{
+	vec2 ret;
+	ret.x = a.x / s;
+	ret.y = a.y / s;
+	return ret;
+}
+
+vec3 div3(vec3 a, vec3 b)
+{
+	vec3 ret;
+	ret.x = a.x / b.x;
+	ret.y = a.y / b.y;
+	ret.z = a.z / b.z;
+	return ret;
+}
+
+vec3 div3scalar(vec3 a, float s)
+{
+	vec3 ret;
+	ret.x = a.x / s;
+	ret.y = a.y / s;
+	ret.z = a.z / s;
+	return ret;
+}
+
+//dot product
+float dot2(vec2 a, vec2 b)
+{
+	return (a.x * b.x) + (a.y * b.y);
+}
+
 //returns the magnitude of a vector
-float magnitude2(vec2 a)
+float magn2(vec2 a)
 {
 	return sqrt((a.x*a.x) + (a.y*a.y));
+}
+
+float magn3(vec3 a)
+{
+	return sqrt((a.x*a.x) + (a.y*a.y) + (a.z*a.z));
 }
 
 //returns the unit vector for any given vector
 vec2 unit2(vec2 a)
 {
-	float magnitude = magnitude2(a);
+	float magnitude = magn2(a);
 	vec2 ret;
 	ret.x = a.x/magnitude;
 	ret.y = a.y/magnitude;
