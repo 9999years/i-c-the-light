@@ -54,7 +54,7 @@ void render(SDL_Surface *screen)
 
 	SDL_FillRect(screen, NULL, 0x000000);
 
-	vec2 c, a, b;
+	vec2 c, a;
 	//c.x = screen->w/2;
 	//c.y = screen->h/2;// + 150 * sin((float)tick/512);
 	c.x = 80  + 15 * cos(time);
@@ -63,20 +63,54 @@ void render(SDL_Surface *screen)
 	a.x = 375 + 35 * cos(time);
 	a.y = 400 + 35 * sin(time);
 
-	int i, j;
+	int i, j, k, l, hits;
+#define SAMPLES 8
+	const int sampsqr = SAMPLES * SAMPLES;
+	const int scale = 0xff / sampsqr;
 	float dist;
+	vec2 point;
+	//O(scary) but actually fine
+	//no but seriously the deepest loop gets hit like 1.5 mil times
 	for(i = 0; i < screen->h; i++) {
 		for(j = 0; j < screen->w; j++) {
+			//if it's far out, skip ahead a bit
 			dist = distline2(a, c, (vec2){.x = j, .y = i});
-			if(dist > 100)
+			if(dist > 2) {
+				//plot(
+					//screen,
+					//j, i,
+					//colortoint(shifthue(
+					//(struct rgbcolor){0xff, 0x88, 0x88},
+					//i * 2 + j
+					//))
+					//);
+				j += floor(dist - 2);
 				continue;
+			}
+			//for each pixel, multisample
+			hits = 0;
+			for(k = 0; k < SAMPLES; k++) {
+				for(l = 0; l < SAMPLES; l++) {
+					point.x = j + (float)k / SAMPLES;
+					point.y = i + (float)l / SAMPLES;
+					dist = distline2(a, c, point);
+					if(dist < 2)
+						hits++;
+				}
+			}
+			//if(dist > 10)
+				//continue;
 			plot(
 				screen,
 				j, i,
-				colortoint(graytocolor(clamp(
-				0xff-dist
+				//0xFFFFFF
+				colortoint(graytocolor(bclamp(
+					hits * scale
 				)))
 				);
+			//nothing left to do if we’ve already hit the line
+			//if(hits == sampsqr)
+				//break;
 		}
 	}
 	return;
