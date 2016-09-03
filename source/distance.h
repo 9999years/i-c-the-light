@@ -72,7 +72,6 @@ float distline2(vec2 a, vec2 b, vec2 c)
 		c,
 		projection
 		);
-	//return dist2(c, projection);
 }
 
 //union
