@@ -48,68 +48,19 @@ int random(int min, int max) {
 
 void render(SDL_Surface *screen)
 {
-	int tick = SDL_GetTicks();
-	float time = (float)tick/200;
-
+	//int tick = SDL_GetTicks();
 	SDL_FillRect(screen, NULL, 0x000000);
 
-	vec2 c, a;
-	//c.x = screen->w/2;
-	//c.y = screen->h/2;// + 150 * sin((float)tick/512);
-	c.x = 80  + 15 * cos(time);
-	c.y = 120 + 15 * sin(time);
-	time += 1;
-	a.x = 375 + 35 * cos(time);
-	a.y = 400 + 35 * sin(time);
-
-	int i, j, k, l, hits;
-#define SAMPLES 10
-	const int sampsqr = SAMPLES * SAMPLES;
-	const int scale = 0xff / sampsqr;
-	//reciprocal
-	const float sampincrement = 1.0F / SAMPLES;
-	const float threshold = 1.0F;
-	float dist;
-	vec2 point;
-	//O(scary) but actually fine
-	//no but seriously the deepest loop gets hit like 1.5 mil times
+	int i, j;
 	for(i = 0; i < screen->h; i++) {
 		for(j = 0; j < screen->w; j++) {
-			point.x = j;
-			point.y = i;
-			//if it's far out, skip ahead a bit
-			dist = distline2(point, c, a);
-			if(dist > threshold) {
-				//plot(screen, j, i, 0xBB00BB);
-				j += floor(dist - threshold);
-				continue;
-			}
-			//for each pixel, multisample
-			hits = 0;
-			for(k = 0; k < SAMPLES; k++) {
-				for(l = 0; l < SAMPLES; l++) {
-					point.x += sampincrement;
-					dist = distline2(point, a, c);
-					if(dist < threshold)
-						hits++;
-				}
-				point.y += sampincrement;
-				point.x--;
-			}
-			//printf("(%d, %d): %d\n", j, i, hits);
-			//if(dist > 10)
-				//continue;
-			plot(
-				screen,
-				j, i,
-				//0xFFFFFF
-				colortoint(graytocolor(bclamp(
-					hits * scale
-				)))
-				);
-			//nothing left to do if we’ve already hit the line
-			//if(hits == sampsqr)
-				//break;
+			//plot(
+				//screen,
+				//j, i,
+				//colortoint(graytocolor(bclamp(
+					//hits * scale
+				//)))
+				//);
 		}
 	}
 	return;
