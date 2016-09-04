@@ -94,6 +94,9 @@ void render(SDL_Surface *screen, int frame)
 	//O(scary) but actually fine
 	//no but seriously the deepest loop gets hit like 1.5 mil times
 	for(i = 0; i < screen->h; i++) {
+		j = 0;
+		byte reverse = 0;
+		while(1) {
 		for(j = 0; j < screen->w; j++) {
 			point.a =
 				((float)j / (float)screen->w)
@@ -118,7 +121,8 @@ void render(SDL_Surface *screen, int frame)
 					);
 				continue;
 			} else if(dist <= 0) {
-				break;
+				reverse = 1;
+				continue;
 			}
 			//for each pixel, multisample
 			//hits = 0;
