@@ -58,15 +58,16 @@ void render(SDL_Surface *screen, int frame)
 	//int tick = SDL_GetTicks();
 	//float time = (float)tick/200;
 
-	SDL_FillRect(screen, NULL, 0x000000);
+	SDL_FillRect(screen, NULL, 0xFFFFFF);
 
-	vec2 c, a;
-	c.x = -1.5F;
-	c.y =  0.5F;
-	a.x =  0.5F;
-	a.y = -0.5F;
+	//vec2 c, a;
+	//c.x = -1.5F;
+	//c.y =  0.5F;
+	//a.x =  0.5F;
+	//a.y = -0.5F;
 
 	const float zoom = (float)frame / 4;
+	//const float zoom = 1;
 
 	const complex center = {
 		.a = -0.74364085F,
@@ -81,50 +82,44 @@ void render(SDL_Surface *screen, int frame)
 	const float irange = imax - imin;
 
 	int i, j;
-	int k, l, hits;
+	//int k, l, hits;
 #define SAMPLES 4
-	const int sampsqr = SAMPLES * SAMPLES;
-	const int scale = 0xff / sampsqr;
+	//const int sampsqr = SAMPLES * SAMPLES;
+	//const int scale = 0xff / sampsqr;
 	const int iterations = 256;
 	//const float thresh = 0.01F;
-	const float thresh = 0.5F;
+	const float thresh = 0.01F;
 	float dist;
-	vec2 point;
+	complex point;
 	//O(scary) but actually fine
 	//no but seriously the deepest loop gets hit like 1.5 mil times
 	for(i = 0; i < screen->h; i++) {
 		for(j = 0; j < screen->w; j++) {
-			point.x =
+			point.a =
 				((float)j / (float)screen->w)
 				* realrange + realmin;
-			point.y =
+			point.b =
 				((float)i / (float)screen->h)
 				* irange + imin;
-			dist = distline2(
-				a, c, point
-				);
-			//dist = distmandlebrot(
-					//point,
-					//iterations
+			dist = distmandlebrot(point, iterations);
+			//dist = distcircle(
+				//(vec2){.x = point.a, .y = point.b},
+				//(vec2){.x = center.a, .y = center.b},
+				//0.2F
 				//);
 			//if(i % 25 == 0 && j % 25 == 0) {
 				//printf("dist: %f\n", dist);
 			//}
 			//if it's far out, skip ahead a bit
-			//if(dist > thresh) {
-				//plot(
-					//screen,
-					//j, i,
-					//colortoint(shifthue(
-					//(struct rgbcolor){0xff, 0x88, 0x88},
-					//i * 2 + j
-					//))
-					//);
-				//j += floor(
-					//((dist * 0.5F) / realrange) * (float)screen->w
-					//);
-				//continue;
-			//}
+			if(dist > thresh) {
+				plot(screen, j, i, i * 2 + j);
+				j += floor(
+					((dist * 0.8F) / realrange) * (float)screen->w
+					);
+				continue;
+			} else if(dist <= 0) {
+				break;
+			}
 			//for each pixel, multisample
 			//hits = 0;
 			//printf("PRE:\n    %f + %fi\n", point.a, point.b);
@@ -143,7 +138,8 @@ void render(SDL_Surface *screen, int frame)
 				//}
 			//}
 			//dist = fabsf(dist);
-			dist = fclamp(2048.0F * dist * zoom, 0.0F, 255.0F);
+			dist = fclamp(64.0F * dist * zoom, 0.0F, 255.0F);
+			//dist = fclamp(8.0F * dist * zoom, 0.0F, 255.0F);
 			dist = pow(dist, 0.25F);
 			//if(dist > thresh)
 				//continue;
@@ -152,7 +148,7 @@ void render(SDL_Surface *screen, int frame)
 				j, i,
 				//0xFFFFFF
 				colortoint(/*invertcolor*/(graytocolor(bclamp(
-					128.0F * dist
+					256.0F * dist
 					//hits * scale
 				))))
 				);
@@ -242,7 +238,7 @@ int WinMain(/*int argc, char* args[]*/)
 	SDL_Window* window = NULL;
 
 	//The surface contained by the window
-	SDL_Surface* screenSurface = NULL;
+	SDL_Surface* screen = NULL;
 
 	//Initialize SDL
 	if(SDL_Init(SDL_INIT_VIDEO) < 0) {
@@ -255,13 +251,10 @@ int WinMain(/*int argc, char* args[]*/)
 		} else {
 			//Get window surface
 			screen = SDL_GetWindowSurface(window);
-
-			//save
-			render(screen);
-
-			saveframe(screen);
 		}
 	}
+	clock_t start, end;
+	double total;
 	int quit = 0;
 	int frame = 0;
 	while (!quit) {
@@ -283,6 +276,7 @@ int WinMain(/*int argc, char* args[]*/)
 			total = (double)(end - start) / CLOCKS_PER_SEC;
 			printf("%.4f FPS\n", 1 / total);
 		}
+		frame++;
 	}
 
 	//Destroy window

@@ -2,12 +2,26 @@
 
 #include <math.h>
 
-float min(float a, float b) {
+//I Can't Believe It's Not Sin(x)
+float parabola(float x)
+{
+	x -= 1;
+	return (-x * x) + 1;
+}
+
+float min(float a, float b)
+{
 	return a < b ? a : b;
 }
 
-float max(float a, float b) {
+float max(float a, float b)
+{
 	return a > b ? a : b;
+}
+
+float fclamp(float val, float fmin, float fmax)
+{
+	return min(max(val, fmin), fmax);
 }
 
 //displace a point by a wobbly sine shape
@@ -62,33 +76,45 @@ float distline2(vec2 a, vec2 b, vec2 c)
 
 float distmandlebrot(complex c, int iterations)
 {
-#define ESCAPE_RADIUS 16.0F
 	complex z  = {.a = 0.0F, .b = 0.0F};
 	complex dz = {.a = 0.0F, .b = 0.0F};
 	complex tmp;
 
-	const complex one = {.a = 1.0F, .b = 0.0F};
-	const complex two = {.a = 2.0F, .b = 0.0F};
+	//const complex one = {.a = 1.0F, .b = 0.0F};
+	//const complex two = {.a = 2.0F, .b = 0.0F};
 
 	float msqr;
 	int i;
 	for(i = 0; i < iterations; i++) {
-		//z' = 2 * z * dz + 1
-		dz = complexmult(z, dz);
-		dz = complexmultscalar(dz, 2.0F);
-		dz.a += 1.0F;
+		//z = z^2 + c
+		//ergo
+		//dz = 2 * z * dz + 1
+
+		//dz = complexmult(z, dz);
+
+		//z * dz
+		tmp.a = z.a * dz.a - z.b * dz.b;
+		tmp.b = z.a * dz.b + z.b * dz.a;
+		//dz = complexmultscalar(dz, 2.0F);
+		dz.a = tmp.a * 2.0F + 1.0F;
+		dz.b = tmp.b * 2.0F;
 
 		//z = z * z + c
-		z = complexadd(complexmult(z, z), c);
+		tmp.a = z.a * z.a - z.b * z.b;
+		tmp.b = z.a * z.b + z.b * z.a;
+		//z = complexadd(complexmult(z, z), c);
+		z.a = tmp.a + c.a;
+		z.b = tmp.b + c.b;
 
-		msqr = complexabssqr(z);
-		if(msqr > ESCAPE_RADIUS) {
+		//msqr = complexabssqr(z);
+		msqr = z.a * z.a + z.b * z.b;
+		if(msqr > 1024.0F) {
 			break;
 		}
 	}
 
 	//G/|G'|
-	return  0.5F * sqrt(msqr / complexabssqr(dz)) * log(msqr);
+	return sqrt(msqr / (dz.a * dz.a + dz.b * dz.b)) * log(msqr);
 }
 
 //union
