@@ -21,20 +21,18 @@
 #include "ppm.h"
 #include "line.h"
 #include "vector.h"
-#include "distance.h"
-#include "xkcdrgb.h"
-
 #include "complex.h"
+#include "distance.h"
 
 //Screen dimension constants
-#define SCREEN_WIDTH 640
-#define SCREEN_HEIGHT 480
-#define HALF_SCREEN_WIDTH 320
-#define HALF_SCREEN_HEIGHT 240
 
 #define PI 3.1415926535
 #define TAU 6.2831853071
 #define HALF_PI 1.57079632675
+
+//mandlebrot should be like 3:2
+#define SCREEN_WIDTH  600
+#define SCREEN_HEIGHT 400
 
 #define BOX_WIDTH 50
 #define BOX_HEIGHT 50
@@ -44,7 +42,8 @@
 //but not today
 //shamelessly pilfered from
 //https://stackoverflow.com/questions/2999075/generate-a-random-number-within-range/2999130#2999130
-int random(int min, int max) {
+int random(int min, int max)
+{
 	int range = max - min;
 	int divisor = RAND_MAX/(range+1);
 	int retval;
@@ -54,91 +53,108 @@ int random(int min, int max) {
 	return retval + min;
 }
 
-void drawgrid(SDL_Surface *screenSurface, int xgap, int ygap, unsigned int color)
+void render(SDL_Surface *screen, int frame)
 {
-	int x = xgap, y = ygap;
-	//printf("w = %d\n", screenSurface->w);
-	//printf("h = %d\n", screenSurface->h);
-	while(x < screenSurface->w) {
-		//printf("x = %d\n", x);
-		drawline(screenSurface,
-			x, 0,
-			x, screenSurface->h,
-			color
-			);
-		x += xgap;
-	}
-	while(y < screenSurface->h) {
-		//printf("y = %d\n", y);
-		drawline(screenSurface,
-			0, y,
-			screenSurface->w, y,
-			color
-			);
-		y += ygap;
-	}
-	return;
-}
+	//int tick = SDL_GetTicks();
+	//float time = (float)tick/200;
 
-void drawvector(SDL_Surface *screenSurface, vec2 a, vec2 b, unsigned int color)
-{
-	drawline(
-		screenSurface,
-		a.x, a.y,
-		a.x + b.x, a.y + b.y,
-		color
-		);
-	return;
-}
+	SDL_FillRect(screen, NULL, 0x000000);
 
-void render(SDL_Surface *screenSurface)
-{
-	//complex a;
-	//complexadd(&a, (complex){.a = 3, .b = 2}, (complex){.a = 1, .b = 7});
-	//printf("(3+2i) * (1+7i) = %f + %fi\n", a.a, a.b);
+	vec2 c, a;
+	c.x = -1.5F;
+	c.y =  0.5F;
+	a.x =  0.5F;
+	a.y = -0.5F;
 
-	float scale = (float)SDL_GetTicks()*10;
+	const float zoom = (float)frame / 4;
 
-	SDL_FillRect(screenSurface, NULL, 0x000000);
+	const complex center = {
+		.a = -0.74364085F,
+		.b =  0.13182733F
+	};
 
-	complex c;
-	c.a = -0.19F;
-	c.b = -0.85F;
-	vec2 ofs;
-	ofs.x = screenSurface->w/2;
-	ofs.y = screenSurface->h/2;
+	const float realmin = center.a - 2.0F / zoom;
+	const float realmax = center.a + 1.0F / zoom;
+	const float realrange = realmax - realmin;
+	const float imin    = center.b - 1.0F / zoom;
+	const float imax    = center.b + 1.0F / zoom;
+	const float irange = imax - imin;
 
-	int i, j, k, l;
-	double V;
-	complex z;
-	const int sampcount = 2; //its actually this^2
-	double fk, fl;
-	int sum;
-	for(i = 0; i < screenSurface->h; i++) {
-		for(j = 0; j < screenSurface->w; j++) {
-			sum = 0;
-			for(k = 0; k < sampcount; k++) {
-				for(l = 0; l < sampcount; l++) {
-					fk = (double)k / sampcount;
-					fl = (double)l / sampcount;
-					z.a = c.a + (double)(j - ofs.y + fl) / scale;
-					z.b = c.b + (double)(i - ofs.x + fk) / scale;
-					sum += mandlebrot(z, 50);
-					//if(i == 297)
-						//printf("a = %f\nb = %f\nsum: %d\n\n", z.a, z.b, sum);
-				}
-			}
-			V = sum / (float)(sampcount * sampcount) * 0xff;
-			//printf("V = %f\n", V);
-			//if(!isfinite(V))
-				//V = 255;
-			//if(V > 10)
-				//printf("V = %f\n", V);
-			//if(V > 1)
-			plot(screenSurface,
+	int i, j;
+	int k, l, hits;
+#define SAMPLES 4
+	const int sampsqr = SAMPLES * SAMPLES;
+	const int scale = 0xff / sampsqr;
+	const int iterations = 256;
+	//const float thresh = 0.01F;
+	const float thresh = 0.5F;
+	float dist;
+	vec2 point;
+	//O(scary) but actually fine
+	//no but seriously the deepest loop gets hit like 1.5 mil times
+	for(i = 0; i < screen->h; i++) {
+		for(j = 0; j < screen->w; j++) {
+			point.x =
+				((float)j / (float)screen->w)
+				* realrange + realmin;
+			point.y =
+				((float)i / (float)screen->h)
+				* irange + imin;
+			dist = distline2(
+				a, c, point
+				);
+			//dist = distmandlebrot(
+					//point,
+					//iterations
+				//);
+			//if(i % 25 == 0 && j % 25 == 0) {
+				//printf("dist: %f\n", dist);
+			//}
+			//if it's far out, skip ahead a bit
+			//if(dist > thresh) {
+				//plot(
+					//screen,
+					//j, i,
+					//colortoint(shifthue(
+					//(struct rgbcolor){0xff, 0x88, 0x88},
+					//i * 2 + j
+					//))
+					//);
+				//j += floor(
+					//((dist * 0.5F) / realrange) * (float)screen->w
+					//);
+				//continue;
+			//}
+			//for each pixel, multisample
+			//hits = 0;
+			//printf("PRE:\n    %f + %fi\n", point.a, point.b);
+			//for(k = 0; k < SAMPLES; k++) {
+				//for(l = 0; l < SAMPLES; l++) {
+					//point.a += ((float)k /
+						//(SAMPLES * screen->w))
+						//* realrange;
+					//point.b += ((float)l /
+						//(SAMPLES * screen->h))
+						//* irange;
+					////printf("POST:\n    %f + %fi\n\n", point.a, point.b);
+					//dist = distmandlebrot(point, iterations);
+					//if(dist < thresh)
+						//hits++;
+				//}
+			//}
+			//dist = fabsf(dist);
+			dist = fclamp(2048.0F * dist * zoom, 0.0F, 255.0F);
+			dist = pow(dist, 0.25F);
+			//if(dist > thresh)
+				//continue;
+			plot(
+				screen,
 				j, i,
-				//0xffffff
-				colortoint(graytocolor(clamp(V)))
+				//0xFFFFFF
+				colortoint(/*invertcolor*/(graytocolor(bclamp(
+					128.0F * dist
+					//hits * scale
+				))))
 				);
 		}
 	}
@@ -238,26 +254,35 @@ int WinMain(/*int argc, char* args[]*/)
 			printf("Window could not be created! SDL_Error: %s\n", SDL_GetError());
 		} else {
 			//Get window surface
-			screenSurface = SDL_GetWindowSurface(window);
+			screen = SDL_GetWindowSurface(window);
+
+			//save
+			render(screen);
+
+			saveframe(screen);
 		}
 	}
 	int quit = 0;
 	int frame = 0;
 	while (!quit) {
-		frame++;
-		// render
-		render(screenSurface);
-		if(frame == 0)
-			saveframe(screenSurface);
-		//if(frame%30 == 0)
+		start = clock();
 
-		SDL_Delay(16);
+		render(screen, frame);
+		//autosave the first frame
+		if(frame == 0)
+			saveframe(screen);
 
 		//Update the surface
 		SDL_UpdateWindowSurface(window);
 
 		// poll for events, and handle the ones we care about.
-		quit = handleevents(screenSurface);
+		quit = handleevents(screen);
+
+		end = clock();
+		if(frame%30 == 0) {
+			total = (double)(end - start) / CLOCKS_PER_SEC;
+			printf("%.4f FPS\n", 1 / total);
+		}
 	}
 
 	//Destroy window

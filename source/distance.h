@@ -25,6 +25,72 @@ float distcircle(vec2 point, vec2 center, float radius)
 	return sqrt((o*o)+(a*a)) - radius;
 }
 
+//distance to line ab from c
+//http://stackoverflow.com/a/1501725/5719760
+float distline2(vec2 a, vec2 b, vec2 c)
+{
+	//length = |b-a|^2 -  avoid a sqrt
+	const float length = distsqr2(a, b);
+	//avoid a = b case & divide by zero
+	if(length == 0.0F) return dist2(c, a);
+	const vec2 ca = sub2(c, a);
+	const vec2 ba = sub2(b, a);
+	//Consider the line extending the segment, parameterized as
+	//a + t (b - a)
+	//we find projection of point c onto the line.
+	//It falls where t = [(c-a) . (b-a)] / |b-a|^2
+	//we clamp t from [0,1] to handle points outside the segment ab.
+	const float t =
+		fclamp(
+			dot2(ca, ba) / length
+		, 0, 1);
+	//projection falls on the segment
+	const vec2 projection =
+		add2(
+			a,
+			mult2scalar(
+				ba,
+				t
+			)
+		);
+	return dist2(
+		c,
+		projection
+		);
+}
+
+
+float distmandlebrot(complex c, int iterations)
+{
+#define ESCAPE_RADIUS 16.0F
+	complex z  = {.a = 0.0F, .b = 0.0F};
+	complex dz = {.a = 0.0F, .b = 0.0F};
+	complex tmp;
+
+	const complex one = {.a = 1.0F, .b = 0.0F};
+	const complex two = {.a = 2.0F, .b = 0.0F};
+
+	float msqr;
+	int i;
+	for(i = 0; i < iterations; i++) {
+		//z' = 2 * z * dz + 1
+		dz = complexmult(z, dz);
+		dz = complexmultscalar(dz, 2.0F);
+		dz.a += 1.0F;
+
+		//z = z * z + c
+		z = complexadd(complexmult(z, z), c);
+
+		msqr = complexabssqr(z);
+		if(msqr > ESCAPE_RADIUS) {
+			break;
+		}
+	}
+
+	//G/|G'|
+	return  0.5F * sqrt(msqr / complexabssqr(dz)) * log(msqr);
+}
+
 //union
 float opu(float a, float b)
 {

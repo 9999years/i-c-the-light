@@ -5,39 +5,46 @@ typedef struct complex {
 	double b;
 } complex;
 
+//handy for avoiding sqrt calls
+double complexabssqr(complex in)
+{
+	return in.a * in.a + in.b * in.b;
+}
+
+//absolute / normal / modulo
 double complexabs(complex in)
 {
 	return sqrt(in.a * in.a + in.b * in.b);
 }
 
-void complexmult(complex *out, complex a, complex b)
+complex complexmult(complex a, complex b)
 {
-	(*out).a = a.a * b.a - a.b * b.b;
-	(*out).b = a.a * b.b + a.b * b.a;
-	return;
+	complex ret;
+	ret.a = a.a * b.a - a.b * b.b;
+	ret.b = a.a * b.b + a.b * b.a;
+	return ret;
 }
 
-void complexadd(complex *out, complex a, complex b)
+complex complexmultscalar(complex a, float b)
 {
-	(*out).a = a.a + b.a;
-	(*out).b = a.b + b.b;
-	return;
+	complex ret;
+	ret.a = a.a * b;
+	ret.b = a.b * b;
+	return ret;
 }
 
-int mandlebrot(complex c, int i)
+complex complexadd(complex a, complex b)
 {
-	complex tmp, z;
-	z = c;
-	while(i --> 0)
-	{
-		//square z & store in tmp, add c and store in z
-		complexmult(&tmp, z, z);
-		complexadd(&z, tmp, c);
-		//printf("(i = %d) %f + %fi\n", i, z.a, z.b);
-		//printf("complex: %f\n", complexabs(z));
-	}
-	float ret = complexabs(z);
-	if(!isfinite(ret))
-		ret = 0xff;
-	return ret >= 2 ? 0 : 1;
+	complex ret;
+	ret.a = a.a + b.a;
+	ret.b = a.b + b.b;
+	return ret;
+}
+
+complex complexsub(complex a, complex b)
+{
+	complex ret;
+	ret.a = a.a - b.a;
+	ret.b = a.b - b.b;
+	return ret;
 }
