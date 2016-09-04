@@ -30,34 +30,34 @@ float sindisplace2(vec2 point, float orig, float freq, float amp)
 	return amp * sin((float)point.x / freq) * sin((float)point.y / freq) + orig;
 }
 
-//distance from a circle
-float distcircle(vec2 point, vec2 center, float radius)
+//distance from point p to circle of radius r centered at c
+float distcircle(vec2 p, vec2 c, float r)
 {
 	float o, a;
-	a = point.x - center.x;
-	o = point.y - center.y;
-	//return root(o * o + a * a) - radius;
-	return sqrt((o*o)+(a*a)) - radius;
+	a = p.x - c.x;
+	o = p.y - c.y;
+	//dist to c
+	return sqrt((o*o)+(a*a)) - r;
 }
 
-//distance to line ab from c
+//distance to line ab from p
 //http://stackoverflow.com/a/1501725/5719760
-float distline2(vec2 a, vec2 b, vec2 c)
+float distline2(vec2 p, vec2 a, vec2 b)
 {
 	//length = |b-a|^2 -  avoid a sqrt
 	const float length = distsqr2(a, b);
 	//avoid a = b case & divide by zero
-	if(length == 0.0F) return dist2(c, a);
-	const vec2 ca = sub2(c, a);
+	if(length == 0.0F) return dist2(p, a);
+	const vec2 pa = sub2(p, a);
 	const vec2 ba = sub2(b, a);
 	//Consider the line extending the segment, parameterized as
 	//a + t (b - a)
 	//we find projection of point c onto the line.
-	//It falls where t = [(c-a) . (b-a)] / |b-a|^2
-	//we clamp t from [0,1] to handle points outside the segment ab.
+	//It falls where t = [(p-a) . (b-a)] / |b-a|^2
+	//we clamp t from [0,1] to handle points outside the segment ab
 	const float t =
 		fclamp(
-			dot2(ca, ba) / length
+			dot2(pa, ba) / length
 		, 0, 1);
 	//projection falls on the segment
 	const vec2 projection =
@@ -69,10 +69,12 @@ float distline2(vec2 a, vec2 b, vec2 c)
 			)
 		);
 	return dist2(
-		c,
+		p,
 		projection
 		);
 }
+
+//float distpoly2(
 
 //union
 float opu(float a, float b)
