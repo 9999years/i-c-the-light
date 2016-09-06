@@ -52,6 +52,15 @@ void render(SDL_Surface *screen)
 	SDL_FillRect(screen, NULL, 0x000000);
 
 	int i, j;
+	//camera offset from origin
+	vec3 camera_ofs;
+	//camera rotation
+	vec3 camera_rot;
+	//horizontal resolution in coord space
+	//NOT screen pixels
+	const float hres;
+	//infer height from screen ratio
+	const float vres = ((float)screen->w / (float)screen->h) * hres;
 	for(i = 0; i < screen->h; i++) {
 		for(j = 0; j < screen->w; j++) {
 			//plot(
