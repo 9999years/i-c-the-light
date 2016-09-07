@@ -61,15 +61,26 @@ void render(SDL_Surface *screen)
 	const float hres;
 	//infer height from screen ratio
 	const float vres = ((float)screen->w / (float)screen->h) * hres;
+	struct rgbcolor colora, colorb;
+	colora.r = 0xff;
+	colora.b = 0x20;
+	colora.g = 0xdd;
+	colorb.r = 0x00;
+	colorb.b = 0xdd;
+	colorb.g = 0x11;
 	for(i = 0; i < screen->h; i++) {
 		for(j = 0; j < screen->w; j++) {
-			//plot(
-				//screen,
-				//j, i,
-				//colortoint(graytocolor(bclamp(
-					//hits * scale
-				//)))
-				//);
+			plot(
+				screen,
+				j, i,
+				colortoint(
+					lerpcolor(
+						colora, colorb,
+						(float)j / screen->w / 2.0F
+						+ (float)i / screen->h / 2.0F
+					)
+				)
+				);
 		}
 	}
 	return;
@@ -173,9 +184,8 @@ int WinMain(/*int argc, char* args[]*/)
 	int frame = 0;
 	clock_t start, end;
 	double total;
-	while (!quit) {
+	while(!quit) {
 		start = clock();
-		frame++;
 
 		//SDL_Delay(16);
 		// render
@@ -196,6 +206,7 @@ int WinMain(/*int argc, char* args[]*/)
 			total = (double)(end - start) / CLOCKS_PER_SEC;
 			printf("%.4f FPS\n", 1 / total);
 		}
+		frame++;
 	}
 
 	//Destroy window

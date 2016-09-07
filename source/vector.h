@@ -53,8 +53,8 @@ vec2 fromdirection2(float xy, float magn)
 vec3 fromdirection3(float xy, float yz, float magn)
 {
 	vec3 ret;
-	ret.x = magn * sin(xy) * cos(yz);
-	ret.y = magn * cos(xy) * cos(yz);
+	ret.x = magn * cos(yz) * sin(xy) ;
+	ret.y = magn * cos(yz) * cos(xy) ;
 	ret.z = magn * sin(yz);
 	return ret;
 }
@@ -250,6 +250,16 @@ vec2 unit2(vec2 a)
 	vec2 ret;
 	ret.x = a.x/magnitude;
 	ret.y = a.y/magnitude;
+	return ret;
+}
+
+vec3 unit3(vec3 a)
+{
+	float magnitude = magn3(a);
+	vec3 ret;
+	ret.x = a.x/magnitude;
+	ret.y = a.y/magnitude;
+	ret.z = a.z/magnitude;
 	return ret;
 }
 

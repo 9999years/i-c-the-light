@@ -100,3 +100,17 @@ struct rgbcolor shifthue(struct rgbcolor in, const float fHue)
 
 	return ret;
 }
+
+//interpolates between a and b
+//binterp is the percent of b to use
+//eg binterp = 1 --> 0% a, 100% b
+//if binterp is > 1 or < 0 you're gonna get some wacky nonsense
+struct rgbcolor lerpcolor(struct rgbcolor a, struct rgbcolor b, float binterp)
+{
+	const float ainterp = 1.0F - binterp;
+	struct rgbcolor ret;
+	ret.r = a.r * ainterp + b.r * binterp;
+	ret.g = a.g * ainterp + b.g * binterp;
+	ret.b = a.b * ainterp + b.b * binterp;
+	return ret;
+}
