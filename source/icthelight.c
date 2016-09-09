@@ -17,6 +17,7 @@
 #include <time.h>
 
 //project files
+#include "common.h"
 #include "color.h"
 #include "ppm.h"
 #include "line.h"
@@ -27,60 +28,36 @@
 #define SCREEN_WIDTH 500
 #define SCREEN_HEIGHT 500
 
-#define PI_SQ   9.86960440108F
-#define TAU     6.28318530717F
-#define PI      3.14159265359F
-#define HALF_PI 1.57079632679F
-
-//i might replace this with sfmt one day
-//but not today
-//shamelessly pilfered from
-//https://stackoverflow.com/questions/2999075/generate-a-random-number-within-range/2999130#2999130
-int random(int min, int max) {
-	int range = max - min;
-	int divisor = RAND_MAX/(range+1);
-	int retval;
-	do {
-		retval = rand() / divisor;
-	} while (retval > range);
-	return retval + min;
-}
-
 void render(SDL_Surface *screen)
 {
 	//int tick = SDL_GetTicks();
 	SDL_FillRect(screen, NULL, 0x000000);
 
-	int i, j;
 	//camera offset from origin
 	vec3 camera_ofs;
 	//camera rotation
 	vec3 camera_rot;
+	const float aspect = (float)screen->w / (float)screen->h;
 	//horizontal resolution in coord space
 	//NOT screen pixels
 	const float hres;
 	//infer height from screen ratio
-	const float vres = ((float)screen->w / (float)screen->h) * hres;
-	struct rgbcolor colora, colorb;
-	colora.r = 0xff;
-	colora.b = 0x20;
-	colora.g = 0xdd;
-	colorb.r = 0x00;
-	colorb.b = 0xdd;
-	colorb.g = 0x11;
-	for(i = 0; i < screen->h; i++) {
-		for(j = 0; j < screen->w; j++) {
-			plot(
-				screen,
-				j, i,
-				colortoint(
-					lerpcolor(
-						colora, colorb,
-						(float)j / screen->w / 2.0F
-						+ (float)i / screen->h / 2.0F
-					)
-				)
-				);
+	const float vres = aspect * hres;
+	//horiz samples
+	//these are the values the for() loops go to
+	const int hsamples = screen->w;
+	const int vsamples = aspect * hsamples;
+	//loop from 0 to samples
+	//map each sample onto hres, offset by camera_ofs
+	//shoot in dir of camera_rot
+	int i, j;
+	for(i = 0; i < vsamples; i++) {
+		for(j = 0; j < hsamples; j++) {
+			//plot(
+				//screen,
+				//j, i,
+				//0xffffff
+				//);
 		}
 	}
 	return;

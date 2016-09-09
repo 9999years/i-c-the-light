@@ -1,6 +1,11 @@
 //functions for dealing with 2 and 3 dimensional vectors
 //functions for 2d vectors end with 2
 //functions for 3d vectors end with 3
+//functions that operate with a scalar end with s
+//eg mult2() multiplies two vec2s
+//and mult2s() would multiply a vec2 by a scalar
+//comparable functions are listed in the order of 2, 3, 2s, 3s
+//(ascending dimensions with scalar variants listed last)
 #include <math.h>
 
 typedef struct vec2 vec2;
@@ -77,6 +82,96 @@ vec3 distalong3(vec3 in, float distance)
 	ret.x = distance * in.x;
 	ret.y = distance * in.y;
 	ret.z = distance * in.z;
+	return ret;
+}
+
+//max, component wise
+vec2 maxvec2(vec2 a, vec2 b)
+{
+	vec2 ret;
+	ret.x = fmax(a.x, b.x);
+	ret.y = fmax(a.y, b.y);
+	return ret;
+}
+
+vec3 maxvec3(vec3 a, vec3 b)
+{
+	vec3 ret;
+	ret.x = fmax(a.x, b.x);
+	ret.y = fmax(a.y, b.y);
+	ret.z = fmax(a.z, b.z);
+	return ret;
+}
+
+//max, scalar variant
+vec2 maxvec2s(vec2 a, float b)
+{
+	vec2 ret;
+	ret.x = fmax(a.x, b);
+	ret.y = fmax(a.y, b);
+	return ret;
+}
+
+vec3 maxvec3s(vec3 a, float b)
+{
+	vec3 ret;
+	ret.x = fmax(a.x, b);
+	ret.y = fmax(a.y, b);
+	ret.z = fmax(a.z, b);
+	return ret;
+}
+
+//min, component wise
+vec2 minvec2(vec2 a, vec2 b)
+{
+	vec2 ret;
+	ret.x = fmin(a.x, b.x);
+	ret.y = fmin(a.y, b.y);
+	return ret;
+}
+
+vec3 minvec3(vec3 a, vec3 b)
+{
+	vec3 ret;
+	ret.x = fmin(a.x, b.x);
+	ret.y = fmin(a.y, b.y);
+	ret.z = fmin(a.z, b.z);
+	return ret;
+}
+
+//min, s variant
+vec2 minvec2s(vec2 a, float b)
+{
+	vec2 ret;
+	ret.x = fmin(a.x, b);
+	ret.y = fmin(a.y, b);
+	return ret;
+}
+
+vec3 minvec3s(vec3 a, float b)
+{
+	vec3 ret;
+	ret.x = fmin(a.x, b);
+	ret.y = fmin(a.y, b);
+	ret.z = fmin(a.z, b);
+	return ret;
+}
+
+//absolute value of a vector
+vec2 absvec2(vec2 a)
+{
+	vec2 ret;
+	ret.x = a.x > 0 ? a.x : -a.x;
+	ret.y = a.y > 0 ? a.y : -a.y;
+	return ret;
+}
+
+vec3 absvec3(vec3 a)
+{
+	vec3 ret;
+	ret.x = a.x > 0 ? a.x : -a.x;
+	ret.y = a.y > 0 ? a.y : -a.y;
+	ret.z = a.z > 0 ? a.z : -a.z;
 	return ret;
 }
 
@@ -160,14 +255,6 @@ vec2 mult2(vec2 a, vec2 b)
 	return ret;
 }
 
-vec2 mult2scalar(vec2 a, float s)
-{
-	vec2 ret;
-	ret.x = a.x * s;
-	ret.y = a.y * s;
-	return ret;
-}
-
 vec3 mult3(vec3 a, vec3 b)
 {
 	vec3 ret;
@@ -177,12 +264,21 @@ vec3 mult3(vec3 a, vec3 b)
 	return ret;
 }
 
-vec3 mult3scalar(vec3 a, float s)
+//scalar
+vec3 mult3s(vec3 a, float s)
 {
 	vec3 ret;
 	ret.x = a.x * s;
 	ret.y = a.y * s;
 	ret.z = a.z * s;
+	return ret;
+}
+
+vec2 mult2s(vec2 a, float s)
+{
+	vec2 ret;
+	ret.x = a.x * s;
+	ret.y = a.y * s;
 	return ret;
 }
 
@@ -195,14 +291,6 @@ vec2 div2(vec2 a, vec2 b)
 	return ret;
 }
 
-vec2 div2scalar(vec2 a, float s)
-{
-	vec2 ret;
-	ret.x = a.x / s;
-	ret.y = a.y / s;
-	return ret;
-}
-
 vec3 div3(vec3 a, vec3 b)
 {
 	vec3 ret;
@@ -212,7 +300,15 @@ vec3 div3(vec3 a, vec3 b)
 	return ret;
 }
 
-vec3 div3scalar(vec3 a, float s)
+vec2 div2s(vec2 a, float s)
+{
+	vec2 ret;
+	ret.x = a.x / s;
+	ret.y = a.y / s;
+	return ret;
+}
+
+vec3 div3s(vec3 a, float s)
 {
 	vec3 ret;
 	ret.x = a.x / s;

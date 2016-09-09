@@ -2,28 +2,6 @@
 #include <math.h>
 #include "trig.h"
 
-//I Can't Believe It's Not Sin(x)
-float parabola(float x)
-{
-	x -= 1;
-	return (-x * x) + 1;
-}
-
-float min(float a, float b)
-{
-	return a < b ? a : b;
-}
-
-float max(float a, float b)
-{
-	return a > b ? a : b;
-}
-
-float fclamp(float val, float fmin, float fmax)
-{
-	return min(max(val, fmin), fmax);
-}
-
 //displace a point by a wobbly sine shape
 float sindisplace2(vec2 point, float orig, float freq, float amp)
 {
@@ -74,7 +52,28 @@ float distline2(vec2 p, vec2 a, vec2 b)
 		);
 }
 
-//float distpoly2(
+//b specifies the box dimensions
+//nesting function calls for basic addition makes me feel like
+//c was not the best choice for this project
+float distbox(vec3 p, vec3 b)
+{
+	//magnitude(max(abs(p) - b, 0))
+	//vec3 ret;
+	//ret = sub3(
+		//absvec3(p),
+		//b
+	//);
+	//ret = maxvec3s(ret, 0.0F);
+	return magn3(
+		maxvec3s(
+			sub3(
+				absvec3s(p),
+				b
+			),
+			0.0F
+		)
+	);
+}
 
 //union
 float opu(float a, float b)
