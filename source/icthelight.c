@@ -33,26 +33,57 @@ void render(SDL_Surface *screen)
 	//int tick = SDL_GetTicks();
 	SDL_FillRect(screen, NULL, 0x000000);
 
+	/*
+	* here's how im setting up the axis (right-handed)
+	*      z
+	*      |
+	*      |
+	*      |
+	*      |
+	*      |
+	*      +----------- y
+	*     /
+	*    /
+	*   /
+	*  /
+	* x
+	*
+	*/
+
 	//camera offset from origin
-	vec3 camera_ofs;
+	//backwards 1000 units on the y axis
+	vec3 camera_ofs = fromdirection3(-PI, 0.0F, 1000.0F);
 	//camera rotation
-	vec3 camera_rot;
+	//pointing along y
+	//this is the direction the rays will fire
+	//if it isn't a unit vector things will explode probably
+	vec3 camera_rot = fromdirection3(PI, 0.0F, 1.0F);
+	//screen aspect ratio
 	const float aspect = (float)screen->w / (float)screen->h;
-	//horizontal resolution in coord space
-	//NOT screen pixels
-	const float hres;
+	//size of area rays will be casted from in coord space
+	//NOT screen pixels!!! that's `samples`
+	vec2 camera_size;
+	camera_size.x = 500.0F;
 	//infer height from screen ratio
-	const float vres = aspect * hres;
+	camera_size.y = aspect * camera_size.x;
 	//horiz samples
 	//these are the values the for() loops go to
-	const int hsamples = screen->w;
-	const int vsamples = aspect * hsamples;
+	const int xsamples = screen->w;
+	const int zsamples = aspect * xsamples;
 	//loop from 0 to samples
-	//map each sample onto hres, offset by camera_ofs
+	//map each sample onto 0..xres, offset by camera_ofs
 	//shoot in dir of camera_rot
-	int i, j;
-	for(i = 0; i < vsamples; i++) {
-		for(j = 0; j < hsamples; j++) {
+	vec3 ray_ofs;
+	vec3 ray_rot = camera_rot;
+	//steps to march
+	const int steps = 5;
+	int i, j, k;
+	for(i = 0; i < zsamples; i++) {
+		for(j = 0; j < xsamples; j++) {
+			//our position in the screen + camera offset
+			ray_ofs.x =
+				scale(i, 0, xsamples, 0, camera_size.x)
+				+ camera_ofs.x;
 			//plot(
 				//screen,
 				//j, i,

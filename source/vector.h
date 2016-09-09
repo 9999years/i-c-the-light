@@ -6,6 +6,24 @@
 //and mult2s() would multiply a vec2 by a scalar
 //comparable functions are listed in the order of 2, 3, 2s, 3s
 //(ascending dimensions with scalar variants listed last)
+
+/*
+ * here's how im setting up the axis
+ *      z
+ *      |
+ *      |
+ *      |
+ *      |
+ *      |
+ *      +----------- y
+ *     /
+ *    /
+ *   /
+ *  /
+ * x
+ *
+ */
+
 #include <math.h>
 
 typedef struct vec2 vec2;
@@ -55,6 +73,7 @@ vec2 fromdirection2(float xy, float magn)
 //from x to y, y to z
 //eg pointing straight along y-axis would be
 //xy = 1, yz = 0
+//i have no clue if this works tbh
 vec3 fromdirection3(float xy, float yz, float magn)
 {
 	vec3 ret;
@@ -67,7 +86,7 @@ vec3 fromdirection3(float xy, float yz, float magn)
 //returns the point a given distance along an input vector
 //as an offset from the initial vector
 //IMPORTANT: if `in` is't a unit vector you're not
-//guarenteed ret will be `distance` long!!!!!
+//guarenteed the return value will be `distance` long!!!!!
 vec2 distalong2(vec2 in, float distance)
 {
 	vec2 ret;
