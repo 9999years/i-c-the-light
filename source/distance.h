@@ -81,6 +81,14 @@ float distsphere(vec3 p, vec3 c, float r)
 	return fabsf(dist3(p, c) - r);
 }
 
+float disttorus(vec3 p, vec3 c, float thickness, float radius)
+{
+	vec2 q;
+	q.x = magn2((vec2){.x = p.x, .y = p.z}) - radius;
+	q.y = p.y;
+	return magn2(q) - thickness;
+}
+
 //union
 float opu(float a, float b)
 {

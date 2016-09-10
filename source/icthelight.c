@@ -56,9 +56,9 @@ void render(SDL_Surface *screen)
 	//backwards 1000 units on the y axis
 	//vec3 camera_ofs = fromdirection3(-PI, 0.0F, 1000.0F);
 	vec3 camera_ofs = {
-		.x = -80.0F,
+		.x = -50.0F,
 		.y = -1000.0F,
-		.z = -150.0F
+		.z = -50.0F
 	};
 	//camera rotation
 	//pointing along y
@@ -75,7 +75,7 @@ void render(SDL_Surface *screen)
 	//size of area rays will be casted from in coord space
 	//NOT screen pixels!!! that's `samples`
 	vec2 camera_size;
-	camera_size.x = 500.0F;
+	camera_size.x = 100.0F;
 	//infer height from screen ratio
 	camera_size.y = aspect * camera_size.x;
 	//horiz samples
@@ -94,21 +94,21 @@ void render(SDL_Surface *screen)
 	//real actual position of the point being measured
 	vec3 ray_pos;
 	vec3 tmp;
-	vec3 box = {
-		.x = 50.0F,
-		.y = 35.0F,
-		.z = 65.0F
-	};
+	//vec3 box = {
+		//.x = 50.0F,
+		//.y = 35.0F,
+		//.z = 65.0F
+	//};
 	//vec3 zero = {
 		//.x = 0.0F,
 		//.y = 0.0F,
 		//.z = 0.0F
 	//};
-	//vec3 sphere = {
-		//.x = 0.0F,
-		//.y = 0.0F,
-		//.z = 0.0F
-	//};
+	vec3 sphere = {
+		.x = 0.0F,
+		.y = 0.0F,
+		.z = 0.0F
+	};
 	//steps to march
 	const int steps = 5;
 	int i, j, k, l, m;
@@ -134,7 +134,8 @@ void render(SDL_Surface *screen)
 					ray_ofs,
 					ray_orig
 					);
-				sumdist += distance = distbox(ray_pos, box);
+				sumdist += distance =
+					disttorus(ray_pos, sphere, 2.0F, 15.0F);
 					//distsphere(ray_pos, sphere, 10.0F);
 				tmp = add3(
 					distalong3(ray_rot, distance),
