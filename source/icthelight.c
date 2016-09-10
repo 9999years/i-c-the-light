@@ -30,34 +30,46 @@
 
 void render(SDL_Surface *screen)
 {
-	//int tick = SDL_GetTicks();
+	float time = (float)SDL_GetTicks() / 500;
 	SDL_FillRect(screen, NULL, 0x000000);
 
 	/*
-	* here's how im setting up the axis (right-handed)
-	*      z
-	*      |
-	*      |
-	*      |
-	*      |
-	*      |
-	*      +----------- y
-	*     /
-	*    /
-	*   /
-	*  /
-	* x
-	*
-	*/
+	 * here's how im setting up the axis (right-handed)
+	 *      z
+	 *      |
+	 *      |
+	 *      |
+	 *      |
+	 *      |
+	 *      +----------- y
+	 *     /
+	 *    /
+	 *   /
+	 *  /
+	 * x
+	 *
+	 */
+
+	// im hard coding everything bithc. fuck off
 
 	//camera offset from origin
 	//backwards 1000 units on the y axis
-	vec3 camera_ofs = fromdirection3(-PI, 0.0F, 1000.0F);
+	//vec3 camera_ofs = fromdirection3(-PI, 0.0F, 1000.0F);
+	vec3 camera_ofs = {
+		.x = -80.0F,
+		.y = -1000.0F,
+		.z = -150.0F
+	};
 	//camera rotation
 	//pointing along y
 	//this is the direction the rays will fire
 	//if it isn't a unit vector things will explode probably
-	vec3 camera_rot = fromdirection3(PI, 0.0F, 1.0F);
+	//vec3 camera_rot = fromdirection3(time, 0.0F, 1.0F);
+	vec3 camera_rot = {
+		.x = 0.0F,
+		.y = 1.0F,
+		.z = 0.0F
+	};
 	//screen aspect ratio
 	const float aspect = (float)screen->w / (float)screen->h;
 	//size of area rays will be casted from in coord space
@@ -73,22 +85,74 @@ void render(SDL_Surface *screen)
 	//loop from 0 to samples
 	//map each sample onto 0..xres, offset by camera_ofs
 	//shoot in dir of camera_rot
-	vec3 ray_ofs;
+	//origin of each ray, where it fires from
+	vec3 ray_orig;
+	//unit vector of the direction to go into
 	vec3 ray_rot = camera_rot;
+	//actual position of the point being measured currently, relative to ray_orig
+	vec3 ray_ofs;
+	//real actual position of the point being measured
+	vec3 ray_pos;
+	vec3 tmp;
+	vec3 box = {
+		.x = 50.0F,
+		.y = 35.0F,
+		.z = 65.0F
+	};
+	//vec3 zero = {
+		//.x = 0.0F,
+		//.y = 0.0F,
+		//.z = 0.0F
+	//};
+	//vec3 sphere = {
+		//.x = 0.0F,
+		//.y = 0.0F,
+		//.z = 0.0F
+	//};
 	//steps to march
 	const int steps = 5;
-	int i, j, k;
+	int i, j, k, l, m;
 	for(i = 0; i < zsamples; i++) {
 		for(j = 0; j < xsamples; j++) {
+			//reset the array
+			ray_ofs.x = 0;
+			ray_ofs.y = 0;
+			ray_ofs.z = 0;
 			//our position in the screen + camera offset
-			ray_ofs.x =
+			ray_orig.x =
 				camera_ofs.x
-				+ scale(i, 0, xsamples, 0, camera_size.x);
-			//plot(
-				//screen,
-				//j, i,
-				//0xffffff
-				//);
+				+ scale(j, 0, xsamples, 0, camera_size.x);
+			ray_orig.y =
+				camera_ofs.y;
+			ray_orig.z =
+				camera_ofs.z
+				+ scale(i, 0, zsamples, 0, camera_size.y);
+			float distance;
+			float sumdist = 0;
+			for(k = 0; k < steps; k++) {
+				ray_pos = add3(
+					ray_ofs,
+					ray_orig
+					);
+				sumdist += distance = distbox(ray_pos, box);
+					//distsphere(ray_pos, sphere, 10.0F);
+				tmp = add3(
+					distalong3(ray_rot, distance),
+					ray_ofs
+					);
+				ray_ofs = tmp;
+			}
+			//if((i % 50 == 0) && (j % 50 == 0))
+			//if(distance < 10.0F)
+				//printf("dist: %f\nsumdist: %f\n\n", distance, sumdist);
+			plot(
+				screen,
+				j, i,
+				colortoint(graytocolor(bclamp(
+					500.0F / distance
+				//distance <= 2.0F ? 0xffffff : 0x000000
+				)))
+				);
 		}
 	}
 	return;

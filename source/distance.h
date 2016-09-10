@@ -75,6 +75,12 @@ float distbox(vec3 p, vec3 b)
 	);
 }
 
+//point, center, radius
+float distsphere(vec3 p, vec3 c, float r)
+{
+	return fabsf(dist3(p, c) - r);
+}
+
 //union
 float opu(float a, float b)
 {
