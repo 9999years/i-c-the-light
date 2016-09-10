@@ -82,8 +82,8 @@ void render(SDL_Surface *screen)
 		for(j = 0; j < xsamples; j++) {
 			//our position in the screen + camera offset
 			ray_ofs.x =
-				scale(i, 0, xsamples, 0, camera_size.x)
-				+ camera_ofs.x;
+				camera_ofs.x
+				+ scale(i, 0, xsamples, 0, camera_size.x);
 			//plot(
 				//screen,
 				//j, i,

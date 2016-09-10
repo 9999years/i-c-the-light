@@ -41,7 +41,7 @@ float distline2(vec2 p, vec2 a, vec2 b)
 	const vec2 projection =
 		add2(
 			a,
-			mult2scalar(
+			mult2s(
 				ba,
 				t
 			)
@@ -67,7 +67,7 @@ float distbox(vec3 p, vec3 b)
 	return magn3(
 		maxvec3s(
 			sub3(
-				absvec3s(p),
+				absvec3(p),
 				b
 			),
 			0.0F

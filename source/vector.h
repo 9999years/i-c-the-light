@@ -8,7 +8,7 @@
 //(ascending dimensions with scalar variants listed last)
 
 /*
- * here's how im setting up the axis
+ * here's how im setting up the axis (right-handed)
  *      z
  *      |
  *      |
@@ -101,6 +101,33 @@ vec3 distalong3(vec3 in, float distance)
 	ret.x = distance * in.x;
 	ret.y = distance * in.y;
 	ret.z = distance * in.z;
+	return ret;
+}
+
+//perpendicular vectors
+//swap components, invert parity of one
+vec2 perp2(vec2 in)
+{
+	vec2 ret;
+	ret.x = -in.y;
+	ret.y =  in.x;
+	return ret;
+}
+
+//vector perpendicular to `in`
+//almost certainly broken
+vec3 perp3(vec3 in)
+{
+	vec3 ret;
+	ret.x = in.z;
+	ret.y = in.z;
+	ret.z = in.x - in.y;
+	//if in = <-1, 1, 0>, it creates a 0 vector
+	if((ret.x == 0.0F) && (ret.y == 0.0F) && (ret.z == 0.0F)) {
+		ret.x = -in.y - in.z;
+		ret.y =  in.x;
+		ret.z =  in.x;
+	}
 	return ret;
 }
 
