@@ -15,7 +15,7 @@ float distcircle(vec2 p, vec2 c, float r)
 	a = p.x - c.x;
 	o = p.y - c.y;
 	//dist to c
-	return sqrt((o*o)+(a*a)) - r;
+	return sqrt((o * o) + (a * a)) - r;
 }
 
 //distance to line ab from p
@@ -33,19 +33,11 @@ float distline2(vec2 p, vec2 a, vec2 b)
 	//we find projection of point c onto the line.
 	//It falls where t = [(p-a) . (b-a)] / |b-a|^2
 	//we clamp t from [0,1] to handle points outside the segment ab
-	const float t =
-		fclamp(
-			dot2(pa, ba) / length
-		, 0, 1);
+	const float t = fclamp(
+		dot2(pa, ba) / length,
+		0, 1);
 	//projection falls on the segment
-	const vec2 projection =
-		add2(
-			a,
-			mult2s(
-				ba,
-				t
-			)
-		);
+	const vec2 projection = add2(a, mult2s(ba, t));
 	return dist2(
 		p,
 		projection
@@ -81,12 +73,19 @@ float distsphere(vec3 p, vec3 c, float r)
 	return fabsf(dist3(p, c) - r);
 }
 
+//TODO make the center param do something
 float disttorus(vec3 p, vec3 c, float thickness, float radius)
 {
 	vec2 q;
 	q.x = magn2((vec2){.x = p.x, .y = p.z}) - radius;
 	q.y = p.y;
 	return magn2(q) - thickness;
+}
+
+//who needs orientation?
+float distground(vec3 p)
+{
+	return p.y;
 }
 
 //union

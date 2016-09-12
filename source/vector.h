@@ -131,6 +131,24 @@ vec3 perp3(vec3 in)
 	return ret;
 }
 
+//invert
+vec2 inv2(vec2 in)
+{
+	vec2 ret;
+	ret.x = -in.x;
+	ret.y = -in.y;
+	return ret;
+}
+
+vec3 inv3(vec3 in)
+{
+	vec3 ret;
+	ret.x = -in.x;
+	ret.y = -in.y;
+	ret.z = -in.z;
+	return ret;
+}
+
 //max, component wise
 vec2 maxvec2(vec2 a, vec2 b)
 {

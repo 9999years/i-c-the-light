@@ -54,22 +54,22 @@ void render(SDL_Surface *screen)
 
 	//camera offset from origin
 	//backwards 1000 units on the y axis
-	//vec3 camera_ofs = fromdirection3(-PI, 0.0F, 1000.0F);
-	vec3 camera_ofs = {
-		.x = -50.0F,
-		.y = -1000.0F,
-		.z = -50.0F
-	};
+	vec3 camera_ofs = fromdirection3(time, 0.0F, 1000.0F);
+	//vec3 camera_ofs = {
+		//.x = -50.0F,
+		//.y = -1000.0F,
+		//.z = -50.0F
+	//};
 	//camera rotation
 	//pointing along y
 	//this is the direction the rays will fire
 	//if it isn't a unit vector things will explode probably
-	//vec3 camera_rot = fromdirection3(time, 0.0F, 1.0F);
-	vec3 camera_rot = {
-		.x = 0.0F,
-		.y = 1.0F,
-		.z = 0.0F
-	};
+	vec3 camera_rot = unit3(inv3(camera_ofs));
+	//vec3 camera_rot = {
+		//.x = 0.0F,
+		//.y = 1.0F,
+		//.z = 0.0F
+	//};
 	//screen aspect ratio
 	const float aspect = (float)screen->w / (float)screen->h;
 	//size of area rays will be casted from in coord space
@@ -94,11 +94,11 @@ void render(SDL_Surface *screen)
 	//real actual position of the point being measured
 	vec3 ray_pos;
 	vec3 tmp;
-	//vec3 box = {
-		//.x = 50.0F,
-		//.y = 35.0F,
-		//.z = 65.0F
-	//};
+	vec3 box = {
+		.x = 15.0F,
+		.y = 15.0F,
+		.z = 15.0F
+	};
 	//vec3 zero = {
 		//.x = 0.0F,
 		//.y = 0.0F,
@@ -110,11 +110,11 @@ void render(SDL_Surface *screen)
 		.z = 0.0F
 	};
 	//steps to march
-	const int steps = 5;
-	int i, j, k, l, m;
+	const int steps = 64;
+	int i, j, k;
 	for(i = 0; i < zsamples; i++) {
 		for(j = 0; j < xsamples; j++) {
-			//reset the array
+			//reset the ray offset
 			ray_ofs.x = 0;
 			ray_ofs.y = 0;
 			ray_ofs.z = 0;
@@ -135,8 +135,14 @@ void render(SDL_Surface *screen)
 					ray_orig
 					);
 				sumdist += distance =
-					disttorus(ray_pos, sphere, 2.0F, 15.0F);
+					ops(
+					distbox(ray_pos, box),
+					distsphere(ray_pos, sphere, 10.0F)
+					);
+					//disttorus(ray_pos, sphere, 2.0F, 15.0F);
 					//distsphere(ray_pos, sphere, 10.0F);
+				if(distance <= 2.0F)
+					break;
 				tmp = add3(
 					distalong3(ray_rot, distance),
 					ray_ofs
@@ -150,6 +156,7 @@ void render(SDL_Surface *screen)
 				screen,
 				j, i,
 				colortoint(graytocolor(bclamp(
+					//255.0F * (float)k / (float)steps
 					500.0F / distance
 				//distance <= 2.0F ? 0xffffff : 0x000000
 				)))
@@ -245,7 +252,14 @@ int WinMain(/*int argc, char* args[]*/)
 		printf("SDL could not initialize! SDL_Error: %s\n", SDL_GetError());
 	} else {
 		//Create window
-		window = SDL_CreateWindow("I C the Light", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN);
+		window = SDL_CreateWindow(
+			"I C the Light",
+			SDL_WINDOWPOS_UNDEFINED,
+			SDL_WINDOWPOS_UNDEFINED,
+			SCREEN_WIDTH,
+			SCREEN_HEIGHT,
+			SDL_WINDOW_SHOWN
+			);
 		if(window == NULL) {
 			printf("Window could not be created! SDL_Error: %s\n", SDL_GetError());
 		} else {
