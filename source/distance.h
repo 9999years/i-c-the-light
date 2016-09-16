@@ -95,6 +95,7 @@ float opu(float a, float b)
 }
 
 //subtraction
+//requires signed distance functions!!!!!
 float ops(float a, float b)
 {
 	return max(-a, b);
