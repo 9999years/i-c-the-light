@@ -17,6 +17,7 @@
 #include <time.h>
 
 //project files
+#include "common.h"
 #include "color.h"
 #include "ppm.h"
 #include "line.h"
@@ -27,90 +28,237 @@
 #define SCREEN_WIDTH 500
 #define SCREEN_HEIGHT 500
 
-#define PI_SQ   9.86960440108F
-#define TAU     6.28318530717F
-#define PI      3.14159265359F
-#define HALF_PI 1.57079632679F
+//global distance estimator
+float de(vec3 pos)
+{
+	//vec3 box = {
+		//.x = 15.0F,
+		//.y = 15.0F,
+		//.z = 15.0F
+	//};
+	//vec3 zero = {
+		//.x = 0.0F,
+		//.y = 0.0F,
+		//.z = 0.0F
+	//};
+	vec3 sphere = {
+		.x = 50.0F,
+		.y = 0.0F,
+		.z = 50.0F
+	};
+	return
+		//ops(
+		//distbox(pos, box),
+		//distsphere(pos, sphere, 10.0F)
+		//);
+		disttorus(pos, sphere, 2.0F, 15.0F);
+		//distsphere(ray_pos, sphere, 10.0F);
+}
 
-//i might replace this with sfmt one day
-//but not today
-//shamelessly pilfered from
-//https://stackoverflow.com/questions/2999075/generate-a-random-number-within-range/2999130#2999130
-int random(int min, int max) {
-	int range = max - min;
-	int divisor = RAND_MAX/(range+1);
-	int retval;
-	do {
-		retval = rand() / divisor;
-	} while (retval > range);
-	return retval + min;
+//returns a normal
+vec3 getnormal(vec3 pos)
+{
+	vec3 ret;
+	vec3 xunit = {
+		.x = 1.0F,
+		.y = 0.0F,
+		.z = 0.0F
+	};
+	vec3 yunit = {
+		.x = 0.0F,
+		.y = 1.0F,
+		.z = 0.0F
+	};
+	vec3 zunit = {
+		.x = 0.0F,
+		.y = 0.0F,
+		.z = 1.0F
+	};
+	ret.x = de(add3(pos, xunit)) - de(sub3(pos, xunit));
+	ret.y = de(add3(pos, yunit)) - de(sub3(pos, yunit));
+	ret.z = de(add3(pos, zunit)) - de(sub3(pos, zunit));
+	return unit3(ret);
+}
+
+void dbvec(vec3 a)
+{
+	printf( "x: %f\n"
+		"y: %f\n"
+		"z: %f\n\n",
+		a.x, a.y, a.z
+	);
+	return;
+}
+
+//takes a light vector and a position vector
+//the position vector is the distance between the camera and the point on the
+//surface (vec V here:
+//https://en.m.wikipedia.org/wiki/Blinn%E2%80%93Phong_shading_model#Description
+//can usually be found with )
+unsigned int blinnphong(vec3 cam, vec3 pos, vec3 light)
+{
+	//k_s: specular constant
+#define k_s 1.0F
+	//k_d: diffuse constant
+#define k_d 0.5F
+	//k_a: ambient constant
+#define k_a 0.0F
+	//α: shininess constant (larger = smaller highlight)
+#define alpha 1.0F
+	//i_s: specular intensity
+#define specular_intensity 1.0F
+	//i_d: diffuse intensity
+#define diffuse_intensity 1.0F
+	//i_a: ambient intensity
+#define ambient_intensity 0.0F
+	//L: light vector, from surface to light
+	//N: normal
+	//R: reflection vector
+	//V: viewer vector
+	//phong:
+	//k_a * i_a + k_d * (L · N) * i_d + k_s * (R · V)^α * i_s
+	//blinn-phong:
+	//k_a * i_a + k_d * (L · N) * i_d + k_s * (N · H)^α * i_s
+	vec3 normal = getnormal(pos);
+	vec3 halfway = avg3(cam, light);
+	//vec3 halfway = unit3(add3(cam, light));
+	//printf("cam:\n");
+	//dbvec(cam);
+	//printf("pos:\n");
+	//dbvec(pos);
+	//printf("light:\n");
+	//dbvec(light);
+	//printf("normal:\n");
+	//dbvec(normal);
+	//printf("halfway:\n");
+	//dbvec(halfway);
+	float ret =
+		dot3(light, normal)// * diffuse_intensity
+		//+ pow(dot3(normal, halfway), alpha) * specular_intensity;
+		+ dot3(normal, halfway);
+	//printf("%f\n", ret);
+	return
+		(unsigned int)(ret);
 }
 
 void render(SDL_Surface *screen)
 {
-
-	int tick = SDL_GetTicks();
-	float time = (float)tick/200;
-
+	float time = (float)SDL_GetTicks() / 500;
 	SDL_FillRect(screen, NULL, 0x000000);
 
-	vec2 c, a;
-	//c.x = screen->w/2;
-	//c.y = screen->h/2;// + 150 * sin((float)tick/512);
-	c.x = 80  + 15 * cos(time);
-	c.y = 120 + 15 * sin(time);
-	time += 1;
-	a.x = 375 + 35 * cos(time);
-	a.y = 400 + 35 * sin(time);
+	/*
+	 * here's how im setting up the axis (right-handed)
+	 *      z
+	 *      |
+	 *      |
+	 *      |
+	 *      |
+	 *      |
+	 *      +----------- y
+	 *     /
+	 *    /
+	 *   /
+	 *  /
+	 * x
+	 *
+	 */
 
-	int i, j, k, l, hits;
-#define SAMPLES 8
-	const int sampsqr = SAMPLES * SAMPLES;
-	const int scale = 0xff / sampsqr;
-	float dist;
-	vec2 point;
-	//O(scary) but actually fine
-	//no but seriously the deepest loop gets hit like 1.5 mil times
-	for(i = 0; i < screen->h; i++) {
-		for(j = 0; j < screen->w; j++) {
-			//if it's far out, skip ahead a bit
-			dist = distline2(a, c, (vec2){.x = j, .y = i});
-			if(dist > 2) {
-				//plot(
-					//screen,
-					//j, i,
-					//colortoint(shifthue(
-					//(struct rgbcolor){0xff, 0x88, 0x88},
-					//i * 2 + j
-					//))
-					//);
-				j += floor(dist - 2);
-				continue;
-			}
-			//for each pixel, multisample
-			hits = 0;
-			for(k = 0; k < SAMPLES; k++) {
-				for(l = 0; l < SAMPLES; l++) {
-					point.x = j + (float)k / SAMPLES;
-					point.y = i + (float)l / SAMPLES;
-					dist = distline2(a, c, point);
-					if(dist < 2)
-						hits++;
+	//camera offset from origin
+	//backwards 1000 units on the y axis
+	//vec3 camera_ofs = fromdirection3(time, 0.0F, 1000.0F);
+	vec3 camera_ofs = {
+		.x = 250.0F,
+		.y = -1000.0F,
+		.z = 250.0F
+	};
+	//camera rotation
+	//pointing along y
+	//this is the direction the rays will fire
+	//if it isn't a unit vector things will explode probably
+	vec3 camera_rot = unit3(inv3(camera_ofs));
+	//vec3 camera_rot = {
+		//.x = 0.0F,
+		//.y = 1.0F,
+		//.z = 0.0F
+	//};
+	//screen aspect ratio
+	const float aspect = (float)screen->w / (float)screen->h;
+	//size of area rays will be casted from in coord space
+	//NOT screen pixels!!! that's `samples`
+	vec2 camera_size;
+	camera_size.x = 100.0F;
+	//infer height from screen ratio
+	camera_size.y = aspect * camera_size.x;
+	//horiz samples
+	//these are the values the for() loops go to
+	const int xsamples = screen->w;
+	const int zsamples = aspect * xsamples;
+	//loop from 0 to samples
+	//map each sample onto 0..xres, offset by camera_ofs
+	//shoot in dir of camera_rot
+	//origin of each ray, where it fires from
+	vec3 ray_orig;
+	//unit vector of the direction to go into
+	vec3 ray_rot = camera_rot;
+	//actual position of the point being measured currently, relative to ray_orig
+	vec3 ray_ofs;
+	//real actual position of the point being measured
+	vec3 ray_pos;
+	vec3 tmp;
+	vec3 light = {
+		.x = 0.707107,
+		.y = 0.0F,
+		.z = 0.707107
+	};
+	//steps to march
+	const int steps = 64;
+	int i, j, k;
+	for(i = 0; i < zsamples; i++) {
+		for(j = 0; j < xsamples; j++) {
+			//reset the ray offset
+			ray_ofs.x = 0;
+			ray_ofs.y = 0;
+			ray_ofs.z = 0;
+			//our position in the screen + camera offset
+			ray_orig.x =
+				camera_ofs.x
+				+ scale(j, 0, xsamples, 0, camera_size.x);
+			ray_orig.y =
+				camera_ofs.y;
+			ray_orig.z =
+				camera_ofs.z
+				+ scale(i, 0, zsamples, 0, camera_size.y);
+			float distance;
+			float sumdist = 0;
+			for(k = 0; k < steps; k++) {
+				ray_pos = add3(
+					ray_ofs,
+					ray_orig
+					);
+				sumdist += distance =
+					de(ray_pos);
+				if(distance <= 2.0F) {
+					plot(
+						screen,
+						j, i,
+						colortoint(graytocolor(bclamp(
+							//255.0F * (float)k / (float)steps
+							//500.0F / distance
+							blinnphong(ray_orig, ray_pos, light)
+						//distance <= 2.0F ? 0xffffff : 0x000000
+						)))
+						);
+					break;
 				}
+				tmp = add3(
+					distalong3(ray_rot, distance),
+					ray_ofs
+					);
+				ray_ofs = tmp;
 			}
-			//if(dist > 10)
-				//continue;
-			plot(
-				screen,
-				j, i,
-				//0xFFFFFF
-				colortoint(graytocolor(bclamp(
-					hits * scale
-				)))
-				);
-			//nothing left to do if we’ve already hit the line
-			//if(hits == sampsqr)
-				//break;
+			//if((i % 50 == 0) && (j % 50 == 0))
+			//if(distance < 10.0F)
+				//printf("dist: %f\nsumdist: %f\n\n", distance, sumdist);
 		}
 	}
 	return;
@@ -202,26 +350,27 @@ int WinMain(/*int argc, char* args[]*/)
 		printf("SDL could not initialize! SDL_Error: %s\n", SDL_GetError());
 	} else {
 		//Create window
-		window = SDL_CreateWindow("I C the Light", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN);
+		window = SDL_CreateWindow(
+			"I C the Light",
+			SDL_WINDOWPOS_UNDEFINED,
+			SDL_WINDOWPOS_UNDEFINED,
+			SCREEN_WIDTH,
+			SCREEN_HEIGHT,
+			SDL_WINDOW_SHOWN
+			);
 		if(window == NULL) {
 			printf("Window could not be created! SDL_Error: %s\n", SDL_GetError());
 		} else {
 			//Get window surface
 			screen = SDL_GetWindowSurface(window);
-
-			//save
-			render(screen);
-
-			saveframe(screen);
 		}
 	}
 	int quit = 0;
 	int frame = 0;
 	clock_t start, end;
 	double total;
-	while (!quit) {
+	while(!quit) {
 		start = clock();
-		frame++;
 
 		//SDL_Delay(16);
 		// render
@@ -236,9 +385,13 @@ int WinMain(/*int argc, char* args[]*/)
 
 		end = clock();
 		if(frame%30 == 0) {
+			if(frame == 0) {
+				saveframe(screen);
+			}
 			total = (double)(end - start) / CLOCKS_PER_SEC;
 			printf("%.4f FPS\n", 1 / total);
 		}
+		frame++;
 	}
 
 	//Destroy window

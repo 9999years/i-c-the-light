@@ -49,6 +49,38 @@ byte bclamp(float value)
 	return (byte)value;
 }
 
+struct rgbcolor addcolor(struct rgbcolor a, struct rgbcolor b)
+{
+	struct rgbcolor ret;
+	ret.r = a.r + b.r;
+	ret.g = a.g + b.g;
+	ret.b = a.b + b.b;
+	return ret;
+}
+
+struct rgbcolor avgcolor(struct rgbcolor a, struct rgbcolor b)
+{
+	struct rgbcolor ret;
+	ret.r = (a.r + b.r) / 2.0F;
+	ret.g = (a.g + b.g) / 2.0F;
+	ret.b = (a.b + b.b) / 2.0F;
+	return ret;
+}
+
+//interpolates between a and b
+//b_interp is the percent of b to use
+//eg b_interp = 1 --> 0% a, 100% b
+//if b_interp is > 1 or < 0 you're gonna get some wacky nonsense
+struct rgbcolor lerpcolor(struct rgbcolor a, struct rgbcolor b, float b_interp)
+{
+	const float a_interp = 1.0F - b_interp;
+	struct rgbcolor ret;
+	ret.r = a.r * a_interp + b.r * b_interp;
+	ret.g = a.g * a_interp + b.g * b_interp;
+	ret.b = a.b * a_interp + b.b * b_interp;
+	return ret;
+}
+
 //this function only *approximates* a hue shift
 //don't use it for anything exact
 //it's also not associative

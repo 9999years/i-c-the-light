@@ -6,6 +6,8 @@
 
 *everything you hated about vector math in precalculus but worse!*
 
+*now on Git Hub!™*
+
 On ray marching (from [Syntopia](http://blog.hvidtfeldts.net/index.php/2011/06/distance-estimated-3d-fractals-part-i/)):
 
 > Classic raytracing shoots one (or more) rays per pixel and calculates where the
@@ -40,7 +42,7 @@ Functions for converting colors between `(unsigned int) 0xFFFFFF` and `unsigned 
 
 Unit tests.
 
-I have a tentative 100% test coverage, in that 100% of the functions are covered—there’s definitely the chance that edge cases are not covered.
+I have a tentative 100% test coverage (update: lol), in that 100% of the functions are covered—there’s definitely the chance that edge cases are not covered.
 
 #### `icthelight.c`
 
