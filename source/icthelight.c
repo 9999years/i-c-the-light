@@ -28,6 +28,118 @@
 #define SCREEN_WIDTH 500
 #define SCREEN_HEIGHT 500
 
+//global distance estimator
+float de(vec3 pos)
+{
+	vec3 box = {
+		.x = 15.0F,
+		.y = 15.0F,
+		.z = 15.0F
+	};
+	//vec3 zero = {
+		//.x = 0.0F,
+		//.y = 0.0F,
+		//.z = 0.0F
+	//};
+	vec3 sphere = {
+		.x = 0.0F,
+		.y = 0.0F,
+		.z = 0.0F
+	};
+	return
+		//ops(
+		//distbox(pos, box),
+		//distsphere(pos, sphere, 10.0F)
+		//);
+		disttorus(pos, sphere, 2.0F, 15.0F);
+		//distsphere(ray_pos, sphere, 10.0F);
+}
+
+//returns a normal
+vec3 getnormal(vec3 pos)
+{
+	vec3 ret;
+	vec3 xunit = {
+		.x = 1.0F,
+		.y = 0.0F,
+		.z = 0.0F
+	};
+	vec3 yunit = {
+		.x = 0.0F,
+		.y = 1.0F,
+		.z = 0.0F
+	};
+	vec3 zunit = {
+		.x = 0.0F,
+		.y = 0.0F,
+		.z = 1.0F
+	};
+	ret.x = de(add3(pos, xunit)) - de(sub3(pos, xunit));
+	ret.y = de(add3(pos, yunit)) - de(sub3(pos, yunit));
+	ret.z = de(add3(pos, zunit)) - de(sub3(pos, zunit));
+	return unit3(ret);
+}
+
+void dbvec(vec3 a)
+{
+	printf( "x: %f\n"
+		"y: %f\n"
+		"z: %f\n\n",
+		a.x, a.y, a.z
+	);
+	return;
+}
+
+//takes a light vector and a position vector
+//the position vector is the distance between the camera and the point on the
+//surface (vec V here:
+//https://en.m.wikipedia.org/wiki/Blinn%E2%80%93Phong_shading_model#Description
+//can usually be found with )
+unsigned int blinnphong(vec3 cam, vec3 pos, vec3 light)
+{
+	//k_s: specular constant
+#define k_s 1.0F
+	//k_d: diffuse constant
+#define k_d 0.5F
+	//k_a: ambient constant
+#define k_a 0.0F
+	//α: shininess constant (larger = smaller highlight)
+#define alpha 1.0F
+	//i_s: specular intensity
+#define specular_intensity 1.0F
+	//i_d: diffuse intensity
+#define diffuse_intensity 1.0F
+	//i_a: ambient intensity
+#define ambient_intensity 0.0F
+	//L: light vector, from surface to light
+	//N: normal
+	//R: reflection vector
+	//V: viewer vector
+	//phong:
+	//k_a * i_a + k_d * (L · N) * i_d + k_s * (R · V)^α * i_s
+	//blinn-phong:
+	//k_a * i_a + k_d * (L · N) * i_d + k_s * (N · H)^α * i_s
+	vec3 normal = getnormal(pos);
+	vec3 halfway = avg3(cam, light);
+	//printf("cam:\n");
+	//dbvec(cam);
+	//printf("pos:\n");
+	//dbvec(pos);
+	//printf("light:\n");
+	//dbvec(light);
+	//printf("normal:\n");
+	//dbvec(normal);
+	//printf("halfway:\n");
+	//dbvec(halfway);
+	float ret =
+		dot3(light, normal)// * diffuse_intensity
+		//+ pow(dot3(normal, halfway), alpha) * specular_intensity;
+		+ dot3(normal, halfway);
+	//printf("%f\n", ret);
+	return
+		(unsigned int)(ret);
+}
+
 void render(SDL_Surface *screen)
 {
 	float time = (float)SDL_GetTicks() / 500;
@@ -50,16 +162,14 @@ void render(SDL_Surface *screen)
 	 *
 	 */
 
-	// im hard coding everything bithc. fuck off
-
 	//camera offset from origin
 	//backwards 1000 units on the y axis
-	vec3 camera_ofs = fromdirection3(time, 0.0F, 1000.0F);
-	//vec3 camera_ofs = {
-		//.x = -50.0F,
-		//.y = -1000.0F,
-		//.z = -50.0F
-	//};
+	//vec3 camera_ofs = fromdirection3(time, 0.0F, 1000.0F);
+	vec3 camera_ofs = {
+		.x = -50.0F,
+		.y = -1000.0F,
+		.z = -50.0F
+	};
 	//camera rotation
 	//pointing along y
 	//this is the direction the rays will fire
@@ -94,20 +204,10 @@ void render(SDL_Surface *screen)
 	//real actual position of the point being measured
 	vec3 ray_pos;
 	vec3 tmp;
-	vec3 box = {
-		.x = 15.0F,
-		.y = 15.0F,
-		.z = 15.0F
-	};
-	//vec3 zero = {
-		//.x = 0.0F,
-		//.y = 0.0F,
-		//.z = 0.0F
-	//};
-	vec3 sphere = {
+	vec3 light = {
 		.x = 0.0F,
-		.y = 0.0F,
-		.z = 0.0F
+		.y = 1.0F,
+		.z = 0.5F
 	};
 	//steps to march
 	const int steps = 64;
@@ -135,14 +235,20 @@ void render(SDL_Surface *screen)
 					ray_orig
 					);
 				sumdist += distance =
-					ops(
-					distbox(ray_pos, box),
-					distsphere(ray_pos, sphere, 10.0F)
-					);
-					//disttorus(ray_pos, sphere, 2.0F, 15.0F);
-					//distsphere(ray_pos, sphere, 10.0F);
-				if(distance <= 2.0F)
+					de(ray_pos);
+				if(distance <= 2.0F) {
+					plot(
+						screen,
+						j, i,
+						colortoint(graytocolor(bclamp(
+							//255.0F * (float)k / (float)steps
+							//500.0F / distance
+							blinnphong(ray_orig, ray_pos, light)
+						//distance <= 2.0F ? 0xffffff : 0x000000
+						)))
+						);
 					break;
+				}
 				tmp = add3(
 					distalong3(ray_rot, distance),
 					ray_ofs
@@ -152,15 +258,6 @@ void render(SDL_Surface *screen)
 			//if((i % 50 == 0) && (j % 50 == 0))
 			//if(distance < 10.0F)
 				//printf("dist: %f\nsumdist: %f\n\n", distance, sumdist);
-			plot(
-				screen,
-				j, i,
-				colortoint(graytocolor(bclamp(
-					//255.0F * (float)k / (float)steps
-					500.0F / distance
-				//distance <= 2.0F ? 0xffffff : 0x000000
-				)))
-				);
 		}
 	}
 	return;

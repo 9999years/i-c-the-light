@@ -381,6 +381,24 @@ vec3 div3s(vec3 a, float s)
 	return ret;
 }
 
+//average
+vec2 avg2(vec2 a, vec2 b)
+{
+	vec2 ret;
+	ret.x = (a.x + b.x) / 2;
+	ret.y = (a.y + b.y) / 2;
+	return ret;
+}
+
+vec3 avg3(vec3 a, vec3 b)
+{
+	vec3 ret;
+	ret.x = (a.x + b.x) / 2;
+	ret.y = (a.y + b.y) / 2;
+	ret.z = (a.z + b.z) / 2;
+	return ret;
+}
+
 //dot product
 float dot2(vec2 a, vec2 b)
 {
