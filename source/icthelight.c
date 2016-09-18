@@ -138,7 +138,7 @@ unsigned int blinnphong(vec3 cam, vec3 pos, vec3 light)
 		+ dot3(normal, halfway);
 	//printf("%f\n", ret);
 	return
-		(unsigned int)(ret);
+		(unsigned int)(ret / 2.1F);
 }
 
 void render(SDL_Surface *screen)
