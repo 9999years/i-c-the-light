@@ -1,0 +1,6 @@
+*.exe
+*.dll
+output/*
+ftpinfo.txt
+**/SDL/*
+**/TEST_PPM.ppm

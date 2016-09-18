@@ -1,0 +1,32 @@
+CC = gcc
+CFLAGS = -Wall -Wextra --std=c99 #-fdiagnostics-color
+SDL_INCLUDE = -IC:\c\include\SDL
+SDL_LIBRARY = -LC:\c\lib64
+SDL_LINKER_FLAGS = -lSDL2main -lSDL2
+# only for windows right now
+NO_CONSOLE = #-mwindows
+
+icthelight: icthelight.c
+	$(CC) $? $(CFLAGS) $(SDL_LIBRARY) $(NO_CONSOLE) $(SDL_INCLUDE) $(SDL_LINKER_FLAGS) -o $@
+
+test: test.c
+	$(CC) $? $(CFLAGS) $(SDL_LIBRARY) $(NO_CONSOLE) $(SDL_INCLUDE) $(SDL_LINKER_FLAGS) -o $@
+
+incrementbuildversion: incrementbuildversion.c
+	$(CC) $? $(CFLAGS) -o $@
+
+convert:
+	mogrify -format png ../output/*.ppm
+	del ..\output\*.ppm
+
+clean:
+	del *.exe
+	del TEST_PPM.ppm
+
+run:
+	.\icthelight
+
+trig: trig.c
+	$(CC) $? $(CFLAGS) -o $@
+	.\trig
+#gnuplot -e "plot 'sin.dat', cos(x)" -p
