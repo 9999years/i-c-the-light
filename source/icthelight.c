@@ -56,6 +56,7 @@ float de(vec3 pos)
 }
 
 //returns a normal
+//why does this work????
 vec3 getnormal(vec3 pos)
 {
 	vec3 ret;
@@ -78,16 +79,6 @@ vec3 getnormal(vec3 pos)
 	ret.y = de(add3(pos, yunit)) - de(sub3(pos, yunit));
 	ret.z = de(add3(pos, zunit)) - de(sub3(pos, zunit));
 	return unit3(ret);
-}
-
-void dbvec(vec3 a)
-{
-	printf( "x: %f\n"
-		"y: %f\n"
-		"z: %f\n\n",
-		a.x, a.y, a.z
-	);
-	return;
 }
 
 //takes a light vector and a position vector
@@ -119,9 +110,11 @@ unsigned int blinnphong(vec3 cam, vec3 pos, vec3 light)
 	//k_a * i_a + k_d * (L · N) * i_d + k_s * (R · V)^α * i_s
 	//blinn-phong:
 	//k_a * i_a + k_d * (L · N) * i_d + k_s * (N · H)^α * i_s
+	cam = unit3(sub3(cam, pos));
+	//pos = unit3(pos);
 	vec3 normal = getnormal(pos);
-	vec3 halfway = avg3(cam, light);
-	//vec3 halfway = unit3(add3(cam, light));
+	//vec3 halfway = avg3(cam, light);
+	vec3 halfway = unit3(add3(cam, light));
 	//printf("cam:\n");
 	//dbvec(cam);
 	//printf("pos:\n");
@@ -133,17 +126,16 @@ unsigned int blinnphong(vec3 cam, vec3 pos, vec3 light)
 	//printf("halfway:\n");
 	//dbvec(halfway);
 	float ret =
-		dot3(light, normal)// * diffuse_intensity
-		//+ pow(dot3(normal, halfway), alpha) * specular_intensity;
-		+ dot3(normal, halfway);
+		dot3(light, normal) * diffuse_intensity
+		+ pow(dot3(normal, halfway), alpha) * specular_intensity;
 	//printf("%f\n", ret);
 	return
-		(unsigned int)(ret / 2.1F);
+		(unsigned int)(scale(ret, -2.0F, 2.0F, 0.0F, 255.0F));
 }
 
-void render(SDL_Surface *screen)
+void render(SDL_Surface *screen, int frame)
 {
-	float time = (float)SDL_GetTicks() / 500;
+	float time = (float)frame / 3.0F;
 	SDL_FillRect(screen, NULL, 0x000000);
 
 	/*
@@ -205,11 +197,12 @@ void render(SDL_Surface *screen)
 	//real actual position of the point being measured
 	vec3 ray_pos;
 	vec3 tmp;
-	vec3 light = {
-		.x = 0.707107,
-		.y = 0.0F,
-		.z = 0.707107
-	};
+	vec3 light;//= {
+		//.x = 0.0F,//707107,
+		//.y = 0.0F,
+		//.z = 1.0F
+	//};
+	light = fromdirection3(time + 1.0F, time, 1.0F);
 	//steps to march
 	const int steps = 64;
 	int i, j, k;
@@ -372,25 +365,26 @@ int WinMain(/*int argc, char* args[]*/)
 	while(!quit) {
 		start = clock();
 
+		//poll for events, and handle the ones we care about.
+		//this returns 1 if we need to quit
+		quit = handleevents(screen);
+
 		//SDL_Delay(16);
 		// render
-		render(screen);
+		render(screen, frame);
 
 
 		//Update the surface
 		SDL_UpdateWindowSurface(window);
 
-		// poll for events, and handle the ones we care about.
-		quit = handleevents(screen);
-
 		end = clock();
-		if(frame%30 == 0) {
+		//if(frame%30 == 0) {
 			if(frame == 0) {
 				saveframe(screen);
 			}
 			total = (double)(end - start) / CLOCKS_PER_SEC;
 			printf("%.4f FPS\n", 1 / total);
-		}
+		//}
 		frame++;
 	}
 

@@ -1,6 +1,5 @@
 //distance estimation functions
 #include <math.h>
-#include "trig.h"
 
 //displace a point by a wobbly sine shape
 float sindisplace2(vec2 point, float orig, float freq, float amp)

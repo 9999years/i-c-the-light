@@ -59,6 +59,6 @@ float lerp(float a, float b, float b_interp)
 //it's useful i swear
 float scale(float val, float valmin, float valmax, float min, float max)
 {
-	float valscale = val / (valmax - valmin);
+	float valscale = (val - valmin) / (valmax - valmin);
 	return valscale * (max - min) + min;
 }
