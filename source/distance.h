@@ -1,12 +1,6 @@
 //distance estimation functions
 #include <math.h>
 
-//displace a point by a wobbly sine shape
-float sindisplace2(vec2 point, float orig, float freq, float amp)
-{
-	return amp * sin((float)point.x / freq) * sin((float)point.y / freq) + orig;
-}
-
 //distance from point p to circle of radius r centered at c
 float distcircle(vec2 p, vec2 c, float r)
 {
@@ -105,4 +99,28 @@ float ops(float a, float b)
 float opi(float a, float b)
 {
 	return max(a, b);
+}
+
+//displace a point by a wobbly sine shape
+float opwobble2(vec2 point, float orig, float freq, float amp)
+{
+	return amp
+		* sin(point.x / freq)
+		* sin(point.y / freq)
+		+ orig;
+}
+
+float opwobble3(vec3 point, float orig, float freq, float amp)
+{
+	return amp
+		* sin(point.x / freq)
+		* sin(point.y / freq)
+		* sin(point.z / freq)
+		+ orig;
+}
+
+float oprepeat3(vec3 point, vec3 period)
+{
+	vec3 q;
+	return;
 }

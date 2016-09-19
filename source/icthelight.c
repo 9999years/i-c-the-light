@@ -31,11 +31,11 @@
 //global distance estimator
 float de(vec3 pos)
 {
-	//vec3 box = {
-		//.x = 15.0F,
-		//.y = 15.0F,
-		//.z = 15.0F
-	//};
+	vec3 box = {
+		.x = 15.0F,
+		.y = 15.0F,
+		.z = 15.0F
+	};
 	//vec3 zero = {
 		//.x = 0.0F,
 		//.y = 0.0F,
@@ -46,34 +46,39 @@ float de(vec3 pos)
 		.y = 0.0F,
 		.z = 50.0F
 	};
+	vec3 period = {
+		.x = 50.0F,
+		.y = 50.0F,
+		.z = 50.0F
+	};
 	return
-		//ops(
-		//distbox(pos, box),
-		//distsphere(pos, sphere, 10.0F)
-		//);
-		disttorus(pos, sphere, 2.0F, 15.0F);
+		ops(
+		distbox(pos, box),
+		distsphere(pos, sphere, 10.0F)
+		);
+		//disttorus(pos, sphere, 2.0F, 15.0F);
 		//distsphere(ray_pos, sphere, 10.0F);
 }
 
 //returns a normal
 //why does this work????
-vec3 getnormal(vec3 pos)
+vec3 getnormal(vec3 pos, float samplesize)
 {
 	vec3 ret;
 	vec3 xunit = {
-		.x = 1.0F,
+		.x = samplesize,
 		.y = 0.0F,
 		.z = 0.0F
 	};
 	vec3 yunit = {
 		.x = 0.0F,
-		.y = 1.0F,
+		.y = samplesize,
 		.z = 0.0F
 	};
 	vec3 zunit = {
 		.x = 0.0F,
 		.y = 0.0F,
-		.z = 1.0F
+		.z = samplesize
 	};
 	ret.x = de(add3(pos, xunit)) - de(sub3(pos, xunit));
 	ret.y = de(add3(pos, yunit)) - de(sub3(pos, yunit));
@@ -86,7 +91,7 @@ vec3 getnormal(vec3 pos)
 //surface (vec V here:
 //https://en.m.wikipedia.org/wiki/Blinn%E2%80%93Phong_shading_model#Description
 //can usually be found with )
-unsigned int blinnphong(vec3 cam, vec3 pos, vec3 light)
+unsigned int blinnphong(vec3 cam, vec3 pos, vec3 rot, vec3 light)
 {
 	//k_s: specular constant
 #define k_s 1.0F
@@ -112,7 +117,8 @@ unsigned int blinnphong(vec3 cam, vec3 pos, vec3 light)
 	//k_a * i_a + k_d * (L · N) * i_d + k_s * (N · H)^α * i_s
 	cam = unit3(sub3(cam, pos));
 	//pos = unit3(pos);
-	vec3 normal = getnormal(pos);
+	//vec3 normal = getnormal(sub3(pos, mult3s(unit3(rot), 2.0F)), 10.0F);
+	vec3 normal = getnormal(pos, 0.5F);
 	//vec3 halfway = avg3(cam, light);
 	vec3 halfway = unit3(add3(cam, light));
 	//printf("cam:\n");
@@ -237,7 +243,7 @@ void render(SDL_Surface *screen, int frame)
 						colortoint(graytocolor(bclamp(
 							//255.0F * (float)k / (float)steps
 							//500.0F / distance
-							blinnphong(ray_orig, ray_pos, light)
+							blinnphong(ray_orig, ray_pos, ray_rot, light)
 						//distance <= 2.0F ? 0xffffff : 0x000000
 						)))
 						);
