@@ -1,4 +1,3 @@
-//I C the Light: a distance-estimating ray marcher
 //repo here: https://github.com/9999years/i-c-the-light
 //MIT/expat license
 //rebecca turner
@@ -52,11 +51,11 @@ float de(vec3 pos)
 		.z = 50.0F
 	};
 	return
-		ops(
-		distbox(pos, box),
-		distsphere(pos, sphere, 10.0F)
-		);
-		//disttorus(pos, sphere, 2.0F, 15.0F);
+		/*ops(*/
+		/*distbox(pos, box),*/
+		/*distsphere(pos, sphere, 10.0F)*/
+		/*);*/
+		disttorus(pos, sphere, 2.0F, 15.0F);
 		//distsphere(ray_pos, sphere, 10.0F);
 }
 
@@ -118,7 +117,7 @@ unsigned int blinnphong(vec3 cam, vec3 pos, vec3 rot, vec3 light)
 	cam = unit3(sub3(cam, pos));
 	//pos = unit3(pos);
 	//vec3 normal = getnormal(sub3(pos, mult3s(unit3(rot), 2.0F)), 10.0F);
-	vec3 normal = getnormal(pos, 0.5F);
+	vec3 normal = getnormal(add3(pos, rot), 2.0F);
 	//vec3 halfway = avg3(cam, light);
 	vec3 halfway = unit3(add3(cam, light));
 	//printf("cam:\n");
