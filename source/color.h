@@ -3,6 +3,9 @@
 
 #include <math.h>
 
+#ifndef COLOR_H
+#define COLOR_H
+
 #define CHANNELS 3
 
 typedef unsigned char byte;
@@ -132,3 +135,4 @@ struct rgbcolor shifthue(struct rgbcolor in, const float fHue)
 
 	return ret;
 }
+#endif //COLOR_H

@@ -27,7 +27,9 @@
 #define SCREEN_WIDTH 500
 #define SCREEN_HEIGHT 500
 
+//globals
 FILE *logfile;
+int frame = 0;
 
 //global distance estimator
 float de(vec3 pos)
@@ -57,8 +59,8 @@ float de(vec3 pos)
 		/*distbox(pos, box),*/
 		//distsphere(pos, sphere, 10.0F);
 		//);
-		disttorus(pos, sphere, 2.0F, 15.0F);
-		//distsphere(ray_pos, sphere, 10.0F);
+		//disttorus(pos, sphere, 2.0F, 15.0F);
+		distsphere(pos, sphere, 10.0F);
 }
 
 //returns a normal
@@ -242,20 +244,26 @@ void render(SDL_Surface *screen, int frame)
 				//fprintf(logfile, "dist:    %f\n", distance);
 				//fprintf(logfile, "sumdist: %f\n", sumdist);
 				if(distance <= 0.05F) {
-					fprintf(logfile, "k: %d\n", k);
-					fprintf(logfile, "ofs:  %f\n", magn3(ray_ofs));
-					fprintf(logfile, "orig: %f\n", magn3(ray_orig));
-					fprintf(logfile, "pos:  %f\n\n", magn3(ray_pos));
+					//fprintf(logfile, "k: %d\n", k);
+					//fprintf(logfile, "ofs:  %f\n", magn3(ray_ofs));
+					//fprintf(logfile, "orig: %f\n", magn3(ray_orig));
+					//fprintf(logfile, "pos:  %f\n\n", magn3(ray_pos));
+					vec3 normal = getnormal(ray_pos, 0.5F);
 					plot(
 						screen,
 						j, i,
-						colortoint(graytocolor(bclamp(
-							k * 20
+						colortoint((struct rgbcolor){
+							.r = normal.x * 128.0F + 128.0F,
+							.b = normal.y * 128.0F + 128.0F,
+							.g = normal.z * 128.0F + 128.0F
+							})
+						//colortoint(graytocolor(bclamp(
+							//k * 20
 							//255.0F * (float)k / (float)steps
 							//500.0F / distance
 							/*blinnphong(ray_orig, ray_pos, ray_rot, light)*/
 						//distance <= 2.0F ? 0xffffff : 0x000000
-						)))
+						//)))
 						);
 					break;
 				}
@@ -354,24 +362,6 @@ int WinMain(/*int argc, char* args[]*/)
 		"%s\n", ctime(&unixtime)
 		);
 
-	//printf(
-//"▄▄▄    ▄▄▄▄▄\n"
-//" █    █     █   ▄▄▄▄▄ ▄    ▄ ▄▄▄▄▄▄   ▄       ▄  ▄▄▄▄  ▄    ▄ ▄▄▄▄▄\n"
-//" █    █           █   █    █ █        █       █ █    █ █    █   █\n"
-//" █    █           █   █▄▄▄▄█ █▄▄▄▄    █       █ █      █▄▄▄▄█   █\n"
-//" █    █           █   █    █ █        █       █ █ ▀▀▀█ █    █   █\n"
-//" █    █     █     █   █    █ █        █       █ █    █ █    █   █\n"
-//"▀▀▀    ▀▀▀▀▀      ▀   ▀    ▀ ▀▀▀▀▀▀   ▀▀▀▀▀▀▀ ▀  ▀▀▀▀  ▀    ▀   ▀\n"
-//" _          _    _             _  _         _      _\n"
-//"(_)        | |  | |           | |(_)       | |    | |\n"
-//" _    ___  | |_ | |__    ___  | | _   __ _ | |__  | |_\n"
-//"| |  / __| | __|| '_ \\  / _ \\ | || | / _` || '_ \\ | __|\n"
-//"| | | (__  | |_ | | | ||  __/ | || || (_| || | | || |_\n"
-//"|_|  \\___|  \\__||_| |_| \\___| |_||_| \\__, ||_| |_| \\__|\n"
-//"                                      __/ |\n"
-//"                                     |___/\n"
-	//);
-
 	//init logging
 	char filename[256] = "./log/UNINITIALIZED.log";
 	//unsigned long int timeint = time(NULL);
@@ -416,7 +406,6 @@ int WinMain(/*int argc, char* args[]*/)
 		}
 	}
 	int quit = 0;
-	int frame = 0;
 	clock_t start, end;
 	double total;
 	while(!quit) {

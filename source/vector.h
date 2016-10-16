@@ -26,6 +26,9 @@
 
 #include <math.h>
 
+#ifndef VECTOR_H
+#define VECTOR_H
+
 typedef struct vec2 vec2;
 typedef struct vec3 vec3;
 
@@ -440,4 +443,4 @@ vec3 unit3(vec3 a)
 	ret.z = a.z/magnitude;
 	return ret;
 }
-
+#endif //VECTOR_H

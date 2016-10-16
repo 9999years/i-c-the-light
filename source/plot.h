@@ -2,6 +2,9 @@
 
 #include <SDL/SDL.h>
 
+#ifndef PLOT_H
+#define PLOT_H
+
 unsigned int getpixel(
 	SDL_Surface *screen,
 	int x, int y
@@ -46,3 +49,4 @@ int plot(
 
 	return 0;
 }
+#endif //PLOT_H

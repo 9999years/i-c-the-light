@@ -3,6 +3,9 @@
 #include <math.h>
 #include <stdlib.h>
 
+#ifndef COMMON_H
+#define COMMON_H
+
 #define PI_SQ   9.86960440108F
 #define TAU     6.28318530717F
 #define PI      3.14159265359F
@@ -62,3 +65,5 @@ float scale(float val, float valmin, float valmax, float min, float max)
 	float valscale = (val - valmin) / (valmax - valmin);
 	return valscale * (max - min) + min;
 }
+
+#endif //COMMON_H

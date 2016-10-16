@@ -1,5 +1,8 @@
 #include <math.h>
 
+#ifndef COMPLEX_H
+#define COMPLEX_H
+
 typedef struct complex {
 	double a;
 	double b;
@@ -41,3 +44,4 @@ int mandlebrot(complex c, int i)
 		ret = 0xff;
 	return ret >= 2 ? 0 : 1;
 }
+#endif //COMPLEX_H

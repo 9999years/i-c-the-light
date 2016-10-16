@@ -3,6 +3,9 @@
 #include <SDL/SDL.h>
 #include "plot.h"
 
+#ifndef LINE_H
+#define LINE_H
+
 int drawline(
 	SDL_Surface *screen,
 	int x,
@@ -29,3 +32,4 @@ int drawline(
 
 	return 0;
 }
+#endif //LINE_H

@@ -1,6 +1,10 @@
 //writing ppm images
 
 #include <stdio.h>
+#include "color.h"
+
+#ifndef PPM_H
+#define PPM_H
 
 int writeppm(
 	char *filename,
@@ -29,3 +33,4 @@ int writeppm(
 	fclose(file);
 	return 0;
 }
+#endif //PPM_H

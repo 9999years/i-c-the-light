@@ -1,5 +1,14 @@
 //distance estimation functions
+#include <stdio.h>
+//sin functions
 #include <math.h>
+//vectors
+#include "vector.h"
+//fclamp
+#include "common.h"
+
+#ifndef DISTANCE_H
+#define DISTANCE_H
 
 //distance from point p to circle of radius r centered at c
 float distcircle(vec2 p, vec2 c, float r)
@@ -63,7 +72,7 @@ float distbox(vec3 p, vec3 b)
 //point, center, radius
 float distsphere(vec3 p, vec3 c, float r)
 {
-	return fabsf(dist3(p, c) - r);
+	return (dist3(p, c) - r);
 }
 
 //TODO make the center param do something
@@ -124,3 +133,4 @@ float oprepeat3(/*vec3 point, vec3 period*/)
 	//this function, obviously, does nothing
 	return -10000.0F;
 }
+#endif //DISTANCE_H
