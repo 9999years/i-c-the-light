@@ -2,5 +2,6 @@
 *.dll
 output/*
 ftpinfo.txt
+*.pyc
 **/SDL/*
 **/TEST_PPM.ppm

@@ -27,14 +27,16 @@
 #define SCREEN_WIDTH 500
 #define SCREEN_HEIGHT 500
 
+FILE *logfile;
+
 //global distance estimator
 float de(vec3 pos)
 {
-	vec3 box = {
-		.x = 15.0F,
-		.y = 15.0F,
-		.z = 15.0F
-	};
+	//vec3 box = {
+		//.x = 15.0F,
+		//.y = 15.0F,
+		//.z = 15.0F
+	//};
 	//vec3 zero = {
 		//.x = 0.0F,
 		//.y = 0.0F,
@@ -45,16 +47,16 @@ float de(vec3 pos)
 		.y = 0.0F,
 		.z = 50.0F
 	};
-	vec3 period = {
-		.x = 50.0F,
-		.y = 50.0F,
-		.z = 50.0F
-	};
+	//vec3 period = {
+		//.x = 50.0F,
+		//.y = 50.0F,
+		//.z = 50.0F
+	//};
 	return
 		/*ops(*/
 		/*distbox(pos, box),*/
-		/*distsphere(pos, sphere, 10.0F)*/
-		/*);*/
+		//distsphere(pos, sphere, 10.0F);
+		//);
 		disttorus(pos, sphere, 2.0F, 15.0F);
 		//distsphere(ray_pos, sphere, 10.0F);
 }
@@ -120,20 +122,20 @@ unsigned int blinnphong(vec3 cam, vec3 pos, vec3 rot, vec3 light)
 	vec3 normal = getnormal(add3(pos, rot), 2.0F);
 	//vec3 halfway = avg3(cam, light);
 	vec3 halfway = unit3(add3(cam, light));
-	//printf("cam:\n");
+	//fprintf(logfile, "cam:\n");
 	//dbvec(cam);
-	//printf("pos:\n");
+	//fprintf(logfile, "pos:\n");
 	//dbvec(pos);
-	//printf("light:\n");
+	//fprintf(logfile, "light:\n");
 	//dbvec(light);
-	//printf("normal:\n");
+	//fprintf(logfile, "normal:\n");
 	//dbvec(normal);
-	//printf("halfway:\n");
+	//fprintf(logfile, "halfway:\n");
 	//dbvec(halfway);
 	float ret =
 		dot3(light, normal) * diffuse_intensity
 		+ pow(dot3(normal, halfway), alpha) * specular_intensity;
-	//printf("%f\n", ret);
+	//fprintf(logfile, "%f\n", ret);
 	return
 		(unsigned int)(scale(ret, -2.0F, 2.0F, 0.0F, 255.0F));
 }
@@ -197,7 +199,8 @@ void render(SDL_Surface *screen, int frame)
 	vec3 ray_orig;
 	//unit vector of the direction to go into
 	vec3 ray_rot = camera_rot;
-	//actual position of the point being measured currently, relative to ray_orig
+	//actual position of the point being measured currently,
+	//RELATIVE TO RAY_ORIG
 	vec3 ray_ofs;
 	//real actual position of the point being measured
 	vec3 ray_pos;
@@ -210,6 +213,8 @@ void render(SDL_Surface *screen, int frame)
 	light = fromdirection3(time + 1.0F, time, 1.0F);
 	//steps to march
 	const int steps = 64;
+	float distance;
+	float sumdist;
 	int i, j, k;
 	for(i = 0; i < zsamples; i++) {
 		for(j = 0; j < xsamples; j++) {
@@ -226,8 +231,7 @@ void render(SDL_Surface *screen, int frame)
 			ray_orig.z =
 				camera_ofs.z
 				+ scale(i, 0, zsamples, 0, camera_size.y);
-			float distance;
-			float sumdist = 0;
+			sumdist = 0.0F;
 			for(k = 0; k < steps; k++) {
 				ray_pos = add3(
 					ray_ofs,
@@ -235,14 +239,21 @@ void render(SDL_Surface *screen, int frame)
 					);
 				sumdist += distance =
 					de(ray_pos);
-				if(distance <= 2.0F) {
+				//fprintf(logfile, "dist:    %f\n", distance);
+				//fprintf(logfile, "sumdist: %f\n", sumdist);
+				if(distance <= 0.05F) {
+					fprintf(logfile, "k: %d\n", k);
+					fprintf(logfile, "ofs:  %f\n", magn3(ray_ofs));
+					fprintf(logfile, "orig: %f\n", magn3(ray_orig));
+					fprintf(logfile, "pos:  %f\n\n", magn3(ray_pos));
 					plot(
 						screen,
 						j, i,
 						colortoint(graytocolor(bclamp(
+							k * 20
 							//255.0F * (float)k / (float)steps
 							//500.0F / distance
-							blinnphong(ray_orig, ray_pos, ray_rot, light)
+							/*blinnphong(ray_orig, ray_pos, ray_rot, light)*/
 						//distance <= 2.0F ? 0xffffff : 0x000000
 						)))
 						);
@@ -256,7 +267,7 @@ void render(SDL_Surface *screen, int frame)
 			}
 			//if((i % 50 == 0) && (j % 50 == 0))
 			//if(distance < 10.0F)
-				//printf("dist: %f\nsumdist: %f\n\n", distance, sumdist);
+				//fprintf(logfile, "dist: %f\nsumdist: %f\n\n", distance, sumdist);
 		}
 	}
 	return;
@@ -275,14 +286,14 @@ void saveframe(SDL_Surface *screen)
 			screen->pixels
 			) != 0
 	) {
-		printf("image write error!\n");
+		fprintf(logfile, "image write error!\n");
 		return;
 	}
 	char shacmd[256];
 	sprintf(shacmd, "sha256sum %s", filename);
 	FILE *file = popen(shacmd, "r");
 	if(file == NULL) {
-		printf("failed to get image hash!\n");
+		fprintf(logfile, "failed to get image hash!\n");
 		return;
 	}
 	//the hash is 64 characters but we need a 0 at the end too
@@ -293,7 +304,8 @@ void saveframe(SDL_Surface *screen)
 		sha[i] = c = fgetc(file);
 	}
 	sha[i++] = 0;
-	printf("sha: %s\n", sha);
+	printf("SHA: %s\n", sha);
+	fprintf(logfile, "SHA: %s\n", sha);
 	pclose(file);
 
 	char hashfilename[256];
@@ -302,12 +314,12 @@ void saveframe(SDL_Surface *screen)
 	if(_access(hashfilename, 0) != -1) {
 		//file exists, delete img
 		if(unlink(filename) != 0) {
-			printf("image delete error!\n");
+			fprintf(logfile, "image delete error!\n");
 		}
 	} else {
 		FILE *hashfile = fopen(hashfilename, "w");
 		if(hashfile == NULL)
-			printf("hash file write error!\nfilename: %s\n", hashfilename);
+			fprintf(logfile, "hash file write error!\nfilename: %s\n", hashfilename);
 		fclose(hashfile);
 	}
 	return;
@@ -336,7 +348,47 @@ int handleevents(SDL_Surface *screen)
 
 int WinMain(/*int argc, char* args[]*/)
 {
-	printf("hello!\n");
+	printf("Hello!\n");
+	const time_t unixtime = time(NULL);
+	printf( "I C the Light by Rebecca Turner (MIT/Expat)\n"
+		"%s\n", ctime(&unixtime)
+		);
+
+	//printf(
+//"▄▄▄    ▄▄▄▄▄\n"
+//" █    █     █   ▄▄▄▄▄ ▄    ▄ ▄▄▄▄▄▄   ▄       ▄  ▄▄▄▄  ▄    ▄ ▄▄▄▄▄\n"
+//" █    █           █   █    █ █        █       █ █    █ █    █   █\n"
+//" █    █           █   █▄▄▄▄█ █▄▄▄▄    █       █ █      █▄▄▄▄█   █\n"
+//" █    █           █   █    █ █        █       █ █ ▀▀▀█ █    █   █\n"
+//" █    █     █     █   █    █ █        █       █ █    █ █    █   █\n"
+//"▀▀▀    ▀▀▀▀▀      ▀   ▀    ▀ ▀▀▀▀▀▀   ▀▀▀▀▀▀▀ ▀  ▀▀▀▀  ▀    ▀   ▀\n"
+//" _          _    _             _  _         _      _\n"
+//"(_)        | |  | |           | |(_)       | |    | |\n"
+//" _    ___  | |_ | |__    ___  | | _   __ _ | |__  | |_\n"
+//"| |  / __| | __|| '_ \\  / _ \\ | || | / _` || '_ \\ | __|\n"
+//"| | | (__  | |_ | | | ||  __/ | || || (_| || | | || |_\n"
+//"|_|  \\___|  \\__||_| |_| \\___| |_||_| \\__, ||_| |_| \\__|\n"
+//"                                      __/ |\n"
+//"                                     |___/\n"
+	//);
+
+	//init logging
+	char filename[256] = "./log/UNINITIALIZED.log";
+	//unsigned long int timeint = time(NULL);
+	sprintf(filename, "./log/icthelight-%lu.log",
+		(unsigned long int)unixtime);
+	logfile = fopen(filename, "w");
+	if(logfile == NULL) {
+		printf( "Log file open failure! (%s)\n"
+			"Check that ./log/ exists?\n",
+			filename);
+	}
+	fprintf(logfile, "# I C the Light, run %lu\n\n"
+		"%s\n",
+		(unsigned long int)unixtime,
+		ctime(&unixtime)
+		);
+
 	//The window we'll be rendering to
 	SDL_Window* window = NULL;
 
@@ -378,7 +430,6 @@ int WinMain(/*int argc, char* args[]*/)
 		// render
 		render(screen, frame);
 
-
 		//Update the surface
 		SDL_UpdateWindowSurface(window);
 
@@ -389,6 +440,7 @@ int WinMain(/*int argc, char* args[]*/)
 			}
 			total = (double)(end - start) / CLOCKS_PER_SEC;
 			printf("%.4f FPS\n", 1 / total);
+			fprintf(logfile, "%.4f FPS\n", 1 / total);
 		//}
 		frame++;
 	}

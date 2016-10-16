@@ -119,8 +119,8 @@ float opwobble3(vec3 point, float orig, float freq, float amp)
 		+ orig;
 }
 
-float oprepeat3(vec3 point, vec3 period)
+float oprepeat3(/*vec3 point, vec3 period*/)
 {
-	vec3 q;
-	return;
+	//this function, obviously, does nothing
+	return -10000.0F;
 }
