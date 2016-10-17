@@ -161,7 +161,7 @@ void render(SDL_Surface *screen, int frame)
 	//size of area rays will be casted from in coord space
 	//NOT screen pixels!!! that's `samples`
 	vec2 camera_size;
-	camera_size.x = 0.5F;
+	camera_size.x = 100.0F;
 	//infer height from screen ratio
 	camera_size.y = aspect * camera_size.x;
 	//horiz samples
