@@ -7,6 +7,9 @@
 //fclamp
 #include "common.h"
 #include "quaternion.h"
+#include "logging.h"
+
+FILE *logfile;
 
 #ifndef DISTANCE_H
 #define DISTANCE_H
@@ -144,13 +147,15 @@ float distancejulia(vec3 pos, quaternion c)
 	quaternion qp = constq(0.0F, 0.0F, 0.0F, 0.0F);
 	quaternion tmp;
 	for(i = 0; i < 64; i++) {
-		tmp = multq(constq(2.0F, 0.0F, 0.0F, 0.0F), multq(q, qp));
+		tmp = multq(q, qp);
 		qp = tmp;
+		qp.r *= 2.0F;
 		tmp = addq(sqrq(q), c);
-		if(magnq(q) > 2.0F)
+		if(magnq(q) > 10.0F)
 			break;
 	}
 	float qmag = magnq(q);
+	fprintf(logfile, "%f\n", magnq(qp));
 	distance = 0.5F * qmag * log(qmag) / magnq(qp);
 	return distance;
 }

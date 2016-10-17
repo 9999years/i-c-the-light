@@ -62,40 +62,20 @@ quaternion multq(quaternion one, quaternion two)
 		- one.b * two.b
 		- one.c * two.c;
 
-	ret.a =   one.r * two.r
-		+ one.a * two.a
-		+ one.b * two.b
-		- one.c * two.c;
+	ret.a =   one.r * two.a
+		+ one.a * two.r
+		+ one.b * two.c
+		- one.c * two.b;
 
-	ret.b =   one.r * two.r
-		+ one.a * two.a
-		+ one.b * two.b
-		- one.c * two.c;
+	ret.b =   one.r * two.b
+		+ one.b * two.r
+		+ one.c * two.a
+		- one.a * two.c;
 
-	ret.c =   one.r * two.r
-		+ one.a * two.a
-		+ one.b * two.b
-		- one.c * two.c;
-
-	//ret.r =   one.r * two.c
-		//+ one.a * two.b
-		//- one.b * two.a
-		//+ one.c * two.r;
-
-	//ret.a =  -one.r * two.b
-		//+ one.a * two.c
-		//+ one.b * two.r
-		//+ one.c * two.a;
-
-	//ret.b =   one.r * two.a
-		//- one.a * two.r
-		//+ one.b * two.c
-		//+ one.c * two.b;
-
-	//ret.c =  -one.r * two.r
-		//- one.a * two.a
-		//- one.b * two.b
-		//+ one.c * two.c;
+	ret.c =   one.r * two.c
+		+ one.c * two.r
+		+ one.a * two.b
+		- one.b * two.a;
 	return ret;
 }
 

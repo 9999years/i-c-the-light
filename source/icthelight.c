@@ -23,14 +23,15 @@
 #include "vector.h"
 #include "distance.h"
 #include "quaternion.h"
+#include "logging.h"
 
 //Screen dimension constants
 #define SCREEN_WIDTH 500
 #define SCREEN_HEIGHT 500
 
 //globals
-FILE *logfile;
 int frame = 0;
+FILE *logfile;
 
 //global distance estimator
 float de(vec3 pos)
@@ -164,20 +165,9 @@ unsigned int blinnphong(vec3 cam, vec3 pos, vec3 rot, vec3 light)
 	vec3 normal = getnormal(add3(pos, rot), 2.0F);
 	//vec3 halfway = avg3(cam, light);
 	vec3 halfway = unit3(add3(cam, light));
-	//fprintf(logfile, "cam:\n");
-	//dbvec(cam);
-	//fprintf(logfile, "pos:\n");
-	//dbvec(pos);
-	//fprintf(logfile, "light:\n");
-	//dbvec(light);
-	//fprintf(logfile, "normal:\n");
-	//dbvec(normal);
-	//fprintf(logfile, "halfway:\n");
-	//dbvec(halfway);
 	float ret =
 		dot3(light, normal) * diffuse_intensity
 		+ pow(dot3(normal, halfway), alpha) * specular_intensity;
-	//fprintf(logfile, "%f\n", ret);
 	return
 		(unsigned int)(scale(ret, -2.0F, 2.0F, 0.0F, 255.0F));
 }
@@ -281,13 +271,8 @@ void render(SDL_Surface *screen, int frame)
 			distance =
 				de(ray_pos);
 			//fprintf(logfile, "dist:          %f\n", distance);
-			//fprintf(logfile, "dist traveled: %f\n", magn3(ray_ofs));
 			if(distance <= 0.05F) {
 				fprintf(logfile, "PLOT!\n");
-				//fprintf(logfile, "k: %d\n", k);
-				//fprintf(logfile, "ofs:  %f\n", magn3(ray_ofs));
-				//fprintf(logfile, "orig: %f\n", magn3(ray_orig));
-				//fprintf(logfile, "pos:  %f\n\n", magn3(ray_pos));
 				plot(
 					screen,
 					j, i,
@@ -312,9 +297,6 @@ void render(SDL_Surface *screen, int frame)
 				);
 			ray_ofs = tmp;
 		}
-		//if((i % 50 == 0) && (j % 50 == 0))
-		//if(distance < 10.0F)
-			//fprintf(logfile, "dist: %f\nsumdist: %f\n\n", distance, sumdist);
 	}
 	}
 	return;
@@ -401,22 +383,30 @@ int WinMain(/*int argc, char* args[]*/)
 		"%s\n", ctime(&unixtime)
 		);
 
-	//init logging
-	char filename[256] = "./log/UNINITIALIZED.log";
-	//unsigned long int timeint = time(NULL);
-	sprintf(filename, "./log/icthelight-%lu.log",
-		(unsigned long int)unixtime);
-	logfile = fopen(filename, "w");
-	if(logfile == NULL) {
-		printf( "Log file open failure! (%s)\n"
-			"Check that ./log/ exists?\n",
-			filename);
-	}
-	fprintf(logfile, "# I C the Light, run %lu\n\n"
-		"%s\n",
-		(unsigned long int)unixtime,
-		ctime(&unixtime)
+	quaternion a = constq(
+		1.0F,
+		2.0F,
+		3.0F,
+		4.0F
 		);
+	quaternion b = constq(
+		6.0F,
+		5.0F,
+		8.0F,
+		9.0F
+		);
+	quaternion c = multq(a, b);
+	printf(
+		"r: %.2f (-64)\n"
+		"a: %.2f (12)\n"
+		"b: %.2f (28)\n"
+		"c: %.2f (34)\n",
+		c.r, c.a, c.b, c.c
+		);
+
+	return 1;
+
+	initializelogfile();
 
 	//The window we'll be rendering to
 	SDL_Window* window = NULL;
