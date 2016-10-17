@@ -1,5 +1,8 @@
 //functions for dealing with quaternions
 #include <math.h>
+#include "logging.h"
+
+FILE *logfile;
 
 #ifndef QUATERNION_H
 #define QUATERNION_H
@@ -13,6 +16,18 @@ struct quaternion
 	float b;
 	float c;
 };
+
+void dumpquaternion(quaternion in)
+{
+	fprintf(logfile,
+		"r: %.2f\n"
+		"a: %.2f\n"
+		"b: %.2f\n"
+		"c: %.2f\n",
+		in.r, in.a, in.b, in.c
+		);
+	return;
+}
 
 quaternion constq(float r, float a, float b, float c)
 {

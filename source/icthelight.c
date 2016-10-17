@@ -36,68 +36,11 @@ FILE *logfile;
 //global distance estimator
 float de(vec3 pos)
 {
-	return distancejulia(pos, constq(-0.213F, -0.0410F, -0.563F, -0.560F));
-	//i don't fucking know how this works
-	//also, this doesn't work
-	//vec3 z = pos;
-	//vec3 tmp;
-	//float dr = 1.0F;
-	//float r = 0.0F;
-	//float theta, phi, zr;
-	//const int Iterations = 64;
-	//const float Bailout = 10.0F;
-	//const int Power = 8;
-	//for(int i = 0; i < Iterations ; i++) {
-		//r = magn3(z);
-		//if (r > Bailout) break;
-		
-		//// convert to polar coordinates
-		//theta = acos(z.z / r);
-		//phi = atan(z.y);//, z.x);
-		//dr =  pow(r, Power - 1.0F) * Power * dr + 1.0F;
-		
-		//// scale and rotate the point
-		//zr = pow(r, Power);
-		//theta = theta * Power;
-		//phi = phi * Power;
-		
-		//// convert back to cartesian coordinates
-		//z.x = zr * sin(theta) * cos(phi);
-		//z.y = zr * sin(phi)   * sin(theta);
-		//z.z = zr * cos(theta);
-		//tmp = add3(pos, z);
-		//z = tmp;
-	//}
-	//return 0.5F * log(r) * r / dr;
-
-	//vec3 box = {
-		//.x = 15.0F,
-		//.y = 15.0F,
-		//.z = 15.0F
-	//};
-	//vec3 zero = {
-		//.x = 0.0F,
-		//.y = 0.0F,
-		//.z = 0.0F
-	//};
-	//vec3 sphere = {
-		//.x = 50.0F,
-		//.y = 0.0F,
-		//.z = 50.0F
-	//};
-	//vec3 period = {
-		//.x = 50.0F,
-		//.y = 50.0F,
-		//.z = 50.0F
-	//};
-	//return
-		/*ops(*/
-		/*distbox(pos, box),*/
-		//distsphere(pos, sphere, 10.0F);
-		//);
+	//return distancejulia(pos, constq(-0.213F, -0.0410F, -0.563F, -0.560F));
+	return disttorus(pos, const3(50.0F, 0.0F, 50.0F), 5.0F, 15.0F);
+		//distsphere(pos, const3(50.0F, 0.0F, 50.0F), 10.0F);
 		//opwobble3(
 			//pos,
-			//disttorus(pos, sphere, 5.0F, 15.0F);
 			//5.0F,
 			//5.0F
 			//);
@@ -199,7 +142,7 @@ void render(SDL_Surface *screen, int frame)
 	//vec3 camera_ofs = fromdirection3(time, 0.0F, 1000.0F);
 	vec3 camera_ofs = {
 		.x = 250.0F,
-		.y = -1000.0F,
+		.y = -1000.0F + 250.0F * sin(time),
 		.z = 250.0F
 	};
 	//camera rotation
@@ -209,8 +152,8 @@ void render(SDL_Surface *screen, int frame)
 	vec3 camera_rot = unit3(inv3(camera_ofs));
 	//vec3 camera_rot = fromdirection3(time, time + 1.0F, 1.0F);
 	//vec3 camera_rot = {
-		//.x = 0.0F,
-		//.y = 1.0F,
+		//.x = sin(time),
+		//.y = cos(time),
 		//.z = 0.0F
 	//};
 	//screen aspect ratio
@@ -218,7 +161,7 @@ void render(SDL_Surface *screen, int frame)
 	//size of area rays will be casted from in coord space
 	//NOT screen pixels!!! that's `samples`
 	vec2 camera_size;
-	camera_size.x = 100.0F;
+	camera_size.x = 0.5F;
 	//infer height from screen ratio
 	camera_size.y = aspect * camera_size.x;
 	//horiz samples
@@ -254,6 +197,7 @@ void render(SDL_Surface *screen, int frame)
 		ray_ofs.x = 0;
 		ray_ofs.y = 0;
 		ray_ofs.z = 0;
+		//ray_rot = unit3(
 		//our position in the screen + camera offset
 		ray_orig.x =
 			camera_ofs.x
@@ -268,9 +212,7 @@ void render(SDL_Surface *screen, int frame)
 				ray_ofs,
 				ray_orig
 				);
-			distance =
-				de(ray_pos);
-			//fprintf(logfile, "dist:          %f\n", distance);
+			distance = de(ray_pos);
 			if(distance <= 0.05F) {
 				fprintf(logfile, "PLOT!\n");
 				plot(

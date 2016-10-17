@@ -48,29 +48,22 @@ struct vec3
 	float z;
 };
 
-//4d vector
-struct vec4
+//construction methods
+vec2 const2(float x, float y)
 {
-	float x;
-	float y;
-	float z;
-	float w;
-};
+	return (vec2){
+		.x = x,
+		.y = y
+	};
+}
 
-//sqrt function
-//dont ask me why or how this works
-unsigned int root(unsigned int x)
+vec3 const3(float x, float y, float z)
 {
-	unsigned int a, b;
-	b = x;
-	a = x = 0x3f;
-	x = b / x;
-	a = x = (x + a) >> 1;
-	x = b / x;
-	a = x = (x + a) >> 1;
-	x = b / x;
-	x = (x + a) >> 1;
-	return x;
+	return (vec3){
+		.x = x,
+		.y = y,
+		.z = z
+	};
 }
 
 //returns a vector in a given direction
