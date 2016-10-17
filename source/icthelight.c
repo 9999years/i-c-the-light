@@ -36,8 +36,8 @@ FILE *logfile;
 //global distance estimator
 float de(vec3 pos)
 {
-	//return distancejulia(pos, constq(-0.213F, -0.0410F, -0.563F, -0.560F));
-	return disttorus(pos, const3(50.0F, 0.0F, 50.0F), 5.0F, 15.0F);
+	return distancejulia(pos, constq(-0.213F, -0.0410F, -0.563F, -0.560F));
+	//return disttorus(pos, const3(50.0F, 0.0F, 50.0F), 5.0F, 15.0F);
 		//distsphere(pos, const3(50.0F, 0.0F, 50.0F), 10.0F);
 		//opwobble3(
 			//pos,
