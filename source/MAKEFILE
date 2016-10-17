@@ -17,11 +17,12 @@ incrementbuildversion: incrementbuildversion.c
 
 convert:
 	mogrify -format png ../output/*.ppm
-	del ..\output\*.ppm
+	del ..\output\*.ppm > nul 2> null
 
 clean:
-	del *.exe
-	del TEST_PPM.ppm
+	del *.exe /q > nul 2> nul
+	del TEST_PPM.ppm > nul 2> nul
+	del log\* /q > nul 2> nul
 
 run:
 	.\icthelight

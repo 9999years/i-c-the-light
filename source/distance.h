@@ -6,6 +6,7 @@
 #include "vector.h"
 //fclamp
 #include "common.h"
+#include "quaternion.h"
 
 #ifndef DISTANCE_H
 #define DISTANCE_H
@@ -133,4 +134,25 @@ float oprepeat3(/*vec3 point, vec3 period*/)
 	//this function, obviously, does nothing
 	return -10000.0F;
 }
+
+float distancejulia(vec3 pos, quaternion c)
+{
+#define MAX_ITERATIONS 64
+	float distance;
+	int i;
+	quaternion q = constq(pos.x, pos.y, pos.z, 0.0F);
+	quaternion qp = constq(0.0F, 0.0F, 0.0F, 0.0F);
+	quaternion tmp;
+	for(i = 0; i < 64; i++) {
+		tmp = multq(constq(2.0F, 0.0F, 0.0F, 0.0F), multq(q, qp));
+		qp = tmp;
+		tmp = addq(sqrq(q), c);
+		if(magnq(q) > 2.0F)
+			break;
+	}
+	float qmag = magnq(q);
+	distance = 0.5F * qmag * log(qmag) / magnq(qp);
+	return distance;
+}
+
 #endif //DISTANCE_H

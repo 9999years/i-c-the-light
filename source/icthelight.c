@@ -22,6 +22,7 @@
 #include "line.h"
 #include "vector.h"
 #include "distance.h"
+#include "quaternion.h"
 
 //Screen dimension constants
 #define SCREEN_WIDTH 500
@@ -34,6 +35,40 @@ int frame = 0;
 //global distance estimator
 float de(vec3 pos)
 {
+	return distancejulia(pos, constq(-0.213F, -0.0410F, -0.563F, -0.560F));
+	//i don't fucking know how this works
+	//also, this doesn't work
+	//vec3 z = pos;
+	//vec3 tmp;
+	//float dr = 1.0F;
+	//float r = 0.0F;
+	//float theta, phi, zr;
+	//const int Iterations = 64;
+	//const float Bailout = 10.0F;
+	//const int Power = 8;
+	//for(int i = 0; i < Iterations ; i++) {
+		//r = magn3(z);
+		//if (r > Bailout) break;
+		
+		//// convert to polar coordinates
+		//theta = acos(z.z / r);
+		//phi = atan(z.y);//, z.x);
+		//dr =  pow(r, Power - 1.0F) * Power * dr + 1.0F;
+		
+		//// scale and rotate the point
+		//zr = pow(r, Power);
+		//theta = theta * Power;
+		//phi = phi * Power;
+		
+		//// convert back to cartesian coordinates
+		//z.x = zr * sin(theta) * cos(phi);
+		//z.y = zr * sin(phi)   * sin(theta);
+		//z.z = zr * cos(theta);
+		//tmp = add3(pos, z);
+		//z = tmp;
+	//}
+	//return 0.5F * log(r) * r / dr;
+
 	//vec3 box = {
 		//.x = 15.0F,
 		//.y = 15.0F,
@@ -44,23 +79,28 @@ float de(vec3 pos)
 		//.y = 0.0F,
 		//.z = 0.0F
 	//};
-	vec3 sphere = {
-		.x = 50.0F,
-		.y = 0.0F,
-		.z = 50.0F
-	};
+	//vec3 sphere = {
+		//.x = 50.0F,
+		//.y = 0.0F,
+		//.z = 50.0F
+	//};
 	//vec3 period = {
 		//.x = 50.0F,
 		//.y = 50.0F,
 		//.z = 50.0F
 	//};
-	return
+	//return
 		/*ops(*/
 		/*distbox(pos, box),*/
 		//distsphere(pos, sphere, 10.0F);
 		//);
-		//disttorus(pos, sphere, 2.0F, 15.0F);
-		distsphere(pos, sphere, 10.0F);
+		//opwobble3(
+			//pos,
+			//disttorus(pos, sphere, 5.0F, 15.0F);
+			//5.0F,
+			//5.0F
+			//);
+		//distsphere(pos, sphere, 10.0F);
 }
 
 //returns a normal
@@ -103,7 +143,7 @@ unsigned int blinnphong(vec3 cam, vec3 pos, vec3 rot, vec3 light)
 	//k_a: ambient constant
 #define k_a 0.0F
 	//α: shininess constant (larger = smaller highlight)
-#define alpha 1.0F
+#define alpha 4.0F
 	//i_s: specular intensity
 #define specular_intensity 1.0F
 	//i_d: diffuse intensity
@@ -177,6 +217,7 @@ void render(SDL_Surface *screen, int frame)
 	//this is the direction the rays will fire
 	//if it isn't a unit vector things will explode probably
 	vec3 camera_rot = unit3(inv3(camera_ofs));
+	//vec3 camera_rot = fromdirection3(time, time + 1.0F, 1.0F);
 	//vec3 camera_rot = {
 		//.x = 0.0F,
 		//.y = 1.0F,
@@ -216,67 +257,65 @@ void render(SDL_Surface *screen, int frame)
 	//steps to march
 	const int steps = 64;
 	float distance;
-	float sumdist;
 	int i, j, k;
 	for(i = 0; i < zsamples; i++) {
-		for(j = 0; j < xsamples; j++) {
-			//reset the ray offset
-			ray_ofs.x = 0;
-			ray_ofs.y = 0;
-			ray_ofs.z = 0;
-			//our position in the screen + camera offset
-			ray_orig.x =
-				camera_ofs.x
-				+ scale(j, 0, xsamples, 0, camera_size.x);
-			ray_orig.y =
-				camera_ofs.y;
-			ray_orig.z =
-				camera_ofs.z
-				+ scale(i, 0, zsamples, 0, camera_size.y);
-			sumdist = 0.0F;
-			for(k = 0; k < steps; k++) {
-				ray_pos = add3(
-					ray_ofs,
-					ray_orig
+	for(j = 0; j < xsamples; j++) {
+		//reset the ray offset
+		ray_ofs.x = 0;
+		ray_ofs.y = 0;
+		ray_ofs.z = 0;
+		//our position in the screen + camera offset
+		ray_orig.x =
+			camera_ofs.x
+			+ scale(j, 0, xsamples, 0, camera_size.x);
+		ray_orig.y =
+			camera_ofs.y;
+		ray_orig.z =
+			camera_ofs.z
+			+ scale(i, 0, zsamples, 0, camera_size.y);
+		for(k = 0; k < steps; k++) {
+			ray_pos = add3(
+				ray_ofs,
+				ray_orig
+				);
+			distance =
+				de(ray_pos);
+			//fprintf(logfile, "dist:          %f\n", distance);
+			//fprintf(logfile, "dist traveled: %f\n", magn3(ray_ofs));
+			if(distance <= 0.05F) {
+				fprintf(logfile, "PLOT!\n");
+				//fprintf(logfile, "k: %d\n", k);
+				//fprintf(logfile, "ofs:  %f\n", magn3(ray_ofs));
+				//fprintf(logfile, "orig: %f\n", magn3(ray_orig));
+				//fprintf(logfile, "pos:  %f\n\n", magn3(ray_pos));
+				plot(
+					screen,
+					j, i,
+					colortoint(graytocolor(bclamp(
+					//k * 20
+					//255.0F * (float)k / (float)steps
+					//500.0F / distance
+					blinnphong(ray_orig, ray_pos, ray_rot, light)
+					//distance <= 2.0F ? 0xffffff : 0x000000
+					)))
 					);
-				sumdist += distance =
-					de(ray_pos);
-				//fprintf(logfile, "dist:    %f\n", distance);
-				//fprintf(logfile, "sumdist: %f\n", sumdist);
-				if(distance <= 0.05F) {
-					//fprintf(logfile, "k: %d\n", k);
-					//fprintf(logfile, "ofs:  %f\n", magn3(ray_ofs));
-					//fprintf(logfile, "orig: %f\n", magn3(ray_orig));
-					//fprintf(logfile, "pos:  %f\n\n", magn3(ray_pos));
-					vec3 normal = getnormal(ray_pos, 0.5F);
-					plot(
-						screen,
-						j, i,
-						colortoint((struct rgbcolor){
-							.r = normal.x * 128.0F + 128.0F,
-							.b = normal.y * 128.0F + 128.0F,
-							.g = normal.z * 128.0F + 128.0F
-							})
-						//colortoint(graytocolor(bclamp(
-							//k * 20
-							//255.0F * (float)k / (float)steps
-							//500.0F / distance
-							/*blinnphong(ray_orig, ray_pos, ray_rot, light)*/
-						//distance <= 2.0F ? 0xffffff : 0x000000
-						//)))
-						);
-					break;
-				}
-				tmp = add3(
-					distalong3(ray_rot, distance),
-					ray_ofs
-					);
-				ray_ofs = tmp;
+				break;
+			} else if(distance >= 100000.0F
+				|| !isfinite(distance)) {
+				//we're done here
+				fprintf(logfile, "LIMIT EXCEEDED, BREAK!\n");
+				break;
 			}
-			//if((i % 50 == 0) && (j % 50 == 0))
-			//if(distance < 10.0F)
-				//fprintf(logfile, "dist: %f\nsumdist: %f\n\n", distance, sumdist);
+			tmp = add3(
+				distalong3(ray_rot, distance),
+				ray_ofs
+				);
+			ray_ofs = tmp;
 		}
+		//if((i % 50 == 0) && (j % 50 == 0))
+		//if(distance < 10.0F)
+			//fprintf(logfile, "dist: %f\nsumdist: %f\n\n", distance, sumdist);
+	}
 	}
 	return;
 }

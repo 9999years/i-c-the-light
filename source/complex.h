@@ -36,12 +36,10 @@ int mandlebrot(complex c, int i)
 		//square z & store in tmp, add c and store in z
 		complexmult(&tmp, z, z);
 		complexadd(&z, tmp, c);
-		//printf("(i = %d) %f + %fi\n", i, z.a, z.b);
-		//printf("complex: %f\n", complexabs(z));
 	}
 	float ret = complexabs(z);
 	if(!isfinite(ret))
 		ret = 0xff;
-	return ret >= 2 ? 0 : 1;
+	return ret >= 2.0F ? 0 : 1;
 }
 #endif //COMPLEX_H

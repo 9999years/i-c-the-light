@@ -31,6 +31,7 @@
 
 typedef struct vec2 vec2;
 typedef struct vec3 vec3;
+typedef struct vec4 vec4;
 
 //2d vector
 struct vec2
@@ -45,6 +46,15 @@ struct vec3
 	float x;
 	float y;
 	float z;
+};
+
+//4d vector
+struct vec4
+{
+	float x;
+	float y;
+	float z;
+	float w;
 };
 
 //sqrt function
