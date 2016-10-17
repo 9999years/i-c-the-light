@@ -383,29 +383,6 @@ int WinMain(/*int argc, char* args[]*/)
 		"%s\n", ctime(&unixtime)
 		);
 
-	quaternion a = constq(
-		1.0F,
-		2.0F,
-		3.0F,
-		4.0F
-		);
-	quaternion b = constq(
-		6.0F,
-		5.0F,
-		8.0F,
-		9.0F
-		);
-	quaternion c = multq(a, b);
-	printf(
-		"r: %.2f (-64)\n"
-		"a: %.2f (12)\n"
-		"b: %.2f (28)\n"
-		"c: %.2f (34)\n",
-		c.r, c.a, c.b, c.c
-		);
-
-	return 1;
-
 	initializelogfile();
 
 	//The window we'll be rendering to

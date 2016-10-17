@@ -2,11 +2,7 @@
 
 ### a distance estimating ray marcher written in C
 
-*guarenteed to work in at least two dimensions or your money back!*
-
-*everything you hated about vector math in precalculus but worse!*
-
-*now on Git Hub!™*
+*Contains at least 200% more calculus than I know!*
 
 On ray marching (from [Syntopia](http://blog.hvidtfeldts.net/index.php/2011/06/distance-estimated-3d-fractals-part-i/)):
 
@@ -27,6 +23,8 @@ On ray marching (from [Syntopia](http://blog.hvidtfeldts.net/index.php/2011/06/d
 > since you are guaranteed not to hit anything within this radius.
 
 Some supplimentary information and reference links can be found at [becca.ooo/i-c-the-light](https://becca.ooo/i-c-the-light/).
+
+## The Following Information Is Hopelessly Out Of Date
 
 ## Directory
 
