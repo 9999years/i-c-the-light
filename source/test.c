@@ -7,6 +7,7 @@
 #include "line.h"
 #include "ppm.h"
 #include "vector.h"
+#include "quaternion.h"
 
 #define COLOR_RED 0xff0000
 #define COLOR_BLACK 0x000000
@@ -159,7 +160,7 @@ void sdltests(SDL_Surface *screen, SDL_Window *window, int width, int height)
 
 	char filename[256] = "output/UNINITIALIZED.ppm";
 	sprintf(filename, "../output/image%lu.ppm", (unsigned long int)time(NULL));
-	if(writeppm(filename, PORTABLE_PIXMAP, width, height, screen->pixels)
+	if(writeppm(filename, width, height, screen->pixels)
 		!= 0)
 		printf("image write error!\n");
 	//printscreen(screen, 0x000000);
@@ -262,7 +263,6 @@ int WinMain(/*int argc, char *argv[]*/)
 	testsection("ppm.h");
 	{
 		char *filename = "TEST_PPM.ppm";
-		char filetype = PORTABLE_PIXMAP;
 		int width = 4;
 		int height = 3;
 		unsigned int image[12] = {
@@ -274,7 +274,7 @@ int WinMain(/*int argc, char *argv[]*/)
 		printf("writing test file: %s\n", filename);
 
 		int result =
-			writeppm(filename, filetype, width, height, image);
+			writeppm(filename, width, height, image);
 
 		assert(result == 0);
 
@@ -349,6 +349,79 @@ int WinMain(/*int argc, char *argv[]*/)
 			c.x, c.y
 			);
 		assert((c.x == -3) && (c.y == 16));
+	}
+
+	testsection("quaternion.h");
+	{
+		TESTING("quaternion multiplication");
+		quaternion one = constq(
+			5.0F,
+			11.0F,
+			-17.0F,
+			31.0F
+			);
+		quaternion two = constq(
+			7.0F,
+			-83.0F,
+			41.0F,
+			-29.0F
+			);
+		quaternion result = multq(one, two);
+		printf(
+			"one =\n"
+			"  %.2f\n"
+			"+ %.2fi\n"
+			"+ %.2fj\n"
+			"+ %.2fk\n\n",
+			one.r, one.a, one.b, one.c
+			);
+		printf(
+			"two =\n"
+			"  %.2f\n"
+			"+ %.2fi\n"
+			"+ %.2fj\n"
+			"+ %.2fk\n\n",
+			two.r, two.a, two.b, two.c
+			);
+		printf(
+			"result = one * two =\n"
+			"  %.2f  \t(expected  2544.00)\n"
+			"+ %.2fi \t(expected -1116.00)\n"
+			"+ %.2fj \t(expected -2168.00)\n"
+			"+ %.2fk \t(expected -888.00)\n\n",
+			result.r, result.a, result.b, result.c
+			);
+		assert(
+			   (int)result.r == 2544
+			&& (int)result.a == -1116
+			&& (int)result.b == -2168
+			&& (int)result.c == -888
+			);
+
+		TESTING("quaternion squaring");
+		result = sqrq(one);
+		printf(
+			"one =\n"
+			"  %.2f\n"
+			"+ %.2fi\n"
+			"+ %.2fj\n"
+			"+ %.2fk\n\n",
+			one.r, one.a, one.b, one.c
+			);
+		printf(
+			"result = one^2\n"
+			"  %.2f  \t(expected -1346.00)\n"
+			"+ %.2fi \t(expected 110.00)\n"
+			"+ %.2fj \t(expected -170.00)\n"
+			"+ %.2fk \t(expected 310.00)\n\n",
+			result.r, result.a, result.b, result.c
+			);
+		assert(
+			   (int)result.r == -1346
+			&& (int)result.a == 110
+			&& (int)result.b == -170
+			&& (int)result.c == 310
+			);
 	}
 
 	printf( "\n"
