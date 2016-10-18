@@ -142,11 +142,11 @@ float distancejulia(vec3 pos, quaternion c)
 {
 #define MAX_ITERATIONS 64
 	float distance;
-	//int i;
+	int i;
 	quaternion q = constq(pos.x, pos.y, pos.z, 0.0F);
 	quaternion qp = constq(1.0F, 0.0F, 0.0F, 0.0F);
 	quaternion tmp;
-	//for(i = 0; i < 64; i++) {
+	for(i = 0; i < 64; i++) {
 
 		tmp = multq(q, qp);
 		qp = tmp;
@@ -165,7 +165,7 @@ float distancejulia(vec3 pos, quaternion c)
 		dumpquaternion(qp);
 		//if(magnq(q) > 10.0F)
 			//break;
-	//}
+	}
 	float qmag = magnq(q);
 	distance = 0.5F * qmag * log(qmag) / magnq(qp);
 	fprintf(logfile, "final distance: %.2f\n", distance);
