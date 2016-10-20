@@ -152,27 +152,6 @@ vec3 through3(vec3 a, vec3 b)
 	return ret;
 }
 
-//returns the point a given distance along an input vector
-//as an offset from the initial vector
-//IMPORTANT: if `in` is't a unit vector you're not
-//guarenteed the return value will be `distance` long!!!!!
-vec2 distalong2(vec2 in, float distance)
-{
-	vec2 ret;
-	ret.x = distance * in.x;
-	ret.y = distance * in.y;
-	return ret;
-}
-
-vec3 distalong3(vec3 in, float distance)
-{
-	vec3 ret;
-	ret.x = distance * in.x;
-	ret.y = distance * in.y;
-	ret.z = distance * in.z;
-	return ret;
-}
-
 //perpendicular vectors
 //these are the same length as the input vector, probably
 //swap components, invert parity of one

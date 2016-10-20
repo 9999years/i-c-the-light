@@ -38,14 +38,16 @@ float de(vec3 pos)
 {
 	//return distancejulia(pos, constq(-0.213F, -0.0410F, -0.563F, -0.560F));
 	return
-		disttorus(pos, const3(0.0F, 0.0F, 0.0F), 5.0F, 15.0F);
+		opu(
+		disttorus(pos, const3(50.0F, 0.0F, 0.0F), 5.0F, 15.0F),
 		//distsphere(pos, const3(50.0F, 0.0F, 50.0F), 10.0F);
-		//opwobble3(
-			//pos,
-			//distsphere(pos, const3(0.0F, 0.0F, 0.0F), 15.0F),
-			//5.0F,
-			//5.0F
-			//);
+		opwobble3(
+			pos,
+			distsphere(pos, const3(0.0F, 0.0F, 0.0F), 15.0F),
+			5.0F,
+			5.0F
+			)
+		);
 		//distsphere(pos, sphere, 10.0F);
 }
 
@@ -120,6 +122,8 @@ unsigned int blinnphong(vec3 cam, vec3 pos, vec3 rot, vec3 light)
 void render(SDL_Surface *screen, int frame)
 {
 	float time = (float)frame / 3.0F;
+	float sintime = sin(time);
+	float costime = cos(time);
 	SDL_FillRect(screen, NULL, 0x000000);
 
 	/* here's how im setting up the axes (right-handed)
@@ -151,7 +155,7 @@ void render(SDL_Surface *screen, int frame)
 
 	//focal length of the camera
 	//longer = more zoomed in
-	float focallength = 200.0F; //sin(time) * 100.0F + 100.0F;
+	float focallength = 100.0F; //sin(time) * 100.0F + 100.0F;
 	//printf("f: %f\n", focallength);
 
 	//width of the camera (horiz. line at the center of the viewport)
@@ -169,7 +173,7 @@ void render(SDL_Surface *screen, int frame)
 	vec3 viewport_ofs = const3(
 		0.0F,
 		-1000.0F,
-		0.0F
+		100.0F * sintime
 		);
 
 
@@ -181,14 +185,15 @@ void render(SDL_Surface *screen, int frame)
 	//it's backwards and perpendicular from the plane
 	//containing the viewport
 	//viewport_ofs + (perp to the w & height of the vp) * focal len
-	vec3 camera;
-	camera = add3(
+	vec3 camera = add3(
 		viewport_ofs,
 		mult3s(
 			unit3(perp3(viewport_width, viewport_height)),
 			focallength
 			)
 		);
+	printf("cam:\n");
+	dump3(camera);
 
 	//direction for the ray to travel in
 	vec3 ray_rot;
@@ -199,15 +204,18 @@ void render(SDL_Surface *screen, int frame)
 
 	//distance from measure_pos
 	float distance;
+	//total distance travelled, i hope i hope i hope
+	float totaldistance;
 
 	vec3 light = fromdirection3(time + 1.0F, time, 1.0F);
 	//steps to march
-	const int steps = 16;
+	const int steps = 64;
 	int i, j, k;
 	for(i = 0; i < hsamples; i++) {
 	for(j = 0; j < wsamples; j++) {
 		//new sample, new distance
 		distance = 0.0F;
+		totaldistance = 0.0F;
 
 		//what portion of the viewport are we rendering to?
 		//-0.5 to 0.5 because viewport_ofs represents the center
@@ -224,18 +232,18 @@ void render(SDL_Surface *screen, int frame)
 		for(k = 0; k < steps; k++) {
 			measure_pos = add3(
 				camera,
-				distalong3(
+				mult3s(
 					ray_rot,
-					distance
+					totaldistance
 					)
 				);
 
-			distance = de(measure_pos);
+			totaldistance += distance = de(measure_pos);
 
 			//fprintf(logfile, "step %d, distance: %f\n",
 				//k, distance);
 
-			if(distance <= 1.0F) {
+			if(distance <= 0.5F) {
 				fprintf(logfile, "PLOT!\n");
 				plot(
 					screen,
@@ -244,7 +252,6 @@ void render(SDL_Surface *screen, int frame)
 					//k * 20
 					//255.0F * (float)k / (float)steps
 					//500.0F / distance
-					//blinnphong(vec3 cam, vec3 pos, vec3 rot, vec3 light)
 					blinnphong(camera, measure_pos, ray_rot, light)
 					//distance <= 2.0F ? 0xffffff : 0x000000
 					)))
@@ -253,7 +260,7 @@ void render(SDL_Surface *screen, int frame)
 			} else if(distance >= 100000.0F
 				|| !isfinite(distance)) {
 				//we're done here
-				fprintf(logfile, "LIMIT EXCEEDED, BREAK!\n");
+				//fprintf(logfile, "LIMIT EXCEEDED, BREAK!\n");
 				break;
 			}
 		}
