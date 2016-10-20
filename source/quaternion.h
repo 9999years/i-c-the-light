@@ -17,6 +17,7 @@ struct quaternion
 	float c;
 };
 
+//debugging function
 void dumpquaternion(quaternion in)
 {
 	fprintf(logfile,
@@ -29,6 +30,7 @@ void dumpquaternion(quaternion in)
 	return;
 }
 
+//construction method
 quaternion constq(float r, float a, float b, float c)
 {
 	return (quaternion){
@@ -39,6 +41,7 @@ quaternion constq(float r, float a, float b, float c)
 	};
 }
 
+//addition
 quaternion addq(quaternion one, quaternion two)
 {
 	quaternion ret;
@@ -49,6 +52,7 @@ quaternion addq(quaternion one, quaternion two)
 	return ret;
 }
 
+//subtraction
 quaternion subq(quaternion one, quaternion two)
 {
 	quaternion ret;
@@ -59,6 +63,9 @@ quaternion subq(quaternion one, quaternion two)
 	return ret;
 }
 
+//i don't really know what a conjugate is either semantically,
+//practically, or at all in relationship to quaternions, so
+//don't ask what this does. the algo itself is correct though.
 quaternion conjugateq(quaternion in)
 {
 	quaternion ret;
@@ -69,6 +76,8 @@ quaternion conjugateq(quaternion in)
 	return ret;
 }
 
+//multiplication
+//this works
 quaternion multq(quaternion one, quaternion two)
 {
 	quaternion ret;
@@ -94,12 +103,13 @@ quaternion multq(quaternion one, quaternion two)
 	return ret;
 }
 
+//ooh, a wrapper function! cute!
 quaternion sqrq(quaternion in)
 {
 	return multq(in, in);
 }
 
-//don't pass anything negative into power or some bad shit will happen
+//if `power` is negative, the behavior is undefined
 quaternion powq(quaternion in, int power)
 {
 	quaternion ret = in;
@@ -112,6 +122,7 @@ quaternion powq(quaternion in, int power)
 	return ret;
 }
 
+//length / magnitude / absolute value
 float magnq(quaternion in)
 {
 	return sqrt(
@@ -122,6 +133,7 @@ float magnq(quaternion in)
 		);
 }
 
+//this is entirely empty. do not trust it
 quaternion invq(quaternion in)
 {
 	//DON'T USE THIS UNTIL I PUT CODE IN IT

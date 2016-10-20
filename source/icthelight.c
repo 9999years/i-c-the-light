@@ -36,14 +36,16 @@ FILE *logfile;
 //global distance estimator
 float de(vec3 pos)
 {
-	return distancejulia(pos, constq(-0.213F, -0.0410F, -0.563F, -0.560F));
-	//return disttorus(pos, const3(50.0F, 0.0F, 50.0F), 5.0F, 15.0F);
+	//return distancejulia(pos, constq(-0.213F, -0.0410F, -0.563F, -0.560F));
+	return
+		//disttorus(pos, const3(50.0F, 0.0F, 50.0F), 5.0F, 15.0F);
 		//distsphere(pos, const3(50.0F, 0.0F, 50.0F), 10.0F);
-		//opwobble3(
-			//pos,
-			//5.0F,
-			//5.0F
-			//);
+		opwobble3(
+			pos,
+			distsphere(pos, const3(50.0F, 0.0F, 50.0F), 15.0F),
+			5.0F,
+			5.0F
+			);
 		//distsphere(pos, sphere, 10.0F);
 }
 
@@ -121,7 +123,7 @@ void render(SDL_Surface *screen, int frame)
 	SDL_FillRect(screen, NULL, 0x000000);
 
 	/*
-	 * here's how im setting up the axis (right-handed)
+	 * here's how im setting up the axes (right-handed)
 	 *      z
 	 *      |
 	 *      |
@@ -137,92 +139,101 @@ void render(SDL_Surface *screen, int frame)
 	 *
 	 */
 
-	//camera offset from origin
-	//backwards 1000 units on the y axis
-	//vec3 camera_ofs = fromdirection3(time, 0.0F, 1000.0F);
-	vec3 camera_ofs = {
-		.x = 250.0F,
-		.y = -1000.0F + 250.0F * sin(time),
-		.z = 250.0F
-	};
-	//camera rotation
-	//pointing along y
-	//this is the direction the rays will fire
-	//if it isn't a unit vector things will explode probably
-	vec3 camera_rot = unit3(inv3(camera_ofs));
-	//vec3 camera_rot = fromdirection3(time, time + 1.0F, 1.0F);
-	//vec3 camera_rot = {
-		//.x = sin(time),
-		//.y = cos(time),
-		//.z = 0.0F
-	//};
 	//screen aspect ratio
 	const float aspect = (float)screen->w / (float)screen->h;
-	//size of area rays will be casted from in coord space
-	//NOT screen pixels!!! that's `samples`
-	vec2 camera_size;
-	camera_size.x = 100.0F;
-	//infer height from screen ratio
-	camera_size.y = aspect * camera_size.x;
 	//horiz samples
 	//these are the values the for() loops go to
-	const int xsamples = screen->w;
-	const int zsamples = aspect * xsamples;
-	//loop from 0 to samples
-	//map each sample onto 0..xres, offset by camera_ofs
-	//shoot in dir of camera_rot
-	//origin of each ray, where it fires from
-	vec3 ray_orig;
-	//unit vector of the direction to go into
-	vec3 ray_rot = camera_rot;
-	//actual position of the point being measured currently,
-	//RELATIVE TO RAY_ORIG
-	vec3 ray_ofs;
-	//real actual position of the point being measured
-	vec3 ray_pos;
-	vec3 tmp;
-	vec3 light;//= {
-		//.x = 0.0F,//707107,
-		//.y = 0.0F,
-		//.z = 1.0F
-	//};
-	light = fromdirection3(time + 1.0F, time, 1.0F);
+	const int wsamples = screen->w;
+	const int hsamples = aspect * wsamples;
+
+	//portion of viewport to render
+	//this is multiplied by the viewport vectors to get a point on the viewport
+	//the ray is shot through
+	float wfrac, hfrac;
+
+	//focal length of the camera
+	//longer = more zoomed in
+	float focallength = 100.0F;
+
+	//width of the camera (horiz. line at the center of the viewport)
+	vec3 viewport_width = const3(100.0F, 0.0F, 0.0F);
+	//height of the camera (vert. line at the center of the viewport)
+	vec3 viewport_height = const3(0.0F, 0.0F, 100.0F);
+
+	//offset of the center of the viewport from the origin
+	//essentially the camera position
+	vec3 viewport_ofs = const3(0.0F, -1000.0F, 0.0F);
+
+	//point the ray will travel through, other than the camera
+	vec3 ray_through;
+
+	//camera
+	//the rays are shot from here through the viewport
+	//it's backwards and perpendicular from the plane containing the viewport
+	vec3 camera;
+	camera = add3(
+		viewport_ofs,
+		mult3s(
+			perp3(viewport_width, viewport_height),
+			focallength
+			)
+		);
+
+	//direction for the ray to travel in
+	vec3 ray_rot;
+
+	//the current position to be measured by the distance estimator
+	//generally camera + distance in the direction of ray_rot
+	vec3 measure_pos;
+
+	//distance from measure_pos
+	float distance;
+
+	vec3 light = fromdirection3(time + 1.0F, time, 1.0F);
 	//steps to march
 	const int steps = 64;
-	float distance;
 	int i, j, k;
-	for(i = 0; i < zsamples; i++) {
-	for(j = 0; j < xsamples; j++) {
-		//reset the ray offset
-		ray_ofs.x = 0;
-		ray_ofs.y = 0;
-		ray_ofs.z = 0;
-		//ray_rot = unit3(
-		//our position in the screen + camera offset
-		ray_orig.x =
-			camera_ofs.x
-			+ scale(j, 0, xsamples, 0, camera_size.x);
-		ray_orig.y =
-			camera_ofs.y;
-		ray_orig.z =
-			camera_ofs.z
-			+ scale(i, 0, zsamples, 0, camera_size.y);
+	for(i = 0; i < hsamples; i++) {
+	for(j = 0; j < wsamples; j++) {
+		//new sample, new distance
+		distance = 0.0F;
+
+		//what portion of the viewport are we rendering to?
+		//-0.5 to 0.5 because viewport_ofs represents the center
+		//of the viewport and viewport_width and _height represent
+		//whole, not half widths of the viewport size
+		wfrac = scale(j, 0, wsamples, -0.5F, 0.5F);
+		hfrac = scale(i, 0, hsamples, -0.5F, 0.5F);
+		ray_through = add3(
+			mult3s(viewport_width, wfrac),
+			mult3s(viewport_height, hfrac)
+			);
+		ray_rot = unit3(through3(camera, ray_through));
+
 		for(k = 0; k < steps; k++) {
-			ray_pos = add3(
-				ray_ofs,
-				ray_orig
+			measure_pos = add3(
+				camera,
+				distalong3(
+					ray_rot,
+					distance
+					)
 				);
-			distance = de(ray_pos);
+
+			distance = de(measure_pos);
+			fprintf(logfile, "step %d, distance: %f",
+				k, distance);
+
 			if(distance <= 0.05F) {
 				fprintf(logfile, "PLOT!\n");
 				plot(
 					screen,
 					j, i,
 					colortoint(graytocolor(bclamp(
-					//k * 20
+					k * 20
 					//255.0F * (float)k / (float)steps
 					//500.0F / distance
-					blinnphong(ray_orig, ray_pos, ray_rot, light)
+					//blinnphong(vec3 cam, vec3 pos, vec3 rot, vec3 light)
+					//blinnphong(camera, measure_pos, ray_rot, light)
 					//distance <= 2.0F ? 0xffffff : 0x000000
 					)))
 					);
@@ -233,11 +244,6 @@ void render(SDL_Surface *screen, int frame)
 				fprintf(logfile, "LIMIT EXCEEDED, BREAK!\n");
 				break;
 			}
-			tmp = add3(
-				distalong3(ray_rot, distance),
-				ray_ofs
-				);
-			ray_ofs = tmp;
 		}
 	}
 	}
@@ -290,7 +296,10 @@ void saveframe(SDL_Surface *screen)
 	} else {
 		FILE *hashfile = fopen(hashfilename, "w");
 		if(hashfile == NULL)
-			fprintf(logfile, "hash file write error!\nfilename: %s\n", hashfilename);
+			fprintf(logfile,
+				"hash file write error!\nfilename: %s\n",
+				hashfilename
+				);
 		fclose(hashfile);
 	}
 	return;
@@ -365,7 +374,8 @@ int WinMain(/*int argc, char* args[]*/)
 
 		//SDL_Delay(16);
 		// render
-		render(screen, frame);
+		if(frame == 0)
+			render(screen, frame);
 
 		//Update the surface
 		SDL_UpdateWindowSurface(window);
@@ -380,6 +390,9 @@ int WinMain(/*int argc, char* args[]*/)
 			fprintf(logfile, "%.4f FPS\n", 1 / total);
 		//}
 		frame++;
+		//quit after first frame
+		//just for debugging
+		//quit = 1;
 	}
 
 	//Destroy window

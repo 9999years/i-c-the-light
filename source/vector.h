@@ -89,6 +89,56 @@ vec3 fromdirection3(float xy, float yz, float magn)
 	return ret;
 }
 
+//returns the magnitude of a vector
+float magn2(vec2 a)
+{
+	return sqrt((a.x*a.x) + (a.y*a.y));
+}
+
+float magn3(vec3 a)
+{
+	return sqrt((a.x*a.x) + (a.y*a.y) + (a.z*a.z));
+}
+
+//returns the unit vector for any given vector
+vec2 unit2(vec2 a)
+{
+	float magnitude = magn2(a);
+	vec2 ret;
+	ret.x = a.x/magnitude;
+	ret.y = a.y/magnitude;
+	return ret;
+}
+
+vec3 unit3(vec3 a)
+{
+	float magnitude = magn3(a);
+	vec3 ret;
+	ret.x = a.x/magnitude;
+	ret.y = a.y/magnitude;
+	ret.z = a.z/magnitude;
+	return ret;
+}
+
+//vector through two points
+//not a unit vector!
+vec2 through2(vec2 a, vec2 b)
+{
+	vec2 ret;
+	ret.x = b.x - a.x;
+	ret.y = b.y - a.y;
+	return ret;
+}
+
+vec3 through3(vec3 a, vec3 b)
+{
+	vec3 ret;
+	ret.x = b.x - a.x;
+	ret.y = b.y - a.y;
+	ret.z = b.z - a.z;
+	return ret;
+}
+
 //returns the point a given distance along an input vector
 //as an offset from the initial vector
 //IMPORTANT: if `in` is't a unit vector you're not
@@ -111,6 +161,7 @@ vec3 distalong3(vec3 in, float distance)
 }
 
 //perpendicular vectors
+//these are the same length as the input vector, probably
 //swap components, invert parity of one
 vec2 perp2(vec2 in)
 {
@@ -120,20 +171,18 @@ vec2 perp2(vec2 in)
 	return ret;
 }
 
-//vector perpendicular to `in`
-//almost certainly broken
-vec3 perp3(vec3 in)
+//vector perpendicular to `a` and `b`
+//this is just a cross product
+//math.SE: https://goo.gl/pdn98S
+vec3 perp3(vec3 a, vec3 b)
 {
 	vec3 ret;
-	ret.x = in.z;
-	ret.y = in.z;
-	ret.z = in.x - in.y;
-	//if in = <-1, 1, 0>, it creates a 0 vector
-	if((ret.x == 0.0F) && (ret.y == 0.0F) && (ret.z == 0.0F)) {
-		ret.x = -in.y - in.z;
-		ret.y =  in.x;
-		ret.z =  in.x;
-	}
+	ret.x =   a.y * b.z
+		- b.y - a.z;
+	ret.y = -(a.x * b.z
+		- b.x * a.z);
+	ret.z =   a.x * b.y
+		- b.x * a.y;
 	return ret;
 }
 
@@ -414,36 +463,5 @@ float dot2(vec2 a, vec2 b)
 float dot3(vec3 a, vec3 b)
 {
 	return (a.x * b.x) + (a.y * b.y) + (a.z * b.z);
-}
-
-//returns the magnitude of a vector
-float magn2(vec2 a)
-{
-	return sqrt((a.x*a.x) + (a.y*a.y));
-}
-
-float magn3(vec3 a)
-{
-	return sqrt((a.x*a.x) + (a.y*a.y) + (a.z*a.z));
-}
-
-//returns the unit vector for any given vector
-vec2 unit2(vec2 a)
-{
-	float magnitude = magn2(a);
-	vec2 ret;
-	ret.x = a.x/magnitude;
-	ret.y = a.y/magnitude;
-	return ret;
-}
-
-vec3 unit3(vec3 a)
-{
-	float magnitude = magn3(a);
-	vec3 ret;
-	ret.x = a.x/magnitude;
-	ret.y = a.y/magnitude;
-	ret.z = a.z/magnitude;
-	return ret;
 }
 #endif //VECTOR_H
