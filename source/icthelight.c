@@ -151,7 +151,8 @@ void render(SDL_Surface *screen, int frame)
 
 	//focal length of the camera
 	//longer = more zoomed in
-	float focallength = 50.0F;
+	float focallength = sin(time) * 100.0F + 100.0F;
+	printf("f: %f\n", focallength);
 
 	//width of the camera (horiz. line at the center of the viewport)
 	vec3 viewport_width = const3(
@@ -177,7 +178,9 @@ void render(SDL_Surface *screen, int frame)
 
 	//camera
 	//the rays are shot from here through the viewport
-	//it's backwards and perpendicular from the plane containing the viewport
+	//it's backwards and perpendicular from the plane
+	//containing the viewport
+	//viewport_ofs + (perp to the w & height of the vp) * focal len
 	vec3 camera;
 	camera = add3(
 		viewport_ofs,
