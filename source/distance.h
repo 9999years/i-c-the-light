@@ -158,16 +158,16 @@ float distancejulia(vec3 pos, quaternion c)
 		tmp = addq(sqrq(q), c);
 		q = tmp;
 
-		fprintf(logfile, "i = %d, q:\n", i);
+		//fprintf(logfile, "i = %d, q:\n", i);
 		dumpquaternion(q);
-		fprintf(logfile, "q':\n");
+		//fprintf(logfile, "q':\n");
 		dumpquaternion(qp);
 		if(magnq(q) > 10.0F)
 			break;
 	}
 	float qmag = magnq(q);
 	distance = 0.5F * qmag * log(qmag) / magnq(qp);
-	fprintf(logfile, "final distance: %.2f\n", distance);
+	//fprintf(logfile, "final distance: %.2f\n", distance);
 	return distance;
 }
 

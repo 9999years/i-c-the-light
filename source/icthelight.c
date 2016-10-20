@@ -38,14 +38,14 @@ float de(vec3 pos)
 {
 	//return distancejulia(pos, constq(-0.213F, -0.0410F, -0.563F, -0.560F));
 	return
-		disttorus(pos, const3(50.0F, 0.0F, 50.0F), 5.0F, 15.0F);
+		//disttorus(pos, const3(0.0F, 0.0F, 0.0F), 5.0F, 15.0F);
 		//distsphere(pos, const3(50.0F, 0.0F, 50.0F), 10.0F);
-		//opwobble3(
-			//pos,
-			//distsphere(pos, const3(50.0F, 0.0F, 50.0F), 15.0F),
-			//5.0F,
-			//5.0F
-			//);
+		opwobble3(
+			pos,
+			distsphere(pos, const3(0.0F, 0.0F, 0.0F), 15.0F),
+			5.0F,
+			5.0F
+			);
 		//distsphere(pos, sphere, 10.0F);
 }
 
@@ -151,10 +151,9 @@ void render(SDL_Surface *screen, int frame)
 
 	//focal length of the camera
 	//longer = more zoomed in
-	float focallength = 100.0F;
+	float focallength = 50.0F;
 
 	//width of the camera (horiz. line at the center of the viewport)
-	//vec3 viewport_width = const3(100.0F, 0.0F, 0.0F);
 	vec3 viewport_width = const3(
 		100.0F * sin(time),
 		100.0F * cos(time),
@@ -166,7 +165,12 @@ void render(SDL_Surface *screen, int frame)
 
 	//offset of the center of the viewport from the origin
 	//essentially the camera position
-	vec3 viewport_ofs = const3(0.0F, -1000.0F, 0.0F);
+	vec3 viewport_ofs = const3(
+		0.0F,
+		-1000.0F,
+		0.0F
+		);
+
 
 	//point the ray will travel through, other than the camera
 	vec3 ray_through;
@@ -195,7 +199,7 @@ void render(SDL_Surface *screen, int frame)
 
 	vec3 light = fromdirection3(time + 1.0F, time, 1.0F);
 	//steps to march
-	const int steps = 64;
+	const int steps = 16;
 	int i, j, k;
 	for(i = 0; i < hsamples; i++) {
 	for(j = 0; j < wsamples; j++) {
@@ -225,8 +229,8 @@ void render(SDL_Surface *screen, int frame)
 
 			distance = de(measure_pos);
 
-			fprintf(logfile, "step %d, distance: %f",
-				k, distance);
+			//fprintf(logfile, "step %d, distance: %f\n",
+				//k, distance);
 
 			if(distance <= 1.0F) {
 				fprintf(logfile, "PLOT!\n");
@@ -236,9 +240,9 @@ void render(SDL_Surface *screen, int frame)
 					colortoint(graytocolor(bclamp(
 					//k * 20
 					//255.0F * (float)k / (float)steps
-					500.0F / distance
+					//500.0F / distance
 					//blinnphong(vec3 cam, vec3 pos, vec3 rot, vec3 light)
-					//blinnphong(camera, measure_pos, ray_rot, light)
+					blinnphong(camera, measure_pos, ray_rot, light)
 					//distance <= 2.0F ? 0xffffff : 0x000000
 					)))
 					);
@@ -372,6 +376,7 @@ int WinMain(/*int argc, char* args[]*/)
 	double total;
 	while(!quit) {
 		start = clock();
+		printf("frame: %d\n", frame);
 
 		//poll for events, and handle the ones we care about.
 		//this returns 1 if we need to quit
