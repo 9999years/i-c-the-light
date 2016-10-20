@@ -24,7 +24,10 @@
  *
  */
 
+#include <stdio.h>
 #include <math.h>
+
+#include "logging.h"
 
 #ifndef VECTOR_H
 #define VECTOR_H
@@ -47,6 +50,16 @@ struct vec3
 	float y;
 	float z;
 };
+
+void dump3(vec3 a)
+{
+	printf( "x: %f\n"
+		"y: %f\n"
+		"z: %f\n",
+		a.x, a.y, a.z
+		);
+	return;
+}
 
 //construction methods
 vec2 const2(float x, float y)
@@ -178,11 +191,11 @@ vec3 perp3(vec3 a, vec3 b)
 {
 	vec3 ret;
 	ret.x =   a.y * b.z
-		- b.y - a.z;
+		- a.z * b.y;
 	ret.y = -(a.x * b.z
-		- b.x * a.z);
+		- a.z * b.x);
 	ret.z =   a.x * b.y
-		- b.x * a.y;
+		- a.y * b.x;
 	return ret;
 }
 

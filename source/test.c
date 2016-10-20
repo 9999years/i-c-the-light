@@ -349,6 +349,18 @@ int WinMain(/*int argc, char *argv[]*/)
 			c.x, c.y
 			);
 		assert((c.x == -3) && (c.y == 16));
+		TESTING("perp3");
+		vec3 d = const3(1.0F, 0.0F, 0.0F);
+		vec3 e = const3(0.0F, 1.0F, 0.0F);
+		vec3 perp = perp3(d, e);
+		printf(
+			"a    = {%f, %f, %f}\n"
+			"b    = {%f, %f, %f}\n"
+			"perp = {%f, %f, %f}\n",
+			d.x, d.y, d.z,
+			e.x, e.y, e.z,
+			perp.x, perp.y, perp.z
+			);
 	}
 
 	testsection("quaternion.h");
@@ -428,7 +440,7 @@ int WinMain(/*int argc, char *argv[]*/)
 		"================\n"
 		"ALL TESTS PASSED\n"
 		"if you're reading this, it means you didn't break the build!\n"
-		"congrats! :-)"
+		"congrats! :-)\n"
 		"consider running `make clean` to delete generated test files\n");
 	return 0;
 }

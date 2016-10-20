@@ -38,14 +38,14 @@ float de(vec3 pos)
 {
 	//return distancejulia(pos, constq(-0.213F, -0.0410F, -0.563F, -0.560F));
 	return
-		//disttorus(pos, const3(50.0F, 0.0F, 50.0F), 5.0F, 15.0F);
+		disttorus(pos, const3(50.0F, 0.0F, 50.0F), 5.0F, 15.0F);
 		//distsphere(pos, const3(50.0F, 0.0F, 50.0F), 10.0F);
-		opwobble3(
-			pos,
-			distsphere(pos, const3(50.0F, 0.0F, 50.0F), 15.0F),
-			5.0F,
-			5.0F
-			);
+		//opwobble3(
+			//pos,
+			//distsphere(pos, const3(50.0F, 0.0F, 50.0F), 15.0F),
+			//5.0F,
+			//5.0F
+			//);
 		//distsphere(pos, sphere, 10.0F);
 }
 
@@ -122,8 +122,7 @@ void render(SDL_Surface *screen, int frame)
 	float time = (float)frame / 3.0F;
 	SDL_FillRect(screen, NULL, 0x000000);
 
-	/*
-	 * here's how im setting up the axes (right-handed)
+	/* here's how im setting up the axes (right-handed)
 	 *      z
 	 *      |
 	 *      |
@@ -136,7 +135,6 @@ void render(SDL_Surface *screen, int frame)
 	 *   /
 	 *  /
 	 * x
-	 *
 	 */
 
 	//screen aspect ratio
@@ -156,7 +154,13 @@ void render(SDL_Surface *screen, int frame)
 	float focallength = 100.0F;
 
 	//width of the camera (horiz. line at the center of the viewport)
-	vec3 viewport_width = const3(100.0F, 0.0F, 0.0F);
+	//vec3 viewport_width = const3(100.0F, 0.0F, 0.0F);
+	vec3 viewport_width = const3(
+		100.0F * sin(time),
+		100.0F * cos(time),
+		0.0F
+		);
+
 	//height of the camera (vert. line at the center of the viewport)
 	vec3 viewport_height = const3(0.0F, 0.0F, 100.0F);
 
@@ -174,7 +178,7 @@ void render(SDL_Surface *screen, int frame)
 	camera = add3(
 		viewport_ofs,
 		mult3s(
-			perp3(viewport_width, viewport_height),
+			unit3(perp3(viewport_width, viewport_height)),
 			focallength
 			)
 		);
@@ -220,10 +224,11 @@ void render(SDL_Surface *screen, int frame)
 				);
 
 			distance = de(measure_pos);
+
 			fprintf(logfile, "step %d, distance: %f",
 				k, distance);
 
-			if(distance <= 0.05F) {
+			if(distance <= 1.0F) {
 				fprintf(logfile, "PLOT!\n");
 				plot(
 					screen,
@@ -374,25 +379,20 @@ int WinMain(/*int argc, char* args[]*/)
 
 		//SDL_Delay(16);
 		// render
-		if(frame == 0)
-			render(screen, frame);
+		render(screen, frame);
 
 		//Update the surface
 		SDL_UpdateWindowSurface(window);
 
 		end = clock();
-		//if(frame%30 == 0) {
-			if(frame == 0) {
+		if(frame%30 == 0) {
+			if(frame == 0)
 				saveframe(screen);
-			}
 			total = (double)(end - start) / CLOCKS_PER_SEC;
 			printf("%.4f FPS\n", 1 / total);
 			fprintf(logfile, "%.4f FPS\n", 1 / total);
-		//}
+		}
 		frame++;
-		//quit after first frame
-		//just for debugging
-		//quit = 1;
 	}
 
 	//Destroy window
