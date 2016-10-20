@@ -38,14 +38,14 @@ float de(vec3 pos)
 {
 	//return distancejulia(pos, constq(-0.213F, -0.0410F, -0.563F, -0.560F));
 	return
-		//disttorus(pos, const3(0.0F, 0.0F, 0.0F), 5.0F, 15.0F);
+		disttorus(pos, const3(0.0F, 0.0F, 0.0F), 5.0F, 15.0F);
 		//distsphere(pos, const3(50.0F, 0.0F, 50.0F), 10.0F);
-		opwobble3(
-			pos,
-			distsphere(pos, const3(0.0F, 0.0F, 0.0F), 15.0F),
-			5.0F,
-			5.0F
-			);
+		//opwobble3(
+			//pos,
+			//distsphere(pos, const3(0.0F, 0.0F, 0.0F), 15.0F),
+			//5.0F,
+			//5.0F
+			//);
 		//distsphere(pos, sphere, 10.0F);
 }
 
@@ -156,8 +156,8 @@ void render(SDL_Surface *screen, int frame)
 
 	//width of the camera (horiz. line at the center of the viewport)
 	vec3 viewport_width = const3(
-		100.0F,
-		0.0F,
+		100.0F * sin(time),
+		100.0F * cos(time),
 		0.0F
 		);
 
