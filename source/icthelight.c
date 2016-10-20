@@ -234,9 +234,9 @@ void render(SDL_Surface *screen, int frame)
 					screen,
 					j, i,
 					colortoint(graytocolor(bclamp(
-					k * 20
+					//k * 20
 					//255.0F * (float)k / (float)steps
-					//500.0F / distance
+					500.0F / distance
 					//blinnphong(vec3 cam, vec3 pos, vec3 rot, vec3 light)
 					//blinnphong(camera, measure_pos, ray_rot, light)
 					//distance <= 2.0F ? 0xffffff : 0x000000
