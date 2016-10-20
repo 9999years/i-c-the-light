@@ -138,6 +138,39 @@ float oprepeat3(/*vec3 point, vec3 period*/)
 	return -10000.0F;
 }
 
+float distserpenski(vec3 pos)
+{
+	vec3 t1 = const3( 1.0F,  1.0F,  1.0F);
+	vec3 t2 = const3(-1.0F, -1.0F,  1.0F);
+	vec3 t3 = const3( 1.0F, -1.0F, -1.0F);
+	vec3 t4 = const3(-1.0F,  1.0F, -1.0F);
+	vec3 c, tmp;
+	float dist, d;
+	float scale = 2.0F;
+	const int Iterations = 3;
+	int n;
+	for(n = 0; n < Iterations; n++) {
+		c = t1;
+		dist = magn3(sub3(pos, t1));
+		d = magn3(sub3(pos, t2));
+		if(d < dist)
+			c = t2, dist = d;
+		d = magn3(sub3(pos, t3));
+		if(d < dist)
+			c = t3, dist = d;
+		d = magn3(sub3(pos, t4));
+		if(d < dist)
+			c = t4, dist = d;
+		tmp = sub3(
+			mult3s(pos, scale),
+			mult3s(c, scale - 1.0F)
+			);
+		pos = tmp;
+	}
+	return magn3(pos)
+		* pow(scale, -(float)n);
+}
+
 float distancejulia(vec3 pos, quaternion c)
 {
 #define MAX_ITERATIONS 64

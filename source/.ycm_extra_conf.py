@@ -3,7 +3,7 @@ import ycm_core
 
 flags = [
 '-Wall',
-'-Wextra',
+# '-Wextra',
 '-Werror',
 '-fexceptions',
 '-DNDEBUG',
