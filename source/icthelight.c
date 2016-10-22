@@ -353,6 +353,15 @@ int WinMain(/*int argc, char* args[]*/)
 		"%s\n", ctime(&unixtime)
 		);
 
+	printf(
+"╭─────────────────────────────────────╮\n"
+"│ ·           ╷         ╷ ·     ╷     │\n"
+"│ ╷   ╭─╮   ┼ ├─╮ ╭─╮   │ ╷ ╭─╮ ├─╮ ┼ │\n"
+"│ │   │     │ │ │ ├─┘   │ │ ╰─╯ │ │ │ │\n"
+"│ ╵   ╰─╯   ╰ ╵ ╵ ╰─╯   ╵ ╵ ╰─╮ ╵ ╵ ╰ │\n"
+"╰───────────────────────────╰─╯───────╯\n"
+	);
+
 	initializelogfile();
 
 	//The window we'll be rendering to
