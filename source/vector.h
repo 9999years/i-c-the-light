@@ -135,6 +135,7 @@ vec3 unit3(vec3 a)
 
 //vector through two points
 //not a unit vector!
+//this is just Δx, Δy, etc...
 vec2 through2(vec2 a, vec2 b)
 {
 	vec2 ret;

@@ -160,8 +160,8 @@ void render(SDL_Surface *screen, int frame)
 
 	//width of the camera (horiz. line at the center of the viewport)
 	vec3 viewport_width = const3(
-		100.0F,
-		0.0F,
+		100.0F * sintime,
+		100.0F * costime,
 		0.0F
 		);
 
@@ -173,7 +173,7 @@ void render(SDL_Surface *screen, int frame)
 	vec3 viewport_ofs = const3(
 		0.0F,
 		-1000.0F,
-		100.0F * sintime
+		100.0F
 		);
 
 
