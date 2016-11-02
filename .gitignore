@@ -1,6 +1,7 @@
 *.exe
 *.dll
-output/*
+output/**
+source/log/**
 ftpinfo.txt
 *.pyc
 **/SDL/*

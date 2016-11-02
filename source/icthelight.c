@@ -32,22 +32,23 @@
 //globals
 int frame = 0;
 FILE *logfile;
+FILE *plotfile;
 
 //global distance estimator
 float de(vec3 pos)
 {
 	//return distancejulia(pos, constq(-0.213F, -0.0410F, -0.563F, -0.560F));
 	return
-		opu(
-		disttorus(pos, const3(50.0F, 0.0F, 0.0F), 5.0F, 15.0F),
+		//opu(
+		//disttorus(pos, const3(0.0F, 0.0F, 0.0F), 5.0F, 15.0F);
 		//distsphere(pos, const3(50.0F, 0.0F, 50.0F), 10.0F);
 		opwobble3(
 			pos,
 			distsphere(pos, const3(0.0F, 0.0F, 0.0F), 15.0F),
-			5.0F,
-			5.0F
-			)
-		);
+			2.0F,
+			2.0F
+			);
+		//);
 		//distsphere(pos, sphere, 10.0F);
 }
 
@@ -119,11 +120,13 @@ unsigned int blinnphong(vec3 cam, vec3 pos, vec3 rot, vec3 light)
 		(unsigned int)(scale(ret, -2.0F, 2.0F, 0.0F, 255.0F));
 }
 
-void render(SDL_Surface *screen, int frame)
+void render(SDL_Surface *screen, const int frame)
 {
-	float time = (float)frame / 3.0F;
-	float sintime = sin(time);
-	float costime = cos(time);
+	const float time = (float)frame / 3.0F;
+	const float sintime = sin(time);
+	const float costime = cos(time);
+	//how big the viewport is
+	const float viewport_size = 25.0F;
 	SDL_FillRect(screen, NULL, 0x000000);
 
 	/* here's how im setting up the axes (right-handed)
@@ -155,26 +158,26 @@ void render(SDL_Surface *screen, int frame)
 
 	//focal length of the camera
 	//longer = more zoomed in
-	float focallength = 100.0F; //sin(time) * 100.0F + 100.0F;
+	float focallength = 1000.0F;
 	//printf("f: %f\n", focallength);
 
 	//width of the camera (horiz. line at the center of the viewport)
 	vec3 viewport_width = const3(
-		100.0F * sintime,
-		100.0F * costime,
+		viewport_size * costime,
+		viewport_size * sintime,
 		0.0F
-		);
+	);
 
 	//height of the camera (vert. line at the center of the viewport)
-	vec3 viewport_height = const3(0.0F, 0.0F, 100.0F);
+	vec3 viewport_height = const3(0.0F, 0.0F, viewport_size);
 
 	//offset of the center of the viewport from the origin
 	//essentially the camera position
 	vec3 viewport_ofs = const3(
-		0.0F,
-		-1000.0F,
-		100.0F
-		);
+		50.0F * cos(time + HALF_PI),
+		50.0F * sin(time + HALF_PI),
+		0.0F
+	);
 
 
 	//point the ray will travel through, other than the camera
@@ -191,9 +194,15 @@ void render(SDL_Surface *screen, int frame)
 			unit3(perp3(viewport_width, viewport_height)),
 			focallength
 			)
-		);
-	printf("cam:\n");
-	dump3(camera);
+	);
+	//printf("cam:\n");
+	//dump3(camera);
+	
+	//fprintf(plotfile, "%f\t%f\t%f\n",
+		//camera.x,
+		//camera.y,
+		//camera.z
+		//);
 
 	//direction for the ray to travel in
 	vec3 ray_rot;
@@ -226,8 +235,19 @@ void render(SDL_Surface *screen, int frame)
 		ray_through = add3(
 			mult3s(viewport_width, wfrac),
 			mult3s(viewport_height, hfrac)
-			);
-		ray_rot = unit3(through3(camera, ray_through));
+		);
+		ray_rot = unit3(through3(
+			camera,
+			add3(ray_through, viewport_ofs)
+		));
+
+		//fprintf(plotfile, "%f\t%f\t%f\n",
+			//ray_rot.x,
+			//ray_rot.y,
+			//ray_rot.z
+			//);
+
+		//continue;
 
 		for(k = 0; k < steps; k++) {
 			measure_pos = add3(
@@ -236,7 +256,7 @@ void render(SDL_Surface *screen, int frame)
 					ray_rot,
 					totaldistance
 					)
-				);
+			);
 
 			totaldistance += distance = de(measure_pos);
 
@@ -255,7 +275,7 @@ void render(SDL_Surface *screen, int frame)
 					blinnphong(camera, measure_pos, ray_rot, light)
 					//distance <= 2.0F ? 0xffffff : 0x000000
 					)))
-					);
+				);
 				break;
 			} else if(distance >= 100000.0F
 				|| !isfinite(distance)) {
@@ -318,7 +338,7 @@ void saveframe(SDL_Surface *screen)
 			fprintf(logfile,
 				"hash file write error!\nfilename: %s\n",
 				hashfilename
-				);
+			);
 		fclose(hashfile);
 	}
 	return;
@@ -351,7 +371,7 @@ int WinMain(/*int argc, char* args[]*/)
 	const time_t unixtime = time(NULL);
 	printf( "I C the Light by Rebecca Turner (MIT/Expat)\n"
 		"%s\n", ctime(&unixtime)
-		);
+	);
 
 	printf(
 "╭─────────────────────────────────────╮\n"
@@ -382,7 +402,7 @@ int WinMain(/*int argc, char* args[]*/)
 			SCREEN_WIDTH,
 			SCREEN_HEIGHT,
 			SDL_WINDOW_SHOWN
-			);
+		);
 		if(window == NULL) {
 			printf("Window could not be created! SDL_Error: %s\n", SDL_GetError());
 		} else {

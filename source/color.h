@@ -119,19 +119,19 @@ struct rgbcolor shifthue(struct rgbcolor in, const float fHue)
 		  in.r * matrix[0][0]
 		+ in.g * matrix[0][1]
 		+ in.b * matrix[0][2]
-		);
+	);
 
 	ret.g = bclamp(
 		  in.r * matrix[1][0]
 		+ in.g * matrix[1][1]
 		+ in.b * matrix[1][2]
-		);
+	);
 
 	ret.b = bclamp(
 		  in.r * matrix[2][0]
 		+ in.g * matrix[2][1]
 		+ in.b * matrix[2][2]
-		);
+	);
 
 	return ret;
 }

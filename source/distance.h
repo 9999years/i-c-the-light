@@ -47,7 +47,7 @@ float distline2(vec2 p, vec2 a, vec2 b)
 	return dist2(
 		p,
 		projection
-		);
+	);
 }
 
 //b specifies the box dimensions
@@ -164,7 +164,7 @@ float distserpenski(vec3 pos)
 		tmp = sub3(
 			mult3s(pos, scale),
 			mult3s(c, scale - 1.0F)
-			);
+		);
 		pos = tmp;
 	}
 	return magn3(pos)

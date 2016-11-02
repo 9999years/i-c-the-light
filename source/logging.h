@@ -9,6 +9,7 @@
 #define LOGGING_H
 
 FILE *logfile;
+FILE *plotfile;
 
 int initializelogfile()
 {
@@ -27,7 +28,16 @@ int initializelogfile()
 		"%s\n",
 		(unsigned long int)unixtime,
 		ctime(&unixtime)
-		);
+	);
+	sprintf(filename, "./log/plot-icthelight-%lu.data",
+		(unsigned long int)unixtime);
+	plotfile = fopen(filename, "w");
+	if(plotfile == NULL) {
+		printf( "Plot file open failure! (%s)\n"
+			"Check that ./log/ exists?\n",
+			filename);
+		return -1;
+	}
 	return 1;
 }
 #endif //LOGGING_H

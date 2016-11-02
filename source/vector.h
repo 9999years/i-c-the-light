@@ -57,7 +57,7 @@ void dump3(vec3 a)
 		"y: %f\n"
 		"z: %f\n",
 		a.x, a.y, a.z
-		);
+	);
 	return;
 }
 
@@ -136,6 +136,7 @@ vec3 unit3(vec3 a)
 //vector through two points
 //not a unit vector!
 //this is just Δx, Δy, etc...
+//a more semantic b - a
 vec2 through2(vec2 a, vec2 b)
 {
 	vec2 ret;
@@ -294,7 +295,7 @@ float dist2(vec2 a, vec2 b)
 	return sqrt(
 		  ((b.x - a.x) * (b.x - a.x))
 		+ ((b.y - a.y) * (b.y - a.y))
-		);
+	);
 }
 
 float dist3(vec3 a, vec3 b)
@@ -303,7 +304,7 @@ float dist3(vec3 a, vec3 b)
 		  ((b.x - a.x) * (b.x - a.x))
 		+ ((b.y - a.y) * (b.y - a.y))
 		+ ((b.z - a.z) * (b.z - a.z))
-		);
+	);
 }
 
 //useful for avoiding spurious sqrt() calls

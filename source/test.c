@@ -40,7 +40,7 @@ void testsection(char name[])
 		"==============================================================================="
 		"\n\n",
 		name
-		);
+	);
 }
 
 void sdltests(SDL_Surface *screen, SDL_Window *window, int width, int height)
@@ -51,7 +51,7 @@ void sdltests(SDL_Surface *screen, SDL_Window *window, int width, int height)
 
 	printf(
 		"SDL initialization success!\n"
-		);
+	);
 
 	TESTING("getpixel (single test)");
 	printf("(1,2) = %d (0xffffff expected)\n", getpixel(screen, 1, 2));
@@ -61,7 +61,7 @@ void sdltests(SDL_Surface *screen, SDL_Window *window, int width, int height)
 		"NOTE: it's difficult to test getpixel alone or drawline alone---\n"
 		"to verify results of drawing, pixels have to be checked. If these\n"
 		"fail, good luck debugging!\n\n"
-		);
+	);
 
 	drawline(screen, 1, 1, 12, 8, COLOR_RED);
 
@@ -69,7 +69,7 @@ void sdltests(SDL_Surface *screen, SDL_Window *window, int width, int height)
 		"line drawn.\n"
 		"asserting (1, 1), (2, 2), (2, 3), (3, 4), (4, 5), (4, 6),\n"
 		"(5, 7), (5, 8), (6, 9), (7, 10), and (7, 11) are red\n"
-		);
+	);
 	//printscreen(screen, COLOR_WHITE);
 
 	int xcoords[11] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11};
@@ -82,7 +82,7 @@ void sdltests(SDL_Surface *screen, SDL_Window *window, int width, int height)
 		printf(
 			"%9s = 0x%6.6x (0xff0000 expected)\n",
 			coords, color = getpixel(screen, xcoords[i], ycoords[i])
-			);
+		);
 		assert(color == COLOR_RED);
 	}
 
@@ -101,7 +101,7 @@ void sdltests(SDL_Surface *screen, SDL_Window *window, int width, int height)
 		printf(
 			"%9s = 0x%6.6x (0xffffff expected)\n",
 			coords, color = getpixel(screen, xcoords[i], ycoords[i])
-			);
+		);
 		assert(color == COLOR_WHITE);
 	}
 
@@ -116,7 +116,7 @@ void sdltests(SDL_Surface *screen, SDL_Window *window, int width, int height)
 		printf(
 			"%9s = 0x%6.6x (0x000000 expected)\n",
 			coords, color = getpixel(screen, xcoords[i], ycoords[i])
-			);
+		);
 		assert(color == COLOR_BLACK);
 	}
 
@@ -132,7 +132,7 @@ void sdltests(SDL_Surface *screen, SDL_Window *window, int width, int height)
 		printf(
 			"%9s = 0x%6.6x (0x0000ff expected)\n",
 			coords, color = getpixel(screen, xcoords[i], ycoords[i])
-			);
+		);
 		assert(color == COLOR_BLUE);
 	}
 
@@ -154,7 +154,7 @@ void sdltests(SDL_Surface *screen, SDL_Window *window, int width, int height)
 		printf(
 			"%9s = 0x%6.6x (0x%6.6x expected)\n",
 			coords, getpixel(screen, x, y), colortoint(a)
-			);
+		);
 
 	}
 
@@ -215,7 +215,7 @@ int WinMain(/*int argc, char *argv[]*/)
 			"0:        %3d (expected: 0)\n"
 			"0xff:     %3x (expected: 0)\n\n",
 			d.r, d.g, d.b, c.r, c.g
-			);
+		);
 		assert(d.r == 0xff);
 		assert(d.g == 0);
 		assert(d.b == 0x40);
@@ -236,12 +236,12 @@ int WinMain(/*int argc, char *argv[]*/)
 			"expected: 0x1000ab\n\n",
 			c.r, c.g, c.b,
 			d.r, d.g, d.b
-			);
+		);
 		assert(
 			   d.r == 0x10
 			&& d.g == 0x00
 			&& d.b == 0xab
-			);
+		);
 
 		c.r = 0xff;
 		c.g = 0x00;
@@ -252,12 +252,12 @@ int WinMain(/*int argc, char *argv[]*/)
 			"expected: 0x00a9aa\n",
 			c.r, c.g, c.b,
 			d.r, d.g, d.b
-			);
+		);
 		assert(
 			   d.r == 0x00
 			&& d.g == 0xa9
 			&& d.b == 0xaa
-			);
+		);
 	}
 
 	testsection("ppm.h");
@@ -347,7 +347,7 @@ int WinMain(/*int argc, char *argv[]*/)
 			a.x, a.y,
 			b.x, b.y,
 			c.x, c.y
-			);
+		);
 		assert((c.x == -3) && (c.y == 16));
 		TESTING("perp3");
 		vec3 d = const3(1.0F, 0.0F, 0.0F);
@@ -360,7 +360,7 @@ int WinMain(/*int argc, char *argv[]*/)
 			d.x, d.y, d.z,
 			e.x, e.y, e.z,
 			perp.x, perp.y, perp.z
-			);
+		);
 	}
 
 	testsection("quaternion.h");
@@ -371,13 +371,13 @@ int WinMain(/*int argc, char *argv[]*/)
 			11.0F,
 			-17.0F,
 			31.0F
-			);
+		);
 		quaternion two = constq(
 			7.0F,
 			-83.0F,
 			41.0F,
 			-29.0F
-			);
+		);
 		quaternion result = multq(one, two);
 		printf(
 			"one =\n"
@@ -386,7 +386,7 @@ int WinMain(/*int argc, char *argv[]*/)
 			"+ %.2fj\n"
 			"+ %.2fk\n\n",
 			one.r, one.a, one.b, one.c
-			);
+		);
 		printf(
 			"two =\n"
 			"  %.2f\n"
@@ -394,7 +394,7 @@ int WinMain(/*int argc, char *argv[]*/)
 			"+ %.2fj\n"
 			"+ %.2fk\n\n",
 			two.r, two.a, two.b, two.c
-			);
+		);
 		printf(
 			"result = one * two =\n"
 			"  %.2f  \t(expected  2544.00)\n"
@@ -402,13 +402,13 @@ int WinMain(/*int argc, char *argv[]*/)
 			"+ %.2fj \t(expected -2168.00)\n"
 			"+ %.2fk \t(expected -888.00)\n\n",
 			result.r, result.a, result.b, result.c
-			);
+		);
 		assert(
 			   (int)result.r == 2544
 			&& (int)result.a == -1116
 			&& (int)result.b == -2168
 			&& (int)result.c == -888
-			);
+		);
 
 		TESTING("quaternion squaring");
 		result = sqrq(one);
@@ -419,7 +419,7 @@ int WinMain(/*int argc, char *argv[]*/)
 			"+ %.2fj\n"
 			"+ %.2fk\n\n",
 			one.r, one.a, one.b, one.c
-			);
+		);
 		printf(
 			"result = one^2\n"
 			"  %.2f  \t(expected -1346.00)\n"
@@ -427,13 +427,13 @@ int WinMain(/*int argc, char *argv[]*/)
 			"+ %.2fj \t(expected -170.00)\n"
 			"+ %.2fk \t(expected 310.00)\n\n",
 			result.r, result.a, result.b, result.c
-			);
+		);
 		assert(
 			   (int)result.r == -1346
 			&& (int)result.a == 110
 			&& (int)result.b == -170
 			&& (int)result.c == 310
-			);
+		);
 	}
 
 	printf( "\n"

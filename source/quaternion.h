@@ -26,7 +26,7 @@ void dumpquaternion(quaternion in)
 		"b: %.2f\n"
 		"c: %.2f\n",
 		in.r, in.a, in.b, in.c
-		);
+	);
 	return;
 }
 
@@ -130,7 +130,7 @@ float magnq(quaternion in)
 		+ in.a * in.a
 		+ in.b * in.b
 		+ in.c * in.c
-		);
+	);
 }
 
 //this is entirely empty. do not trust it
