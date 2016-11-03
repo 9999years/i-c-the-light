@@ -1,6 +1,7 @@
 *.exe
 *.dll
 output/**
+!output/bounce.scp
 source/log/**
 ftpinfo.txt
 *.pyc
