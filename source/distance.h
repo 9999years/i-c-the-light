@@ -140,30 +140,24 @@ float oprepeat3(/*vec3 point, vec3 period*/)
 
 float distserpenski(vec3 pos)
 {
-	vec3 t1 = const3( 1.0F,  1.0F,  1.0F);
-	vec3 t2 = const3(-1.0F, -1.0F,  1.0F);
-	vec3 t3 = const3( 1.0F, -1.0F, -1.0F);
-	vec3 t4 = const3(-1.0F,  1.0F, -1.0F);
-	vec3 c, tmp;
-	float dist, d;
+	const int iterations = 4;
 	float scale = 2.0F;
-	const int Iterations = 3;
 	int n;
-	for(n = 0; n < Iterations; n++) {
-		c = t1;
-		dist = magn3(sub3(pos, t1));
-		d = magn3(sub3(pos, t2));
-		if(d < dist)
-			c = t2, dist = d;
-		d = magn3(sub3(pos, t3));
-		if(d < dist)
-			c = t3, dist = d;
-		d = magn3(sub3(pos, t4));
-		if(d < dist)
-			c = t4, dist = d;
+	vec3 offset = const3(1, 1, 1);
+	vec3 tmp;
+	for(n = 0; n < iterations; n++) {
+		if(pos.x + pos.y < 0)
+			pos.x = -pos.y,
+			pos.y = -pos.x;
+		if(pos.x + pos.z < 0)
+			pos.x = -pos.z,
+			pos.z = -pos.x;
+		if(pos.y + pos.z < 0)
+			pos.z = -pos.y,
+			pos.y = -pos.z;
 		tmp = sub3(
 			mult3s(pos, scale),
-			mult3s(c, scale - 1.0F)
+			mult3s(offset, scale - 1.0F)
 		);
 		pos = tmp;
 	}

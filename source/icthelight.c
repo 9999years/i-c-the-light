@@ -41,7 +41,7 @@ float de(vec3 pos)
 	return distserpenski(pos);
 	//return
 		//opu(
-		//disttorus(pos, const3(0.0F, 0.0F, 0.0F), 5.0F, 15.0F);
+		//disttorus(pos, const3(0.0F, 0.0F, 0.0F), 2.0F, 5.5F);
 		//distsphere(pos, const3(50.0F, 0.0F, 50.0F), 10.0F);
 		//opwobble3(
 			//pos,
@@ -123,14 +123,14 @@ unsigned int blinnphong(vec3 cam, vec3 pos, vec3 rot, vec3 light)
 
 void render(SDL_Surface *screen, const int frame)
 {
-#define MAX_DISTANCE 1.0F
-#define MIN_DISTANCE 0.1F
-#define BOUNDING_RADIUS 100.0F
-	const float time = (float)frame / 3.0F;
-	//const float sintime = sin(time);
-	//const float costime = cos(time);
+#define MAX_DISTANCE 50.0F
+#define MIN_DISTANCE 0.5F
+#define BOUNDING_RADIUS 100000.0F
+	const float time = (float)frame / 3.0F + HALF_PI;
+	const float sintime = sin(time);
+	const float costime = cos(time);
 	//how big the viewport is
-	const float viewport_size = 2.0F;
+	const float viewport_size = 25.0F;
 	SDL_FillRect(screen, NULL, 0x000000);
 
 	/* here's how im setting up the axes (right-handed)
@@ -156,19 +156,19 @@ void render(SDL_Surface *screen, const int frame)
 	const int hsamples = aspect * wsamples;
 
 	//portion of viewport to render
-	//this is multiplied by the viewport vectors to get a point on the viewport
-	//the ray is shot through
+	//this is multiplied by the viewport vectors to get a point on the
+	//viewport the ray is shot through
 	float wfrac, hfrac;
 
 	//focal length of the camera
 	//longer = more zoomed in
-	float focallength = 10.0F;
+	float focallength = 100.0F;
 	//printf("f: %f\n", focallength);
 
 	//width of the camera (horiz. line at the center of the viewport)
 	vec3 viewport_width = const3(
-		viewport_size,// * costime,
-		0.0F,//viewport_size * sintime,
+		viewport_size * costime,
+		viewport_size * sintime,
 		0.0F
 	);
 
@@ -178,8 +178,8 @@ void render(SDL_Surface *screen, const int frame)
 	//offset of the center of the viewport from the origin
 	//essentially the camera position
 	vec3 viewport_ofs = const3(
-		0.0F,//5.0F * cos(time + HALF_PI),
-		2.0F + time,// * sin(time + HALF_PI),
+		25.0F * cos(time + HALF_PI),
+		25.0F * sin(time + HALF_PI),
 		0.0F
 	);
 
@@ -197,7 +197,7 @@ void render(SDL_Surface *screen, const int frame)
 		mult3s(
 			unit3(perp3(viewport_width, viewport_height)),
 			focallength
-			)
+		)
 	);
 	//printf("cam:\n");
 	//dump3(camera);
@@ -261,13 +261,14 @@ void render(SDL_Surface *screen, const int frame)
 				mult3s(
 					ray_rot,
 					totaldistance
-					)
+				)
 			);
 
-			totaldistance += distance = fmax(de(measure_pos), MAX_DISTANCE);
+			totaldistance += distance = de(measure_pos);
+			//fmin(de(measure_pos), MAX_DISTANCE);
 
-			//fprintf(logfile, "step %d, distance: %f\n",
-				//k, distance);
+			fprintf(logfile, "step %d, distance: %f\n",
+				k, distance);
 
 			if(distance <= MIN_DISTANCE) {
 				fprintf(logfile, "PLOT!\n");
