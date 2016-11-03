@@ -21,10 +21,10 @@ struct quaternion
 void dumpquaternion(quaternion in)
 {
 	fprintf(logfile,
-		"r: %.2f\n"
-		"a: %.2f\n"
-		"b: %.2f\n"
-		"c: %.2f\n",
+		"    r: %.2f\n"
+		"    a: %.2f\n"
+		"    b: %.2f\n"
+		"    c: %.2f\n",
 		in.r, in.a, in.b, in.c
 	);
 	return;

@@ -3,6 +3,9 @@
 #include <stdio.h>
 #include "color.h"
 
+#define PPM_WRITE_ALL_BLACK 2
+#define PPM_FILE_OPEN_FAILURE 1
+
 #ifndef PPM_H
 #define PPM_H
 
@@ -13,13 +16,28 @@ int writeppm(
 	unsigned int image[]
 	)
 {
+	//run through image, check to make sure it's not all black
+	int i, j;
+	char allblack = 1;
+	for(i = 0; i < height; i++) {
+		for(j = 0; j < width; j++) {
+			if(image[j + i * width] != 0x000000)
+				allblack = 0;
+		}
+	}
+
+	if(allblack == 1)
+	{
+		printf("image is ALL BLACK, not writing!\n");
+		return PPM_WRITE_ALL_BLACK;
+	}
+
 	FILE *file = fopen(filename, "w");
 	if(file == NULL) {
 		printf("file open failure!\n");
-		return 1;
+		return PPM_FILE_OPEN_FAILURE;
 	}
 	fprintf(file, "P3\n%d %d\n%d\n", width, height, 0xff);
-	int i = 0, j = 0;
 	struct rgbcolor pixel;
 	for(i = 0; i < height; i++) {
 		for(j = 0; j < width; j++) {

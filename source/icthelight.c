@@ -38,16 +38,17 @@ FILE *plotfile;
 float de(vec3 pos)
 {
 	//return distancejulia(pos, constq(-0.213F, -0.0410F, -0.563F, -0.560F));
-	return
+	return distserpenski(pos);
+	//return
 		//opu(
 		//disttorus(pos, const3(0.0F, 0.0F, 0.0F), 5.0F, 15.0F);
 		//distsphere(pos, const3(50.0F, 0.0F, 50.0F), 10.0F);
-		opwobble3(
-			pos,
-			distsphere(pos, const3(0.0F, 0.0F, 0.0F), 15.0F),
-			2.0F,
-			2.0F
-			);
+		//opwobble3(
+			//pos,
+			//distsphere(pos, const3(0.0F, 0.0F, 0.0F), 15.0F),
+			//2.0F,
+			//2.0F
+			//);
 		//);
 		//distsphere(pos, sphere, 10.0F);
 }
@@ -122,11 +123,14 @@ unsigned int blinnphong(vec3 cam, vec3 pos, vec3 rot, vec3 light)
 
 void render(SDL_Surface *screen, const int frame)
 {
+#define MAX_DISTANCE 1.0F
+#define MIN_DISTANCE 0.1F
+#define BOUNDING_RADIUS 100.0F
 	const float time = (float)frame / 3.0F;
-	const float sintime = sin(time);
-	const float costime = cos(time);
+	//const float sintime = sin(time);
+	//const float costime = cos(time);
 	//how big the viewport is
-	const float viewport_size = 25.0F;
+	const float viewport_size = 2.0F;
 	SDL_FillRect(screen, NULL, 0x000000);
 
 	/* here's how im setting up the axes (right-handed)
@@ -158,13 +162,13 @@ void render(SDL_Surface *screen, const int frame)
 
 	//focal length of the camera
 	//longer = more zoomed in
-	float focallength = 1000.0F;
+	float focallength = 10.0F;
 	//printf("f: %f\n", focallength);
 
 	//width of the camera (horiz. line at the center of the viewport)
 	vec3 viewport_width = const3(
-		viewport_size * costime,
-		viewport_size * sintime,
+		viewport_size,// * costime,
+		0.0F,//viewport_size * sintime,
 		0.0F
 	);
 
@@ -174,8 +178,8 @@ void render(SDL_Surface *screen, const int frame)
 	//offset of the center of the viewport from the origin
 	//essentially the camera position
 	vec3 viewport_ofs = const3(
-		50.0F * cos(time + HALF_PI),
-		50.0F * sin(time + HALF_PI),
+		0.0F,//5.0F * cos(time + HALF_PI),
+		2.0F + time,// * sin(time + HALF_PI),
 		0.0F
 	);
 
@@ -218,10 +222,11 @@ void render(SDL_Surface *screen, const int frame)
 
 	vec3 light = fromdirection3(time + 1.0F, time, 1.0F);
 	//steps to march
-	const int steps = 64;
+	const int steps = 32;
 	int i, j, k;
 	for(i = 0; i < hsamples; i++) {
 	for(j = 0; j < wsamples; j++) {
+		fprintf(logfile, "NEW RAY!\n");
 		//new sample, new distance
 		distance = 0.0F;
 		totaldistance = 0.0F;
@@ -250,6 +255,7 @@ void render(SDL_Surface *screen, const int frame)
 		//continue;
 
 		for(k = 0; k < steps; k++) {
+			fprintf(plotfile, "%d\t%d\t", j, i);
 			measure_pos = add3(
 				camera,
 				mult3s(
@@ -258,12 +264,12 @@ void render(SDL_Surface *screen, const int frame)
 					)
 			);
 
-			totaldistance += distance = de(measure_pos);
+			totaldistance += distance = fmax(de(measure_pos), MAX_DISTANCE);
 
 			//fprintf(logfile, "step %d, distance: %f\n",
 				//k, distance);
 
-			if(distance <= 0.5F) {
+			if(distance <= MIN_DISTANCE) {
 				fprintf(logfile, "PLOT!\n");
 				plot(
 					screen,
@@ -277,7 +283,7 @@ void render(SDL_Surface *screen, const int frame)
 					)))
 				);
 				break;
-			} else if(distance >= 100000.0F
+			} else if(distance >= BOUNDING_RADIUS
 				|| !isfinite(distance)) {
 				//we're done here
 				//fprintf(logfile, "LIMIT EXCEEDED, BREAK!\n");
@@ -294,15 +300,26 @@ void saveframe(SDL_Surface *screen)
 	char filename[256] = "output/UNINITIALIZED.ppm";
 	unsigned long int timeint = time(NULL);
 	sprintf(filename, "../output/image%lu.ppm", timeint);
+	int writestatus;
 	if(
-		writeppm(
+		(writestatus = writeppm(
 			filename,
 			SCREEN_WIDTH,
 			SCREEN_HEIGHT,
 			screen->pixels
-			) != 0
+		)) != 0
 	) {
-		fprintf(logfile, "image write error!\n");
+		switch(writestatus) {
+		case PPM_FILE_OPEN_FAILURE:
+			fprintf(logfile, "image write error!\n");
+			break;
+		case PPM_WRITE_ALL_BLACK:
+			fprintf(logfile, "image is all black!\n");
+			break;
+		default:
+			fprintf(logfile, "unknown write error!\n");
+			break;
+		}
 		return;
 	}
 	char shacmd[256];
@@ -428,10 +445,11 @@ int WinMain(/*int argc, char* args[]*/)
 		//Update the surface
 		SDL_UpdateWindowSurface(window);
 
+		saveframe(screen);
 		end = clock();
 		if(frame%30 == 0) {
-			if(frame == 0)
-				saveframe(screen);
+			//if(frame == 0)
+				//saveframe(screen);
 			total = (double)(end - start) / CLOCKS_PER_SEC;
 			printf("%.4f FPS\n", 1 / total);
 			fprintf(logfile, "%.4f FPS\n", 1 / total);

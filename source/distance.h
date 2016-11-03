@@ -176,31 +176,37 @@ float distancejulia(vec3 pos, quaternion c)
 #define MAX_ITERATIONS 64
 	float distance;
 	int i;
+	fprintf(logfile, "\npos:\n"
+		"    %.2f\n"
+		"    %.2f\n"
+		"    %.2f\n",
+		pos.x, pos.y, pos.z
+	);
+	quaternion two = constq(2.0F, 0.0F, 0.0F, 0.0F);
 	quaternion q = constq(0.0F, pos.x, pos.y, pos.z);
+	//q prime, the running derivative of q
 	quaternion qp = constq(1.0F, 0.0F, 0.0F, 0.0F);
 	quaternion tmp;
-	for(i = 0; i < 64; i++) {
+	for(i = 0; i < MAX_ITERATIONS; i++) {
 		tmp = multq(q, qp);
-		qp = tmp;
-
-		qp.r *= 2.0F;
-		qp.a *= 2.0F;
-		qp.b *= 2.0F;
-		qp.c *= 2.0F;
+		qp = multq(tmp, two);
 
 		tmp = addq(sqrq(q), c);
 		q = tmp;
 
-		//fprintf(logfile, "i = %d, q:\n", i);
+		fprintf(logfile, "\ni = %d, q:\n", i);
 		dumpquaternion(q);
-		//fprintf(logfile, "q':\n");
+		fprintf(logfile, "q':\n");
 		dumpquaternion(qp);
 		if(magnq(q) > 10.0F)
 			break;
 	}
 	float qmag = magnq(q);
-	distance = 0.5F * qmag * log(qmag) / magnq(qp);
-	//fprintf(logfile, "final distance: %.2f\n", distance);
+	//distance = 0.5F * qmag * log(qmag) / magnq(qp);
+	distance = (qmag * log(qmag)) / (2.0F * magnq(qp));
+	fprintf(logfile, "final distance:\n"
+		"    %.2f\n", distance);
+	fprintf(plotfile, "%f\n", distance);
 	return distance;
 }
 
