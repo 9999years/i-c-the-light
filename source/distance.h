@@ -140,29 +140,43 @@ float oprepeat3(/*vec3 point, vec3 period*/)
 
 float distserpenski(vec3 pos)
 {
-	const int iterations = 4;
-	float scale = 2.0F;
+	const int iterations = 10;
+	const float bailout = 100.0F, scale = 2.0F;
+	float r = dot3(pos, pos);
 	int n;
-	vec3 offset = const3(1, 1, 1);
+	//vec3 offset = const3(1, 1, 1);
 	vec3 tmp;
-	for(n = 0; n < iterations; n++) {
-		if(pos.x + pos.y < 0)
-			pos.x = -pos.y,
+	float tmpf;
+	for(n = 0; n < iterations && r < bailout; n++) {
+		if(pos.x + pos.y < 0) {
+			tmpf  = -pos.y;
 			pos.y = -pos.x;
-		if(pos.x + pos.z < 0)
-			pos.x = -pos.z,
+			pos.x = tmpf;
+		}
+		if(pos.x + pos.z < 0) {
+			tmpf  = -pos.z;
 			pos.z = -pos.x;
-		if(pos.y + pos.z < 0)
-			pos.z = -pos.y,
-			pos.y = -pos.z;
-		tmp = sub3(
+			pos.x = tmpf;
+		}
+		if(pos.y + pos.z < 0) {
+			tmpf  = -pos.z;
+			pos.z = -pos.y;
+			pos.y = tmpf;
+		}
+		//tmp = sub3(
+			//mult3s(pos, scale),
+			//mult3s(offset, scale - 1.0F)
+		//);
+		tmp = sub3s(
 			mult3s(pos, scale),
-			mult3s(offset, scale - 1.0F)
+			scale - 1.0F
 		);
 		pos = tmp;
+		r = dot3(pos, pos);
 	}
-	return magn3(pos)
-		* pow(scale, -(float)n);
+	return (sqrt(r) - 2.0F) * pow(scale, -(float)n);
+	//return magn3(pos)
+		//* pow(scale, -(float)n);
 }
 
 float distancejulia(vec3 pos, quaternion c)
@@ -176,14 +190,18 @@ float distancejulia(vec3 pos, quaternion c)
 		"    %.2f\n",
 		pos.x, pos.y, pos.z
 	);
-	quaternion two = constq(2.0F, 0.0F, 0.0F, 0.0F);
-	quaternion q = constq(0.0F, pos.x, pos.y, pos.z);
+	quaternion q = constq(pos.x, pos.y, pos.z, 0.0F);
 	//q prime, the running derivative of q
 	quaternion qp = constq(1.0F, 0.0F, 0.0F, 0.0F);
 	quaternion tmp;
 	for(i = 0; i < MAX_ITERATIONS; i++) {
 		tmp = multq(q, qp);
-		qp = multq(tmp, two);
+		qp = tmp;
+
+		qp.r *= 2.0F;
+		qp.a *= 2.0F;
+		qp.b *= 2.0F;
+		qp.c *= 2.0F;
 
 		tmp = addq(sqrq(q), c);
 		q = tmp;

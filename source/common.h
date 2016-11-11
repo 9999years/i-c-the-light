@@ -6,10 +6,11 @@
 #ifndef COMMON_H
 #define COMMON_H
 
-#define PI_SQ   9.86960440108F
-#define TAU     6.28318530717F
-#define PI      3.14159265359F
-#define HALF_PI 1.57079632679F
+#define PI_SQ      9.869604401089358F
+#define TAU        6.283185307179586F
+#define PI         3.141592653589793F
+#define HALF_PI    1.570796326794897F
+#define QUARTER_PI 0.785398163397448F
 
 //i might replace this with sfmt one day
 //but not today
@@ -23,6 +24,11 @@ int random(int min, int max) {
 		retval = rand() / divisor;
 	} while (retval > range);
 	return retval + min;
+}
+
+float randf(float min, float max) {
+	float range = max - min;
+	return (rand() / RAND_MAX) * range + min;
 }
 
 //I Can't Believe It's Not Sin(x)

@@ -341,6 +341,15 @@ vec3 add3(vec3 a, vec3 b)
 	return ret;
 }
 
+vec3 add3s(vec3 a, float b)
+{
+	vec3 ret;
+	ret.x = a.x + b;
+	ret.y = a.y + b;
+	ret.z = a.z + b;
+	return ret;
+}
+
 //subtraction
 vec2 sub2(vec2 a, vec2 b)
 {
@@ -356,6 +365,15 @@ vec3 sub3(vec3 a, vec3 b)
 	ret.x = a.x - b.x;
 	ret.y = a.y - b.y;
 	ret.z = a.z - b.z;
+	return ret;
+}
+
+vec3 sub3s(vec3 a, float b)
+{
+	vec3 ret;
+	ret.x = a.x - b;
+	ret.y = a.y - b;
+	ret.z = a.z - b;
 	return ret;
 }
 

@@ -25,6 +25,7 @@ clean:
 	del log\* /q > nul 2> nul
 
 run:
+	chcp 65001
 	.\icthelight
 
 trig: trig.c

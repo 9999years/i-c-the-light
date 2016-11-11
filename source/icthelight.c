@@ -111,12 +111,13 @@ unsigned int blinnphong(vec3 cam, vec3 pos, vec3 rot, vec3 light)
 	cam = unit3(sub3(cam, pos));
 	//pos = unit3(pos);
 	//vec3 normal = getnormal(sub3(pos, mult3s(unit3(rot), 2.0F)), 10.0F);
-	vec3 normal = getnormal(add3(pos, rot), 2.0F);
+	vec3 normal = getnormal(add3(pos, rot), 0.1F);
 	//vec3 halfway = avg3(cam, light);
 	vec3 halfway = unit3(add3(cam, light));
 	float ret =
 		dot3(light, normal) * diffuse_intensity
 		+ pow(dot3(normal, halfway), alpha) * specular_intensity;
+	//ret *= randf(0.0F, 1.F);
 	return
 		(unsigned int)(scale(ret, -2.0F, 2.0F, 0.0F, 255.0F));
 }
@@ -124,14 +125,14 @@ unsigned int blinnphong(vec3 cam, vec3 pos, vec3 rot, vec3 light)
 void render(SDL_Surface *screen, const int frame)
 {
 #define MAX_DISTANCE 50.0F
-#define MIN_DISTANCE 0.5F
-#define BOUNDING_RADIUS 100000.0F
-	const float time = (float)frame / 3.0F + HALF_PI;
+#define MIN_DISTANCE 0.01F
+#define BOUNDING_RADIUS 1000.0F
+	const float time = (float)frame / 3.0F + 0.3F + QUARTER_PI;
 	const float sintime = sin(time);
 	const float costime = cos(time);
 	//how big the viewport is
-	const float viewport_size = 25.0F;
-	SDL_FillRect(screen, NULL, 0x000000);
+	const float viewport_size = 5.0F;
+	SDL_FillRect(screen, NULL, 0xffffff);
 
 	/* here's how im setting up the axes (right-handed)
 	 *      z
@@ -162,7 +163,7 @@ void render(SDL_Surface *screen, const int frame)
 
 	//focal length of the camera
 	//longer = more zoomed in
-	float focallength = 100.0F;
+	float focallength = 50.0F;
 	//printf("f: %f\n", focallength);
 
 	//width of the camera (horiz. line at the center of the viewport)
@@ -199,14 +200,8 @@ void render(SDL_Surface *screen, const int frame)
 			focallength
 		)
 	);
-	//printf("cam:\n");
-	//dump3(camera);
-	
-	//fprintf(plotfile, "%f\t%f\t%f\n",
-		//camera.x,
-		//camera.y,
-		//camera.z
-		//);
+	printf("cam:\n");
+	dump3(camera);
 
 	//direction for the ray to travel in
 	vec3 ray_rot;
@@ -367,7 +362,7 @@ int handleevents(SDL_Surface *screen)
 	SDL_Event event;
 	while((SDL_PollEvent(&event))) {
 		switch(event.type) {
-		case SDL_KEYUP:
+		case SDL_KEYDOWN:
 			// if escape is pressed, quit
 			if((event.key.keysym.sym == SDLK_ESCAPE) || (event.key.keysym.sym == SDLK_q)) {
 				return 1;
