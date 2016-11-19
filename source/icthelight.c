@@ -37,8 +37,8 @@ FILE *plotfile;
 //global distance estimator
 float de(vec3 pos)
 {
-	//return distancejulia(pos, constq(-0.213F, -0.0410F, -0.563F, -0.560F));
-	return distserpenski(pos);
+	return distancejulia(pos, constq(-0.2F, 0.6F, 0.2F, 0.2F));
+	//return distserpenski(pos);
 	//return
 		//opu(
 		//disttorus(pos, const3(0.0F, 0.0F, 0.0F), 2.0F, 5.5F);
@@ -124,16 +124,6 @@ unsigned int blinnphong(vec3 cam, vec3 pos, vec3 rot, vec3 light)
 
 void render(SDL_Surface *screen, const int frame)
 {
-#define MAX_DISTANCE 50.0F
-#define MIN_DISTANCE 0.01F
-#define BOUNDING_RADIUS 1000.0F
-	const float time = (float)frame / 3.0F + 0.3F + QUARTER_PI;
-	const float sintime = sin(time);
-	const float costime = cos(time);
-	//how big the viewport is
-	const float viewport_size = 5.0F;
-	SDL_FillRect(screen, NULL, 0xffffff);
-
 	/* here's how im setting up the axes (right-handed)
 	 *      z
 	 *      |
@@ -148,6 +138,17 @@ void render(SDL_Surface *screen, const int frame)
 	 *  /
 	 * x
 	 */
+
+#define MAX_DISTANCE 50.0F
+#define MIN_DISTANCE 2.0F
+#define BOUNDING_RADIUS 1000.0F
+
+	const float time = (float)frame / 3.0F + 0.3F + QUARTER_PI;
+	const float sintime = sin(time);
+	const float costime = cos(time);
+	//how big the viewport is
+	const float viewport_size = 2.5F;
+	SDL_FillRect(screen, NULL, 0xffffff);
 
 	//screen aspect ratio
 	const float aspect = (float)screen->w / (float)screen->h;
@@ -179,8 +180,8 @@ void render(SDL_Surface *screen, const int frame)
 	//offset of the center of the viewport from the origin
 	//essentially the camera position
 	vec3 viewport_ofs = const3(
-		25.0F * cos(time + HALF_PI),
-		25.0F * sin(time + HALF_PI),
+		3.0F * cos(time + HALF_PI),
+		3.0F * sin(time + HALF_PI),
 		0.0F
 	);
 
@@ -210,6 +211,9 @@ void render(SDL_Surface *screen, const int frame)
 	//generally camera + distance in the direction of ray_rot
 	vec3 measure_pos;
 
+	//ray origin (location on the viewport plane)
+	vec3 ray_orig;
+
 	//distance from measure_pos
 	float distance;
 	//total distance travelled, i hope i hope i hope
@@ -232,14 +236,22 @@ void render(SDL_Surface *screen, const int frame)
 		//whole, not half widths of the viewport size
 		wfrac = scale(j, 0, wsamples, -0.5F, 0.5F);
 		hfrac = scale(i, 0, hsamples, -0.5F, 0.5F);
+
+		//multiply that by width / height to get a real location
 		ray_through = add3(
 			mult3s(viewport_width, wfrac),
 			mult3s(viewport_height, hfrac)
 		);
+
+		//where the ray starts (on the viewport)
+		ray_orig = add3(ray_through, viewport_ofs);
+
+		//a unit vec from the camera through the viewport
 		ray_rot = unit3(through3(
 			camera,
 			add3(ray_through, viewport_ofs)
 		));
+
 
 		//fprintf(plotfile, "%f\t%f\t%f\n",
 			//ray_rot.x,
@@ -250,9 +262,8 @@ void render(SDL_Surface *screen, const int frame)
 		//continue;
 
 		for(k = 0; k < steps; k++) {
-			fprintf(plotfile, "%d\t%d\t", j, i);
 			measure_pos = add3(
-				camera,
+				ray_orig,
 				mult3s(
 					ray_rot,
 					totaldistance
@@ -261,6 +272,10 @@ void render(SDL_Surface *screen, const int frame)
 
 			totaldistance += distance = de(measure_pos);
 			//fmin(de(measure_pos), MAX_DISTANCE);
+
+			if((i % 10 == 0) && (j % 10 == 0))
+				fprintf(plotfile, "%d\t%d\t%f\n",
+					i, j, totaldistance);
 
 			fprintf(logfile, "step %d, distance: %f\n",
 				k, distance);
@@ -273,8 +288,8 @@ void render(SDL_Surface *screen, const int frame)
 					colortoint(graytocolor(bclamp(
 					//k * 20
 					//255.0F * (float)k / (float)steps
-					//500.0F / distance
-					blinnphong(camera, measure_pos, ray_rot, light)
+					500.0F / distance
+					//blinnphong(camera, measure_pos, ray_rot, light)
 					//distance <= 2.0F ? 0xffffff : 0x000000
 					)))
 				);
@@ -387,12 +402,12 @@ int WinMain(/*int argc, char* args[]*/)
 	);
 
 	printf(
-"╭─────────────────────────────────────╮\n"
-"│ ·           ╷         ╷ ·     ╷     │\n"
-"│ ╷   ╭─╮   ┼ ├─╮ ╭─╮   │ ╷ ╭─╮ ├─╮ ┼ │\n"
-"│ │   │     │ │ │ ├─┘   │ │ ╰─╯ │ │ │ │\n"
-"│ ╵   ╰─╯   ╰ ╵ ╵ ╰─╯   ╵ ╵ ╰─╮ ╵ ╵ ╰ │\n"
-"╰───────────────────────────╰─╯───────╯\n"
+		"╭─────────────────────────────────────╮\n"
+		"│ ·           ╷         ╷ ·     ╷     │\n"
+		"│ ╷   ╭─╮   ┼ ├─╮ ╭─╮   │ ╷ ╭─╮ ├─╮ ┼ │\n"
+		"│ │   │     │ │ │ ├─┘   │ │ ╰─╯ │ │ │ │\n"
+		"│ ╵   ╰─╯   ╰ ╵ ╵ ╰─╯   ╵ ╵ ╰─╮ ╵ ╵ ╰ │\n"
+		"╰───────────────────────────╰─╯───────╯\n"
 	);
 
 	initializelogfile();
@@ -426,9 +441,9 @@ int WinMain(/*int argc, char* args[]*/)
 	int quit = 0;
 	clock_t start, end;
 	double total;
-	while(!quit) {
+	do {
 		start = clock();
-		printf("frame: %d\n", frame);
+		//printf("frame: %d\n", frame);
 
 		//poll for events, and handle the ones we care about.
 		//this returns 1 if we need to quit
@@ -436,22 +451,24 @@ int WinMain(/*int argc, char* args[]*/)
 
 		//SDL_Delay(16);
 		// render
-		render(screen, frame);
+		if(frame == 0) {
+			render(screen, frame);
+			saveframe(screen);
+		}
 
 		//Update the surface
 		SDL_UpdateWindowSurface(window);
 
-		saveframe(screen);
 		end = clock();
-		if(frame%30 == 0) {
-			//if(frame == 0)
-				//saveframe(screen);
-			total = (double)(end - start) / CLOCKS_PER_SEC;
-			printf("%.4f FPS\n", 1 / total);
-			fprintf(logfile, "%.4f FPS\n", 1 / total);
-		}
+		//if(frame%30 == 0) {
+			////if(frame == 0)
+				////saveframe(screen);
+			//total = (double)(end - start) / CLOCKS_PER_SEC;
+			//printf("%.4f FPS\n", 1 / total);
+			//fprintf(logfile, "%.4f FPS\n", 1 / total);
+		//}
 		frame++;
-	}
+	} while(!quit);
 
 	//Destroy window
 	SDL_DestroyWindow(window);

@@ -92,21 +92,52 @@ quaternion multq(quaternion one, quaternion two)
 		- one.c * two.b;
 
 	ret.b =   one.r * two.b
+		- one.a * two.c
 		+ one.b * two.r
-		+ one.c * two.a
-		- one.a * two.c;
+		+ one.c * two.a;
 
 	ret.c =   one.r * two.c
-		+ one.c * two.r
 		+ one.a * two.b
-		- one.b * two.a;
+		- one.b * two.a
+		+ one.c * two.r;
 	return ret;
 }
 
-//ooh, a wrapper function! cute!
+//scalar multiplication, aka multiplication by a number
+//with only a real component
+quaternion multqs(quaternion one, float two)
+{
+	quaternion ret;
+	ret.r =   one.r * two;
+	ret.a =   one.a * two;
+	ret.b =   one.b * two;
+	ret.c =   one.c * two;
+	return ret;
+}
+
+//various terms cancel so quaternion squaring is much simpler
 quaternion sqrq(quaternion in)
 {
-	return multq(in, in);
+	quaternion ret;
+	ret.r =   in.r * in.r
+		- in.a * in.a
+		- in.b * in.b
+		- in.c * in.c;
+	ret.a = 2 * in.r * in.a;
+	ret.b = 2 * in.r * in.b;
+	ret.c = 2 * in.r * in.c;
+	return ret;
+}
+
+//this signifies nothing but im just ripping it out of
+//crane's implementation
+float dotq(quaternion in)
+{
+	return
+		  in.r * in.r
+		+ in.a * in.a
+		+ in.b * in.b
+		+ in.c * in.c;
 }
 
 //if `power` is negative, the behavior is undefined

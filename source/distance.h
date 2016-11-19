@@ -2,6 +2,7 @@
 #include <stdio.h>
 //sin functions
 #include <math.h>
+#include <float.h>
 //vectors
 #include "vector.h"
 //fclamp
@@ -184,41 +185,50 @@ float distancejulia(vec3 pos, quaternion c)
 #define MAX_ITERATIONS 64
 	float distance;
 	int i;
-	fprintf(logfile, "\npos:\n"
+	fprintf(logfile,
+		"\npos:\n"
 		"    %.2f\n"
 		"    %.2f\n"
 		"    %.2f\n",
 		pos.x, pos.y, pos.z
 	);
+	//keep one component fixed to view a 3d "slice" of the 4d fractal
 	quaternion q = constq(pos.x, pos.y, pos.z, 0.0F);
 	//q prime, the running derivative of q
+	//why does this start at real 1? "it's complicated"
 	quaternion qp = constq(1.0F, 0.0F, 0.0F, 0.0F);
 	quaternion tmp;
+	float last = -FLT_MAX;
 	for(i = 0; i < MAX_ITERATIONS; i++) {
+		//q' = 2*q*q'
 		tmp = multq(q, qp);
-		qp = tmp;
+		qp = multqs(tmp, 2.0F);
 
-		qp.r *= 2.0F;
-		qp.a *= 2.0F;
-		qp.b *= 2.0F;
-		qp.c *= 2.0F;
-
+		//q = q^2 + c
 		tmp = addq(sqrq(q), c);
 		q = tmp;
+
+		//if the distance decreases, get HYPED
+		if(magnq(q) < last)
+			fprintf(logfile, "\nDECREASED!!\n");
+
+		last = dotq(q);
 
 		fprintf(logfile, "\ni = %d, q:\n", i);
 		dumpquaternion(q);
 		fprintf(logfile, "q':\n");
 		dumpquaternion(qp);
-		if(magnq(q) > 10.0F)
+		fprintf(logfile, "|q|: %f\n", last);
+		if(last > 10.0F)
 			break;
 	}
+	//|q| log(|q|)
+	//------------ = distance
+	//   2|q'|
 	float qmag = magnq(q);
-	//distance = 0.5F * qmag * log(qmag) / magnq(qp);
 	distance = (qmag * log(qmag)) / (2.0F * magnq(qp));
 	fprintf(logfile, "final distance:\n"
 		"    %.2f\n", distance);
-	fprintf(plotfile, "%f\n", distance);
 	return distance;
 }
 

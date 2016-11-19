@@ -20,9 +20,9 @@ convert:
 	del ..\output\*.ppm > nul 2> null
 
 clean:
-	del *.exe /q > nul 2> nul
-	del TEST_PPM.ppm > nul 2> nul
-	del log\* /q > nul 2> nul
+	del *.exe /q 2> nul
+	del TEST_PPM.ppm 2> nul
+	del log\* /q 2> nul
 
 run:
 	chcp 65001
