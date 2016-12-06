@@ -7,3 +7,4 @@ ftpinfo.txt
 *.pyc
 **/SDL/*
 **/TEST_PPM.ppm
+source/null
