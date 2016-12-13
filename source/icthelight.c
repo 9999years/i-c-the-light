@@ -66,16 +66,12 @@ void renderwhole(SDL_Surface *screen, int frame)
 	return;
 }
 
-void render(SDL_Surface *screen, int frame, int *i, int *j)
+void render(SDL_Surface *screen, SDL_Surface *backplate, int frame, int *i, int *j)
 {
 	float time = (float)frame/30;
 	SDL_FillRect(screen, NULL, 0x000000);
-	
-	renderwhole(screen, frame);
 
 	vec2 c, a;
-	//c.x = screen->w/2;
-	//c.y = screen->h/2;// + 150 * sin((float)tick/512);
 	c.x = 80  + 15 * cos(time);
 	c.y = 120 + 15 * sin(time);
 	time += 1;
@@ -86,41 +82,29 @@ void render(SDL_Surface *screen, int frame, int *i, int *j)
 	vec2 point;
 	float dist;
 
-	int k, l;
-
-	for(k = 0; k <= *i; k++) {
-	for(l = 0; l < screen->w; l++) {
-		point.x = l;
-		point.y = k;
-		plot(
-			screen,
-			l, k,
-			0x00AAAA
-			);
-		//if it's far out, skip ahead a bit
-		dist = distline2(point, c, a);
-		if(dist > threshold) {
-			//plot(screen, j, i, 0xBB00BB);
-			l += floor(dist - threshold);
-			continue;
-		}
-		plot(
-			screen,
-			l, k,
-			0xFFFFFF
-			);
-		if(k == *i && l > *j)
-			break;
-	}
-	}
+	//regular rendering
 	point.x = *j;
 	point.y = *i;
 	plot(
-		screen,
+		backplate,
 		*j, *i,
 		0x00AAAA
 		);
-	dist = distline2(point, c, a);
+	//if it's far out, skip ahead a bit
+	dist = distline2(point, c, a) - threshold;
+	if(dist < 0) {
+		plot(
+			backplate,
+			*j, *i,
+			0xFFFFFF
+			);
+	}
+
+	//copy it over, preserving backplate
+	SDL_BlitSurface(backplate, NULL, screen, NULL);
+
+	//add frame-to-frame decoration
+
 	drawcircle(
 		screen,
 		*j, //center coords
@@ -129,16 +113,16 @@ void render(SDL_Surface *screen, int frame, int *i, int *j)
 		0xAA0000
 		);
 	//if it's far out, skip ahead a bit
-	if(dist > threshold) {
+	if(dist > 0) {
 		drawline(
 			screen,
 			*j,
 			*i,
-			*j + floor(dist - threshold),
+			*j + floor(dist),
 			*i,
 			0xAA0000
 			);
-		*j += min(floor(dist - threshold), screen->w - *j);
+		*j += floor(dist);
 		drawline(
 			screen,
 			*j,
@@ -155,34 +139,34 @@ void render(SDL_Surface *screen, int frame, int *i, int *j)
 			*i + 5,
 			0xAA0000
 			);
-		return;
+	} else {
+		drawline(
+			screen,
+			*j - 10,
+			*i - 10,
+			*j + 10,
+			*i + 10,
+			0xAA00AA
+			);
+		drawline(
+			screen,
+			*j + 10,
+			*i - 10,
+			*j - 10,
+			*i + 10,
+			0xAA00AA
+			);
+		drawcircle(screen, *j,     *i,     13, 0xAA00AA);
+		drawcircle(screen, *j + 1, *i,     13, 0xAA00AA);
+		drawcircle(screen, *j - 1, *i,     13, 0xAA00AA);
+		drawcircle(screen, *j,     *i + 1, 13, 0xAA00AA);
+		drawcircle(screen, *j,     *i - 1, 13, 0xAA00AA);
+		plot(
+			screen,
+			*j, *i,
+			0xFFFFFF
+			);
 	}
-	drawline(
-		screen,
-		*j - 10,
-		*i - 10,
-		*j + 10,
-		*i + 10,
-		0xAA00AA
-		);
-	drawline(
-		screen,
-		*j + 10,
-		*i - 10,
-		*j - 10,
-		*i + 10,
-		0xAA00AA
-		);
-	drawcircle(screen, *j,     *i,     13, 0xAA00AA);
-	drawcircle(screen, *j + 1, *i,     13, 0xAA00AA);
-	drawcircle(screen, *j - 1, *i,     13, 0xAA00AA);
-	drawcircle(screen, *j,     *i + 1, 13, 0xAA00AA);
-	drawcircle(screen, *j,     *i - 1, 13, 0xAA00AA);
-	plot(
-		screen,
-		*j, *i,
-		0xFFFFFF
-		);
 
 	//nothing left to do if we’ve already hit the line
 	//if(hits == sampsqr)
@@ -192,8 +176,8 @@ void render(SDL_Surface *screen, int frame, int *i, int *j)
 
 void saveframe(SDL_Surface *screen)
 {
-	char filename[256] = "../output/seq1/UNINIT.ppm";
-	sprintf(filename, "../output/seq1/image%d.ppm", realframe);
+	char filename[256] = "../seq1/UNINIT.ppm";
+	sprintf(filename, "../seq1/image%d.ppm", realframe);
 	if(
 		writeppm(
 			filename,
@@ -205,38 +189,38 @@ void saveframe(SDL_Surface *screen)
 		printf("image write error!\n");
 		return;
 	}
-	char shacmd[256];
-	sprintf(shacmd, "sha256sum %s", filename);
-	FILE *file = popen(shacmd, "r");
-	if(file == NULL) {
-		printf("failed to get image hash!\n");
-		return;
-	}
-	//the hash is 64 characters but we need a 0 at the end too
-	char sha[68];
-	int i;
-	char c;
-	for(i = 0; (i < 64) && (c != EOF) && (c != 0x20); i++) {
-		sha[i] = c = fgetc(file);
-	}
-	sha[i++] = 0;
-	printf("sha: %s\n", sha);
-	pclose(file);
+	//char shacmd[256];
+	//sprintf(shacmd, "sha256sum %s", filename);
+	//FILE *file = popen(shacmd, "r");
+	//if(file == NULL) {
+		//printf("failed to get image hash!\n");
+		//return;
+	//}
+	////the hash is 64 characters but we need a 0 at the end too
+	//char sha[68];
+	//int i;
+	//char c;
+	//for(i = 0; (i < 64) && (c != EOF) && (c != 0x20); i++) {
+		//sha[i] = c = fgetc(file);
+	//}
+	//sha[i++] = 0;
+	//printf("sha: %s\n", sha);
+	//pclose(file);
 
-	char hashfilename[256];
-	sprintf(hashfilename, "../output/seq1/hash/%s", sha);
+	//char hashfilename[256];
+	//sprintf(hashfilename, "../output/seq1/hash/%s", sha);
 
-	if(_access(hashfilename, 0) != -1) {
-		//file exists, delete img
-		if(unlink(filename) != 0) {
-			printf("image delete error!\n");
-		}
-	} else {
-		FILE *hashfile = fopen(hashfilename, "w");
-		if(hashfile == NULL)
-			printf("hash file write error!\nfilename: %s\n", hashfilename);
-		fclose(hashfile);
-	}
+	//if(_access(hashfilename, 0) != -1) {
+		////file exists, delete img
+		//if(unlink(filename) != 0) {
+			//printf("image delete error!\n");
+		//}
+	//} else {
+		//FILE *hashfile = fopen(hashfilename, "w");
+		//if(hashfile == NULL)
+			//printf("hash file write error!\nfilename: %s\n", hashfilename);
+		//fclose(hashfile);
+	//}
 	return;
 }
 
@@ -271,6 +255,7 @@ int WinMain(/*int argc, char* args[]*/)
 
 	//The surface contained by the window
 	SDL_Surface* screen = NULL;
+	SDL_Surface* backplate = NULL;
 
 	//Initialize SDL
 	if(SDL_Init(SDL_INIT_VIDEO) < 0) {
@@ -283,28 +268,36 @@ int WinMain(/*int argc, char* args[]*/)
 		} else {
 			//Get window surface
 			screen = SDL_GetWindowSurface(window);
+			backplate = SDL_ConvertSurface(
+				screen,
+				screen->format,
+				0
+				);
 		}
 	}
 	int quit = 0;
 	int frame = 0;
 	int i = 0;
 	int j = 0;
+	renderwhole(backplate, frame);
 	while(quit != 1) {
 		// render
 		SDL_Delay(50);
-		render(screen, frame, &i, &j);
+		render(screen, backplate, frame, &i, &j);
 
 		//Update the surface
-		SDL_UpdateWindowSurface(window);
+		if(realframe % 30 == 0) {
+			SDL_UpdateWindowSurface(window);
+		}
 
 		// poll for events, and handle the ones we care about.
 		quit = handleevents(screen);
 		if(quit == 2)
 			j += 2500;
 
-		//if(realframe == 0) {
+		if(realframe > 5350 && realframe < 5370) {
 			saveframe(screen);
-		//}
+		}
 
 		j++;
 		if(j > screen->w) {
