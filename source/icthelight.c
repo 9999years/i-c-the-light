@@ -37,18 +37,18 @@ FILE *plotfile;
 //global distance estimator
 float de(vec3 pos)
 {
-	return distancejulia(pos, constq(-0.2F, 0.6F, 0.2F, 0.2F));
+	//return distancejulia(pos, constq(-0.2F, 0.6F, 0.2F, 0.2F));
 	//return distserpenski(pos);
-	//return
+	return
 		//opu(
 		//disttorus(pos, const3(0.0F, 0.0F, 0.0F), 2.0F, 5.5F);
 		//distsphere(pos, const3(50.0F, 0.0F, 50.0F), 10.0F);
-		//opwobble3(
-			//pos,
-			//distsphere(pos, const3(0.0F, 0.0F, 0.0F), 15.0F),
-			//2.0F,
-			//2.0F
-			//);
+		opwobble3(
+			pos,
+			distsphere(pos, const3(0.0F, 0.0F, 0.0F), 15.0F),
+			3.0F,
+			10.0F
+			);
 		//);
 		//distsphere(pos, sphere, 10.0F);
 }
@@ -147,7 +147,7 @@ void render(SDL_Surface *screen, const int frame)
 	const float sintime = sin(time);
 	const float costime = cos(time);
 	//how big the viewport is
-	const float viewport_size = 2.5F;
+	const float viewport_size = 55.5F;
 	SDL_FillRect(screen, NULL, 0xffffff);
 
 	//screen aspect ratio
@@ -221,7 +221,7 @@ void render(SDL_Surface *screen, const int frame)
 
 	vec3 light = fromdirection3(time + 1.0F, time, 1.0F);
 	//steps to march
-	const int steps = 32;
+	const int steps = 64;
 	int i, j, k;
 	for(i = 0; i < hsamples; i++) {
 	for(j = 0; j < wsamples; j++) {
@@ -288,8 +288,8 @@ void render(SDL_Surface *screen, const int frame)
 					colortoint(graytocolor(bclamp(
 					//k * 20
 					//255.0F * (float)k / (float)steps
-					500.0F / distance
-					//blinnphong(camera, measure_pos, ray_rot, light)
+					//500.0F / distance
+					blinnphong(camera, measure_pos, ray_rot, light)
 					//distance <= 2.0F ? 0xffffff : 0x000000
 					)))
 				);
@@ -451,10 +451,10 @@ int WinMain(/*int argc, char* args[]*/)
 
 		//SDL_Delay(16);
 		// render
-		if(frame == 0) {
+		//if(frame == 0) {
 			render(screen, frame);
 			saveframe(screen);
-		}
+		//}
 
 		//Update the surface
 		SDL_UpdateWindowSurface(window);
