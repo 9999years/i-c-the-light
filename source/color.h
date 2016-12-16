@@ -3,6 +3,9 @@
 
 #include <math.h>
 
+#ifndef COLOR_H
+#define COLOR_H
+
 #define CHANNELS 3
 
 typedef unsigned char byte;
@@ -13,11 +16,13 @@ struct rgbcolor {
 	byte b;
 } rgbcolor;
 
+//converts an rgbcolor to a uint
 unsigned int colortoint(struct rgbcolor color)
 {
 	return color.b + color.g * 0x100 + color.r * 0x10000;
 }
 
+//converts a uint to an rgbcolor
 struct rgbcolor inttocolor(unsigned int color)
 {
 	struct rgbcolor ret;
@@ -27,22 +32,13 @@ struct rgbcolor inttocolor(unsigned int color)
 	return ret;
 }
 
+//returns the equivalent gray for any byte value 0-0xff
 struct rgbcolor graytocolor(byte gray)
 {
 	struct rgbcolor ret;
 	ret.r = gray;
 	ret.g = gray;
 	ret.b = gray;
-	return ret;
-}
-
-//inverts a color
-struct rgbcolor invertcolor(struct rgbcolor color)
-{
-	struct rgbcolor ret;
-	ret.r = 0xff - color.r;
-	ret.g = 0xff - color.g;
-	ret.b = 0xff - color.b;
 	return ret;
 }
 
@@ -56,17 +52,48 @@ byte bclamp(float value)
 	return (byte)value;
 }
 
+struct rgbcolor addcolor(struct rgbcolor a, struct rgbcolor b)
+{
+	struct rgbcolor ret;
+	ret.r = a.r + b.r;
+	ret.g = a.g + b.g;
+	ret.b = a.b + b.b;
+	return ret;
+}
+
+struct rgbcolor avgcolor(struct rgbcolor a, struct rgbcolor b)
+{
+	struct rgbcolor ret;
+	ret.r = (a.r + b.r) / 2.0F;
+	ret.g = (a.g + b.g) / 2.0F;
+	ret.b = (a.b + b.b) / 2.0F;
+	return ret;
+}
+
+//interpolates between a and b
+//b_interp is the percent of b to use
+//eg b_interp = 1 --> 0% a, 100% b
+//if b_interp is > 1 or < 0 you're gonna get some wacky nonsense
+struct rgbcolor lerpcolor(struct rgbcolor a, struct rgbcolor b, float b_interp)
+{
+	const float a_interp = 1.0F - b_interp;
+	struct rgbcolor ret;
+	ret.r = a.r * a_interp + b.r * b_interp;
+	ret.g = a.g * a_interp + b.g * b_interp;
+	ret.b = a.b * a_interp + b.b * b_interp;
+	return ret;
+}
+
 //this function only *approximates* a hue shift
 //don't use it for anything exact
 //it's also not associative
 struct rgbcolor shifthue(struct rgbcolor in, const float fHue)
 {
 	struct rgbcolor ret;
-	float cosA = cos(fHue*3.14159265f/180);
-	float sinA = sin(fHue*3.14159265f/180);
-	//printf("cos: %f\nsin: %f\nhue: %f\n", cosA, sinA, fHue);
+	const float cosA = cos(fHue*3.14159265f/180);
+	const float sinA = sin(fHue*3.14159265f/180);
 	//calculate the rotation matrix, only depends on Hue
-	float matrix[CHANNELS][CHANNELS] =
+	const float matrix[CHANNELS][CHANNELS] =
 	{
 		{
 			     cosA + (1.0f - cosA) / 3.0f,
@@ -92,19 +119,20 @@ struct rgbcolor shifthue(struct rgbcolor in, const float fHue)
 		  in.r * matrix[0][0]
 		+ in.g * matrix[0][1]
 		+ in.b * matrix[0][2]
-		);
+	);
 
 	ret.g = bclamp(
 		  in.r * matrix[1][0]
 		+ in.g * matrix[1][1]
 		+ in.b * matrix[1][2]
-		);
+	);
 
 	ret.b = bclamp(
 		  in.r * matrix[2][0]
 		+ in.g * matrix[2][1]
 		+ in.b * matrix[2][2]
-		);
+	);
 
 	return ret;
 }
+#endif //COLOR_H

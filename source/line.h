@@ -3,8 +3,11 @@
 #include <SDL/SDL.h>
 #include "plot.h"
 
+#ifndef LINE_H
+#define LINE_H
+
 int drawline(
-	SDL_Surface *screenSurface,
+	SDL_Surface *screen,
 	int x,
 	int y,
 	int endx,
@@ -21,7 +24,7 @@ int drawline(
 	int error = (deltax > deltay ? deltax : -deltay)/2, errorcompare;
 
 	while(x != endx || y != endy) {
-		plot(screenSurface, x, y, color);
+		plot(screen, x, y, color);
 		errorcompare = error;
 		if(errorcompare > -deltax) { error -= deltay; x += signx; }
 		if(errorcompare <  deltay) { error += deltax; y += signy; }
@@ -29,3 +32,4 @@ int drawline(
 
 	return 0;
 }
+#endif //LINE_H

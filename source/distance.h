@@ -1,120 +1,98 @@
 //distance estimation functions
-
+#include <stdio.h>
+//sin functions
 #include <math.h>
+//vectors
+#include "vector.h"
+//fclamp
+#include "common.h"
+#include "quaternion.h"
+#include "logging.h"
 
-//I Can't Believe It's Not Sin(x)
-float parabola(float x)
-{
-	x -= 1;
-	return (-x * x) + 1;
-}
+FILE *logfile;
 
-float min(float a, float b)
-{
-	return a < b ? a : b;
-}
+#ifndef DISTANCE_H
+#define DISTANCE_H
 
-float max(float a, float b)
-{
-	return a > b ? a : b;
-}
-
-float fclamp(float val, float fmin, float fmax)
-{
-	return min(max(val, fmin), fmax);
-}
-
-//displace a point by a wobbly sine shape
-float sindisplace2(vec2 point, float orig, float freq, float amp)
-{
-	return amp * sin((float)point.x / freq) * sin((float)point.y / freq) + orig;
-}
-
-//distance from a circle
-float distcircle(vec2 point, vec2 center, float radius)
+//distance from point p to circle of radius r centered at c
+float distcircle(vec2 p, vec2 c, float r)
 {
 	float o, a;
-	a = point.x - center.x;
-	o = point.y - center.y;
-	return sqrt((o*o)+(a*a)) - radius;
+	a = p.x - c.x;
+	o = p.y - c.y;
+	//dist to c
+	return sqrt((o * o) + (a * a)) - r;
 }
 
-//distance to line ab from c
+//distance to line ab from p
 //http://stackoverflow.com/a/1501725/5719760
-float distline2(vec2 a, vec2 b, vec2 c)
+float distline2(vec2 p, vec2 a, vec2 b)
 {
 	//length = |b-a|^2 -  avoid a sqrt
 	const float length = distsqr2(a, b);
 	//avoid a = b case & divide by zero
-	if(length == 0.0F) return dist2(c, a);
-	const vec2 ca = sub2(c, a);
+	if(length == 0.0F) return dist2(p, a);
+	const vec2 pa = sub2(p, a);
 	const vec2 ba = sub2(b, a);
 	//Consider the line extending the segment, parameterized as
 	//a + t (b - a)
 	//we find projection of point c onto the line.
-	//It falls where t = [(c-a) . (b-a)] / |b-a|^2
-	//we clamp t from [0,1] to handle points outside the segment ab.
-	const float t =
-		fclamp(
-			dot2(ca, ba) / length
-		, 0, 1);
+	//It falls where t = [(p-a) . (b-a)] / |b-a|^2
+	//we clamp t from [0,1] to handle points outside the segment ab
+	const float t = fclamp(
+		dot2(pa, ba) / length,
+		0, 1);
 	//projection falls on the segment
-	const vec2 projection =
-		add2(
-			a,
-			mult2scalar(
-				ba,
-				t
-			)
-		);
+	const vec2 projection = add2(a, mult2s(ba, t));
 	return dist2(
-		c,
+		p,
 		projection
-		);
+	);
 }
 
-
-float distmandlebrot(complex c, int iterations)
+//b specifies the box dimensions
+//nesting function calls for basic addition makes me feel like
+//c was not the best choice for this project
+float distbox(vec3 p, vec3 b)
 {
-	complex z  = {.a = 0.0F, .b = 0.0F};
-	complex dz = {.a = 0.0F, .b = 0.0F};
-	complex tmp;
+	//magnitude(max(abs(p) - b, 0))
+	//vec3 ret;
+	//ret = sub3(
+		//absvec3(p),
+		//b
+	//);
+	//ret = maxvec3s(ret, 0.0F);
+	return magn3(
+		maxvec3s(
+			sub3(
+				absvec3(p),
+				b
+			),
+			0.0F
+		)
+	);
+}
 
-	//const complex one = {.a = 1.0F, .b = 0.0F};
-	//const complex two = {.a = 2.0F, .b = 0.0F};
+//point, center, radius
+float distsphere(vec3 p, vec3 c, float r)
+{
+	return (dist3(p, c) - r);
+}
 
-	float msqr;
-	int i;
-	for(i = 0; i < iterations; i++) {
-		//z = z^2 + c
-		//ergo
-		//dz = 2 * z * dz + 1
+//TODO make the center param do something
+float disttorus(vec3 p, vec3 c, float thickness, float radius)
+{
+	p = sub3(p, c);
+	vec2 q;
+	q.x = magn2((vec2){.x = p.x, .y = p.z}) - radius;
+	q.y = p.y;
+	return magn2(q) - thickness;
+}
 
-		//dz = complexmult(z, dz);
-
-		//z * dz
-		tmp.a = z.a * dz.a - z.b * dz.b;
-		tmp.b = z.a * dz.b + z.b * dz.a;
-		//dz = complexmultscalar(dz, 2.0F);
-		dz.a = tmp.a * 2.0F + 1.0F;
-		dz.b = tmp.b * 2.0F;
-
-		//z = z * z + c
-		tmp.a = z.a * z.a - z.b * z.b;
-		tmp.b = z.a * z.b + z.b * z.a;
-		//z = complexadd(complexmult(z, z), c);
-		z.a = tmp.a + c.a;
-		z.b = tmp.b + c.b;
-
-		//msqr = complexabssqr(z);
-		msqr = z.a * z.a + z.b * z.b;
-		if(msqr > 1024.0F) {
-			break;
-		}
-	}
-
-	//G/|G'|
-	return sqrt(msqr / (dz.a * dz.a + dz.b * dz.b)) * log(msqr);
+//who needs orientation?
+float distground(vec3 p)
+{
+	return p.y;
 }
 
 //union
@@ -124,6 +102,7 @@ float opu(float a, float b)
 }
 
 //subtraction
+//requires signed distance functions!!!!!
 float ops(float a, float b)
 {
 	return max(-a, b);
@@ -134,3 +113,95 @@ float opi(float a, float b)
 {
 	return max(a, b);
 }
+
+//displace a point by a wobbly sine shape
+float opwobble2(vec2 point, float orig, float freq, float amp)
+{
+	return amp
+		* sin(point.x / freq)
+		* sin(point.y / freq)
+		+ orig;
+}
+
+float opwobble3(vec3 point, float orig, float freq, float amp)
+{
+	return amp
+		* sin(point.x / freq)
+		* sin(point.y / freq)
+		* sin(point.z / freq)
+		+ orig;
+}
+
+float oprepeat3(/*vec3 point, vec3 period*/)
+{
+	//this function, obviously, does nothing
+	return -10000.0F;
+}
+
+float distserpenski(vec3 pos)
+{
+	vec3 t1 = const3( 1.0F,  1.0F,  1.0F);
+	vec3 t2 = const3(-1.0F, -1.0F,  1.0F);
+	vec3 t3 = const3( 1.0F, -1.0F, -1.0F);
+	vec3 t4 = const3(-1.0F,  1.0F, -1.0F);
+	vec3 c, tmp;
+	float dist, d;
+	float scale = 2.0F;
+	const int Iterations = 3;
+	int n;
+	for(n = 0; n < Iterations; n++) {
+		c = t1;
+		dist = magn3(sub3(pos, t1));
+		d = magn3(sub3(pos, t2));
+		if(d < dist)
+			c = t2, dist = d;
+		d = magn3(sub3(pos, t3));
+		if(d < dist)
+			c = t3, dist = d;
+		d = magn3(sub3(pos, t4));
+		if(d < dist)
+			c = t4, dist = d;
+		tmp = sub3(
+			mult3s(pos, scale),
+			mult3s(c, scale - 1.0F)
+		);
+		pos = tmp;
+	}
+	return magn3(pos)
+		* pow(scale, -(float)n);
+}
+
+float distancejulia(vec3 pos, quaternion c)
+{
+#define MAX_ITERATIONS 64
+	float distance;
+	int i;
+	quaternion q = constq(0.0F, pos.x, pos.y, pos.z);
+	quaternion qp = constq(1.0F, 0.0F, 0.0F, 0.0F);
+	quaternion tmp;
+	for(i = 0; i < 64; i++) {
+		tmp = multq(q, qp);
+		qp = tmp;
+
+		qp.r *= 2.0F;
+		qp.a *= 2.0F;
+		qp.b *= 2.0F;
+		qp.c *= 2.0F;
+
+		tmp = addq(sqrq(q), c);
+		q = tmp;
+
+		//fprintf(logfile, "i = %d, q:\n", i);
+		dumpquaternion(q);
+		//fprintf(logfile, "q':\n");
+		dumpquaternion(qp);
+		if(magnq(q) > 10.0F)
+			break;
+	}
+	float qmag = magnq(q);
+	distance = 0.5F * qmag * log(qmag) / magnq(qp);
+	//fprintf(logfile, "final distance: %.2f\n", distance);
+	return distance;
+}
+
+#endif //DISTANCE_H

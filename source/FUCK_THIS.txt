@@ -1,3 +1,0 @@
-so this SUCKS on the cpu. fuck it. i have to write gpu code or something if i
-ever want this to work. fuck this. i might look into opengl. i dont know. fuck.
-i want to go home.

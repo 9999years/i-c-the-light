@@ -18,148 +18,67 @@
 
 //project files
 #include "color.h"
+#include "common.h"
 #include "ppm.h"
 #include "line.h"
 #include "vector.h"
 #include "complex.h"
 #include "distance.h"
 
-//Screen dimension constants
-
-#define PI 3.1415926535
-#define TAU 6.2831853071
-#define HALF_PI 1.57079632675
+int frame = 0;
 
 //mandlebrot should be like 3:2
 #define SCREEN_WIDTH  600
 #define SCREEN_HEIGHT 400
 
-#define BOX_WIDTH 50
-#define BOX_HEIGHT 50
-#define WIGGLE_AMP 20
-
-//i might replace this with sfmt one day
-//but not today
-//shamelessly pilfered from
-//https://stackoverflow.com/questions/2999075/generate-a-random-number-within-range/2999130#2999130
-int random(int min, int max)
-{
-	int range = max - min;
-	int divisor = RAND_MAX/(range+1);
-	int retval;
-	do {
-		retval = rand() / divisor;
-	} while (retval > range);
-	return retval + min;
-}
-
 void render(SDL_Surface *screen, int frame)
 {
-	//int tick = SDL_GetTicks();
-	//float time = (float)tick/200;
-
-	SDL_FillRect(screen, NULL, 0xFFFFFF);
-
-	//vec2 c, a;
-	//c.x = -1.5F;
-	//c.y =  0.5F;
-	//a.x =  0.5F;
-	//a.y = -0.5F;
-
-	const float zoom = (float)frame / 4;
-	//const float zoom = 1;
-
-	const complex center = {
-		.a = -0.74364085F,
-		.b =  0.13182733F
+	//float time = (float)frame/30;
+	SDL_FillRect(screen, NULL, 0x000000);
+	float width = 1.0F;
+	float aspect = (float)screen->w/(float)screen->h;
+	float height = width / aspect;
+	complex center = {
+		.a = -0.743643135F,
+		.b = 0.131825963F
 	};
 
-	const float realmin = center.a - 2.0F / zoom;
-	const float realmax = center.a + 1.0F / zoom;
-	const float realrange = realmax - realmin;
-	const float imin    = center.b - 1.0F / zoom;
-	const float imax    = center.b + 1.0F / zoom;
-	const float irange = imax - imin;
+#define ITERATIONS 64
 
-	int i, j;
-	//int k, l, hits;
-#define SAMPLES 4
-	//const int sampsqr = SAMPLES * SAMPLES;
-	//const int scale = 0xff / sampsqr;
-	const int iterations = 256;
-	//const float thresh = 0.01F;
-	const float thresh = 0.01F;
-	float dist;
+	//const float threshold = 0.1F;
 	complex point;
-	//O(scary) but actually fine
-	//no but seriously the deepest loop gets hit like 1.5 mil times
+	float dist;
+	int i, j;
 	for(i = 0; i < screen->h; i++) {
-		j = 0;
-		byte reverse = 0;
-		while(1) {
-		for(j = 0; j < screen->w; j++) {
-			point.a =
-				((float)j / (float)screen->w)
-				* realrange + realmin;
-			point.b =
-				((float)i / (float)screen->h)
-				* irange + imin;
-			dist = distmandlebrot(point, iterations);
-			//dist = distcircle(
-				//(vec2){.x = point.a, .y = point.b},
-				//(vec2){.x = center.a, .y = center.b},
-				//0.2F
-				//);
-			//if(i % 25 == 0 && j % 25 == 0) {
-				//printf("dist: %f\n", dist);
-			//}
-			//if it's far out, skip ahead a bit
-			if(dist > thresh) {
-				plot(screen, j, i, i * 2 + j);
-				j += floor(
-					((dist * 0.8F) / realrange) * (float)screen->w
-					);
-				continue;
-			} else if(dist <= 0) {
-				reverse = 1;
-				continue;
-			}
-			//for each pixel, multisample
-			//hits = 0;
-			//printf("PRE:\n    %f + %fi\n", point.a, point.b);
-			//for(k = 0; k < SAMPLES; k++) {
-				//for(l = 0; l < SAMPLES; l++) {
-					//point.a += ((float)k /
-						//(SAMPLES * screen->w))
-						//* realrange;
-					//point.b += ((float)l /
-						//(SAMPLES * screen->h))
-						//* irange;
-					////printf("POST:\n    %f + %fi\n\n", point.a, point.b);
-					//dist = distmandlebrot(point, iterations);
-					//if(dist < thresh)
-						//hits++;
-				//}
-			//}
-			//dist = fabsf(dist);
-			dist = fclamp(64.0F * dist * zoom, 0.0F, 255.0F);
-			//dist = fclamp(8.0F * dist * zoom, 0.0F, 255.0F);
-			dist = pow(dist, 0.25F);
-			//if(dist > thresh)
-				//continue;
+	for(j = 0; j < screen->w; j++) {
+		point.a = scale((float)j, 0, screen->w,
+			center.a - width, center.a + width);
+		point.b = scale((float)i, 0, screen->h,
+			center.b - height, center.b + height);
+		//if it's far out, skip ahead a bit
+		dist = distmandlebrot(point, ITERATIONS);
+		//if(dist > threshold) {
+			//j += floor(dist - threshold);
+			//continue;
+		//} else
+		if(dist > 0.0) {
 			plot(
 				screen,
 				j, i,
-				//0xFFFFFF
-				colortoint(/*invertcolor*/(graytocolor(bclamp(
-					256.0F * dist
-					//hits * scale
-				))))
+				colortoint(graytocolor(0xff - bclamp(
+					50000.0F * dist
+					)))
+				//colortoint(graytocolor(10.0F / fabsf(dist)))
+				);
+		} else {
+			plot(
+				screen,
+				j, i,
+				0xFFFFFF
 				);
 		}
 	}
-	//if(tick > 0)
-	//printf("tick: %f\nV: %f\n", tick, V);
+	}
 	return;
 }
 
@@ -257,17 +176,17 @@ int WinMain(/*int argc, char* args[]*/)
 			screen = SDL_GetWindowSurface(window);
 		}
 	}
-	clock_t start, end;
-	double total;
+	//clock_t start, end;
+	//double total;
 	int quit = 0;
 	int frame = 0;
-	while (!quit) {
-		start = clock();
-
+	while(quit != 1) {
+		// render
+		//SDL_Delay(50);
 		render(screen, frame);
-		//autosave the first frame
-		if(frame == 0)
+		if(frame == 0) {
 			saveframe(screen);
+		}
 
 		//Update the surface
 		SDL_UpdateWindowSurface(window);
@@ -275,11 +194,6 @@ int WinMain(/*int argc, char* args[]*/)
 		// poll for events, and handle the ones we care about.
 		quit = handleevents(screen);
 
-		end = clock();
-		if(frame%30 == 0) {
-			total = (double)(end - start) / CLOCKS_PER_SEC;
-			printf("%.4f FPS\n", 1 / total);
-		}
 		frame++;
 	}
 
