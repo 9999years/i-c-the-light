@@ -9,13 +9,13 @@ typedef struct complex {
 } complex;
 
 //handy for avoiding sqrt calls
-double complexabssqr(complex in)
+long double complexabssqr(complex in)
 {
 	return in.a * in.a + in.b * in.b;
 }
 
 //absolute / normal / modulo
-double complexabs(complex in)
+long double complexabs(complex in)
 {
 	return sqrt(in.a * in.a + in.b * in.b);
 }
@@ -61,7 +61,7 @@ float distmandlebrot(complex c, int iterations)
 	//const complex one = {.a = 1.0F, .b = 0.0F};
 	//const complex two = {.a = 2.0F, .b = 0.0F};
 
-	float msqr;
+	long double msqr;
 	int i;
 	for(i = 0; i < iterations; i++) {
 		//z = z^2 + c

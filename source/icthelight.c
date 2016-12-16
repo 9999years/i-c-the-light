@@ -28,22 +28,22 @@
 int frame = 0;
 
 //mandlebrot should be like 3:2
-#define SCREEN_WIDTH  600
-#define SCREEN_HEIGHT 400
+#define SCREEN_WIDTH  1200
+#define SCREEN_HEIGHT 800
 
-void render(SDL_Surface *screen, int frame)
+void render(SDL_Surface *screen)
 {
-	//float time = (float)frame/30;
+	//float time = (float)frame / 5.0F;
 	SDL_FillRect(screen, NULL, 0x000000);
-	float width = 1.0F;
-	float aspect = (float)screen->w/(float)screen->h;
+	float width = 2.0F / ((float)frame * (float)frame);
+	float aspect = (float)screen->w / (float)screen->h;
 	float height = width / aspect;
 	complex center = {
 		.a = -0.743643135F,
 		.b = 0.131825963F
 	};
 
-#define ITERATIONS 64
+	const int iterations = 256 + 2 * frame;
 
 	//const float threshold = 0.1F;
 	complex point;
@@ -56,7 +56,7 @@ void render(SDL_Surface *screen, int frame)
 		point.b = scale((float)i, 0, screen->h,
 			center.b - height, center.b + height);
 		//if it's far out, skip ahead a bit
-		dist = distmandlebrot(point, ITERATIONS);
+		dist = distmandlebrot(point, iterations);
 		//if(dist > threshold) {
 			//j += floor(dist - threshold);
 			//continue;
@@ -66,7 +66,7 @@ void render(SDL_Surface *screen, int frame)
 				screen,
 				j, i,
 				colortoint(graytocolor(0xff - bclamp(
-					50000.0F * dist
+					90000.0F * dist / width
 					)))
 				//colortoint(graytocolor(10.0F / fabsf(dist)))
 				);
@@ -85,8 +85,9 @@ void render(SDL_Surface *screen, int frame)
 void saveframe(SDL_Surface *screenSurface)
 {
 	char filename[256] = "output/UNINITIALIZED.ppm";
-	unsigned long int timeint = time(NULL);
-	sprintf(filename, "../output/image%lu.ppm", timeint);
+	//unsigned long int timeint = time(NULL);
+	//sprintf(filename, "../seq2/image%lu.ppm", timeint);
+	sprintf(filename, "../seq2/image%d.ppm", frame);
 	if(
 		writeppm(
 			filename,
@@ -98,38 +99,38 @@ void saveframe(SDL_Surface *screenSurface)
 		printf("image write error!\n");
 		return;
 	}
-	char shacmd[256];
-	sprintf(shacmd, "sha256sum %s", filename);
-	FILE *file = popen(shacmd, "r");
-	if(file == NULL) {
-		printf("failed to get image hash!\n");
-		return;
-	}
-	//the hash is 64 characters but we need a 0 at the end too
-	char sha[68];
-	int i;
-	char c;
-	for(i = 0; (i < 64) && (c != EOF) && (c != 0x20); i++) {
-		sha[i] = c = fgetc(file);
-	}
-	sha[i++] = 0;
-	printf("sha: %s\n", sha);
-	pclose(file);
+	//char shacmd[256];
+	//sprintf(shacmd, "sha256sum %s", filename);
+	//FILE *file = popen(shacmd, "r");
+	//if(file == NULL) {
+		//printf("failed to get image hash!\n");
+		//return;
+	//}
+	////the hash is 64 characters but we need a 0 at the end too
+	//char sha[68];
+	//int i;
+	//char c;
+	//for(i = 0; (i < 64) && (c != EOF) && (c != 0x20); i++) {
+		//sha[i] = c = fgetc(file);
+	//}
+	//sha[i++] = 0;
+	//printf("sha: %s\n", sha);
+	//pclose(file);
 
-	char hashfilename[256];
-	sprintf(hashfilename, "../output/hash/%s", sha);
+	//char hashfilename[256];
+	//sprintf(hashfilename, "../output/hash/%s", sha);
 
-	if(_access(hashfilename, 0) != -1) {
-		//file exists, delete img
-		if(unlink(filename) != 0) {
-			printf("image delete error!\n");
-		}
-	} else {
-		FILE *hashfile = fopen(hashfilename, "w");
-		if(hashfile == NULL)
-			printf("hash file write error!\nfilename: %s\n", hashfilename);
-		fclose(hashfile);
-	}
+	//if(_access(hashfilename, 0) != -1) {
+		////file exists, delete img
+		//if(unlink(filename) != 0) {
+			//printf("image delete error!\n");
+		//}
+	//} else {
+		//FILE *hashfile = fopen(hashfilename, "w");
+		//if(hashfile == NULL)
+			//printf("hash file write error!\nfilename: %s\n", hashfilename);
+		//fclose(hashfile);
+	//}
 	return;
 }
 
@@ -179,14 +180,13 @@ int WinMain(/*int argc, char* args[]*/)
 	//clock_t start, end;
 	//double total;
 	int quit = 0;
-	int frame = 0;
 	while(quit != 1) {
 		// render
 		//SDL_Delay(50);
-		render(screen, frame);
-		if(frame == 0) {
+		render(screen);
+		//if(frame == 0) {
 			saveframe(screen);
-		}
+		//}
 
 		//Update the surface
 		SDL_UpdateWindowSurface(window);
