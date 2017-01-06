@@ -28,7 +28,6 @@ run:
 	chcp 65001
 	.\icthelight
 
-trig: trig.c
+repl: repl.c
 	$(CC) $? $(CFLAGS) -o $@
-	.\trig
 #gnuplot -e "plot 'sin.dat', cos(x)" -p

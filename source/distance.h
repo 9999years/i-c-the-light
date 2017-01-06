@@ -182,16 +182,16 @@ float distserpenski(vec3 pos)
 
 float distancejulia(vec3 pos, quaternion c)
 {
-#define MAX_ITERATIONS 64
+#define MAX_ITERATIONS 128
 	float distance;
 	int i;
-	fprintf(logfile,
-		"\npos:\n"
-		"    %.2f\n"
-		"    %.2f\n"
-		"    %.2f\n",
-		pos.x, pos.y, pos.z
-	);
+	//fprintf(logfile,
+		//"\npos:\n"
+		//"    %.2f\n"
+		//"    %.2f\n"
+		//"    %.2f\n",
+		//pos.x, pos.y, pos.z
+	//);
 	//keep one component fixed to view a 3d "slice" of the 4d fractal
 	quaternion q = constq(pos.x, pos.y, pos.z, 0.0F);
 	//q prime, the running derivative of q
@@ -209,26 +209,27 @@ float distancejulia(vec3 pos, quaternion c)
 		q = tmp;
 
 		//if the distance decreases, get HYPED
-		if(magnq(q) < last)
-			fprintf(logfile, "\nDECREASED!!\n");
+		//if(dotq(q) < last) {
+			//printf(logfile, "\nDECREASED!!\n");
+		//}
 
 		last = dotq(q);
 
-		fprintf(logfile, "\ni = %d, q:\n", i);
-		dumpquaternion(q);
-		fprintf(logfile, "q':\n");
-		dumpquaternion(qp);
-		fprintf(logfile, "|q|: %f\n", last);
-		if(last > 10.0F)
+		//fprintf(logfile, "\ni = %d, q:\n", i);
+		//dumpquaternion(q);
+		//fprintf(logfile, "q':\n");
+		//dumpquaternion(qp);
+		//fprintf(logfile, "|q|: %f\n", last);
+		if(last > 16.0F)
 			break;
 	}
 	//|q| log(|q|)
 	//------------ = distance
 	//   2|q'|
 	float qmag = magnq(q);
-	distance = (qmag * log(qmag)) / (2.0F * magnq(qp));
-	fprintf(logfile, "final distance:\n"
-		"    %.2f\n", distance);
+	distance = (qmag * log(dotq(q))) / (2.0F * magnq(qp));
+	//fprintf(logfile, "final distance:\n"
+		//"    %.2f\n", distance);
 	return distance;
 }
 

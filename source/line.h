@@ -1,6 +1,5 @@
 //function for drawing lines
 
-#include <SDL/SDL.h>
 #include "plot.h"
 
 #ifndef LINE_H

@@ -108,10 +108,10 @@ quaternion multq(quaternion one, quaternion two)
 quaternion multqs(quaternion one, float two)
 {
 	quaternion ret;
-	ret.r =   one.r * two;
-	ret.a =   one.a * two;
-	ret.b =   one.b * two;
-	ret.c =   one.c * two;
+	ret.r = one.r * two;
+	ret.a = one.a * two;
+	ret.b = one.b * two;
+	ret.c = one.c * two;
 	return ret;
 }
 
@@ -168,6 +168,7 @@ float magnq(quaternion in)
 quaternion invq(quaternion in)
 {
 	//DON'T USE THIS UNTIL I PUT CODE IN IT
+	printf("WHAT THE FUCK ARE YOU DOING I SAID NOT TO CALL THIS FUNCTION\n");
 	return in;
 }
 

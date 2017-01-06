@@ -37,18 +37,18 @@ FILE *plotfile;
 //global distance estimator
 float de(vec3 pos)
 {
-	//return distancejulia(pos, constq(-0.2F, 0.6F, 0.2F, 0.2F));
+	return distancejulia(pos, constq(-0.2F, 0.6F, 0.2F, 0.2F));
 	//return distserpenski(pos);
-	return
+	//return
 		//opu(
 		//disttorus(pos, const3(0.0F, 0.0F, 0.0F), 2.0F, 5.5F);
 		//distsphere(pos, const3(50.0F, 0.0F, 50.0F), 10.0F);
-		opwobble3(
-			pos,
-			distsphere(pos, const3(0.0F, 0.0F, 0.0F), 15.0F),
-			3.0F,
-			10.0F
-			);
+		//opwobble3(
+			//pos,
+			//distsphere(pos, const3(0.0F, 0.0F, 0.0F), 15.0F),
+			//3.0F,
+			//10.0F
+			//);
 		//);
 		//distsphere(pos, sphere, 10.0F);
 }
@@ -139,15 +139,15 @@ void render(SDL_Surface *screen, const int frame)
 	 * x
 	 */
 
-#define MAX_DISTANCE 50.0F
-#define MIN_DISTANCE 2.0F
-#define BOUNDING_RADIUS 1000.0F
+#define MAX_DISTANCE 0.1F
+#define MIN_DISTANCE 0.0001F
+#define BOUNDING_RADIUS 5.0F
 
-	const float time = (float)frame / 3.0F + 0.3F + QUARTER_PI;
+	const float time = (float)frame / 8.0F + 0.3F + QUARTER_PI;
 	const float sintime = sin(time);
 	const float costime = cos(time);
 	//how big the viewport is
-	const float viewport_size = 55.5F;
+	const float viewport_size = 3.0F;
 	SDL_FillRect(screen, NULL, 0xffffff);
 
 	//screen aspect ratio
@@ -180,8 +180,8 @@ void render(SDL_Surface *screen, const int frame)
 	//offset of the center of the viewport from the origin
 	//essentially the camera position
 	vec3 viewport_ofs = const3(
-		3.0F * cos(time + HALF_PI),
-		3.0F * sin(time + HALF_PI),
+		1.0F * cos(time + HALF_PI),
+		1.0F * sin(time + HALF_PI),
 		0.0F
 	);
 
@@ -219,13 +219,16 @@ void render(SDL_Surface *screen, const int frame)
 	//total distance travelled, i hope i hope i hope
 	float totaldistance;
 
-	vec3 light = fromdirection3(time + 1.0F, time, 1.0F);
+	//preview value
+	float predist;
+
+	//vec3 light = fromdirection3(time + 1.0F, time, 1.0F);
 	//steps to march
-	const int steps = 64;
+	const int steps = 128;
 	int i, j, k;
 	for(i = 0; i < hsamples; i++) {
 	for(j = 0; j < wsamples; j++) {
-		fprintf(logfile, "NEW RAY!\n");
+		//fprintf(logfile, "NEW RAY!\n");
 		//new sample, new distance
 		distance = 0.0F;
 		totaldistance = 0.0F;
@@ -246,12 +249,14 @@ void render(SDL_Surface *screen, const int frame)
 		//where the ray starts (on the viewport)
 		ray_orig = add3(ray_through, viewport_ofs);
 
+		//printf("ray start pos:\n");
+		//dump3(ray_orig);
+
 		//a unit vec from the camera through the viewport
 		ray_rot = unit3(through3(
 			camera,
 			add3(ray_through, viewport_ofs)
 		));
-
 
 		//fprintf(plotfile, "%f\t%f\t%f\n",
 			//ray_rot.x,
@@ -262,6 +267,14 @@ void render(SDL_Surface *screen, const int frame)
 		//continue;
 
 		for(k = 0; k < steps; k++) {
+			//printf(
+				//"-----------------\n"
+				//"k: %d\n"
+				//"total: %.4f\n"
+				//"dist: %.4f\n"
+				//"predist: %.4f\n",
+				//k, totaldistance, distance, predist
+			//);
 			measure_pos = add3(
 				ray_orig,
 				mult3s(
@@ -270,36 +283,42 @@ void render(SDL_Surface *screen, const int frame)
 				)
 			);
 
-			totaldistance += distance = de(measure_pos);
-			//fmin(de(measure_pos), MAX_DISTANCE);
+			predist = de(measure_pos);
 
-			if((i % 10 == 0) && (j % 10 == 0))
-				fprintf(plotfile, "%d\t%d\t%f\n",
-					i, j, totaldistance);
+			totaldistance += distance =
+				//fclamp(de(measure_pos), MIN_DISTANCE, MAX_DISTANCE);
+				fmin(predist, MAX_DISTANCE);
 
-			fprintf(logfile, "step %d, distance: %f\n",
-				k, distance);
+			//if((i % 10 == 0) && (j % 10 == 0))
+				//fprintf(plotfile, "%d\t%d\t%f\n",
+					//i, j, totaldistance);
+
+			//fprintf(logfile, "step %d, distance: %f\n",
+				//k, distance);
 
 			if(distance <= MIN_DISTANCE) {
-				fprintf(logfile, "PLOT!\n");
+				//fprintf(logfile, "PLOT!\n");
+				//printf("d: %f\n", totaldistance);
+				printf("k: %d\n", k);
 				plot(
 					screen,
 					j, i,
 					colortoint(graytocolor(bclamp(
-					//k * 20
+					k * 20
 					//255.0F * (float)k / (float)steps
-					//500.0F / distance
-					blinnphong(camera, measure_pos, ray_rot, light)
+					//0.01F / (totaldistance + 0.00003F)
+					//blinnphong(camera, measure_pos, ray_rot, light)
 					//distance <= 2.0F ? 0xffffff : 0x000000
 					)))
 				);
 				break;
-			} else if(distance >= BOUNDING_RADIUS
+			} else if(totaldistance >= BOUNDING_RADIUS
 				|| !isfinite(distance)) {
 				//we're done here
 				//fprintf(logfile, "LIMIT EXCEEDED, BREAK!\n");
 				break;
 			}
+			//SDL_Delay(200);
 		}
 	}
 	}
@@ -463,10 +482,10 @@ int WinMain(/*int argc, char* args[]*/)
 		//if(frame%30 == 0) {
 			////if(frame == 0)
 				////saveframe(screen);
-			//total = (double)(end - start) / CLOCKS_PER_SEC;
-			//printf("%.4f FPS\n", 1 / total);
-			//fprintf(logfile, "%.4f FPS\n", 1 / total);
 		//}
+		total = (double)(end - start) / CLOCKS_PER_SEC;
+		printf("%.4f FPS\n", 1 / total);
+		fprintf(logfile, "%.4f FPS\n", 1 / total);
 		frame++;
 	} while(!quit);
 
