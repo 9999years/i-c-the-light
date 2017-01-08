@@ -5,6 +5,7 @@
 
 //display
 #include <SDL/SDL.h>
+#undef main
 //logging, file out
 #include <stdio.h>
 #include <io.h>
@@ -26,8 +27,8 @@
 #include "logging.h"
 
 //Screen dimension constants
-#define SCREEN_WIDTH 500
-#define SCREEN_HEIGHT 500
+#define SCREEN_WIDTH  2160
+#define SCREEN_HEIGHT 2160
 
 //globals
 int frame = 0;
@@ -37,7 +38,10 @@ FILE *plotfile;
 //global distance estimator
 float de(vec3 pos)
 {
-	return distancejulia(pos, constq(-0.2F, 0.6F, 0.2F, 0.2F));
+	//quaternion c = constq(-0.2F, 0.6F, 0.2F, 0.2F);
+	quaternion c = constq(-0.137F, -0.630F, -0.475F, -0.046);
+	//quaternion c = constq(-0.213F, -0.0410F, -0.563F, -0.560);
+	return distancejulia(pos, c, 64);
 	//return distserpenski(pos);
 	//return
 		//opu(
@@ -84,7 +88,7 @@ vec3 getnormal(vec3 pos, float samplesize)
 //surface (vec V here:
 //https://en.m.wikipedia.org/wiki/Blinn%E2%80%93Phong_shading_model#Description
 //can usually be found with )
-unsigned int blinnphong(vec3 cam, vec3 pos, vec3 rot, vec3 light)
+float blinnphong(vec3 cam, vec3 pos, vec3 rot, vec3 light)
 {
 	//k_s: specular constant
 #define k_s 1.0F
@@ -111,15 +115,16 @@ unsigned int blinnphong(vec3 cam, vec3 pos, vec3 rot, vec3 light)
 	cam = unit3(sub3(cam, pos));
 	//pos = unit3(pos);
 	//vec3 normal = getnormal(sub3(pos, mult3s(unit3(rot), 2.0F)), 10.0F);
-	vec3 normal = getnormal(add3(pos, rot), 0.1F);
+	vec3 normal = getnormal(pos, 0.01F);
+	//vec3 halfway = div3s(add3(cam, light), magn3(add3(cam, light)));
 	//vec3 halfway = avg3(cam, light);
 	vec3 halfway = unit3(add3(cam, light));
 	float ret =
 		dot3(light, normal) * diffuse_intensity
 		+ pow(dot3(normal, halfway), alpha) * specular_intensity;
 	//ret *= randf(0.0F, 1.F);
-	return
-		(unsigned int)(scale(ret, -2.0F, 2.0F, 0.0F, 255.0F));
+	//printf("ret: %f\n", ret);
+	return ret;
 }
 
 void render(SDL_Surface *screen, const int frame)
@@ -140,22 +145,42 @@ void render(SDL_Surface *screen, const int frame)
 	 */
 
 #define MAX_DISTANCE 0.1F
-#define MIN_DISTANCE 0.0001F
-#define BOUNDING_RADIUS 5.0F
+#define MIN_DISTANCE 0.001F
+#define BOUNDING_RADIUS 100.0F
 
-	const float time = (float)frame / 8.0F + 0.3F + QUARTER_PI;
-	const float sintime = sin(time);
-	const float costime = cos(time);
+	printf("initializing render scene, allocating\n");
+
+#define FRAMES_IN_ROTATION 60.0F
+	const float timef = (float)(frame * TAU) / FRAMES_IN_ROTATION;
+	unsigned long int timeint = time(NULL);
+	printf("time: %f for %lu\n", timef, timeint);
+	const float sintime = sin(timef);
+	const float costime = cos(timef);
+	//const float tworoottwo = sqrt(2.0F) / 2.0F;
 	//how big the viewport is
-	const float viewport_size = 3.0F;
+	const float viewport_size = 2.75F;
 	SDL_FillRect(screen, NULL, 0xffffff);
+	//SDL_FillRect(screen, NULL, 0x000000);
+
+	//stores values to calculate colors
+	//i can set exposure by figuring out the minimum/maximum of this array
+	float *values = (float *)malloc(sizeof(float) * screen->w * screen->h);
+	//the coordinates of matching keys in `values`, for plotting
+	int *coords = (int *)malloc(sizeof(int) * screen->w * screen->h);
+	//the length of both of those arrays
+	int coordslen = 0;
+
+	if(values == NULL) {
+		printf("no memory for values!\n");
+		return;
+	}
+	if(coords == NULL) {
+		printf("no memory for keys!\n");
+		return;
+	}
 
 	//screen aspect ratio
-	const float aspect = (float)screen->w / (float)screen->h;
-	//horiz samples
-	//these are the values the for() loops go to
-	const int wsamples = screen->w;
-	const int hsamples = aspect * wsamples;
+	//const float aspect = (float)screen->w / (float)screen->h;
 
 	//portion of viewport to render
 	//this is multiplied by the viewport vectors to get a point on the
@@ -164,13 +189,16 @@ void render(SDL_Surface *screen, const int frame)
 
 	//focal length of the camera
 	//longer = more zoomed in
-	float focallength = 50.0F;
+	float focallength = 20.0F;
+	//float focallength = frame * frame;
 	//printf("f: %f\n", focallength);
 
 	//width of the camera (horiz. line at the center of the viewport)
 	vec3 viewport_width = const3(
 		viewport_size * costime,
 		viewport_size * sintime,
+		//viewport_size * tworoottwo,
+		//viewport_size * tworoottwo,
 		0.0F
 	);
 
@@ -180,8 +208,8 @@ void render(SDL_Surface *screen, const int frame)
 	//offset of the center of the viewport from the origin
 	//essentially the camera position
 	vec3 viewport_ofs = const3(
-		1.0F * cos(time + HALF_PI),
-		1.0F * sin(time + HALF_PI),
+		2.0F * cos(timef - HALF_PI),
+		2.0F * sin(timef - HALF_PI),
 		0.0F
 	);
 
@@ -201,8 +229,8 @@ void render(SDL_Surface *screen, const int frame)
 			focallength
 		)
 	);
-	printf("cam:\n");
-	dump3(camera);
+	//printf("cam:\n");
+	//dump3(camera);
 
 	//direction for the ray to travel in
 	vec3 ray_rot;
@@ -222,12 +250,16 @@ void render(SDL_Surface *screen, const int frame)
 	//preview value
 	float predist;
 
-	//vec3 light = fromdirection3(time + 1.0F, time, 1.0F);
+	vec3 light = fromdirection3(timef + 1.0F, timef, 1.0F);
+
 	//steps to march
-	const int steps = 128;
+	const int steps = 512;
+
+	printf("beginning render loop\n");
+
 	int i, j, k;
-	for(i = 0; i < hsamples; i++) {
-	for(j = 0; j < wsamples; j++) {
+	for(i = 0; i < screen->h; i++) {
+	for(j = 0; j < screen->w; j++) {
 		//fprintf(logfile, "NEW RAY!\n");
 		//new sample, new distance
 		distance = 0.0F;
@@ -237,8 +269,8 @@ void render(SDL_Surface *screen, const int frame)
 		//-0.5 to 0.5 because viewport_ofs represents the center
 		//of the viewport and viewport_width and _height represent
 		//whole, not half widths of the viewport size
-		wfrac = scale(j, 0, wsamples, -0.5F, 0.5F);
-		hfrac = scale(i, 0, hsamples, -0.5F, 0.5F);
+		wfrac = scale(j, 0, screen->w, -0.5F, 0.5F);
+		hfrac = scale(i, 0, screen->h, -0.5F, 0.5F);
 
 		//multiply that by width / height to get a real location
 		ray_through = add3(
@@ -267,14 +299,16 @@ void render(SDL_Surface *screen, const int frame)
 		//continue;
 
 		for(k = 0; k < steps; k++) {
-			//printf(
-				//"-----------------\n"
-				//"k: %d\n"
-				//"total: %.4f\n"
-				//"dist: %.4f\n"
-				//"predist: %.4f\n",
-				//k, totaldistance, distance, predist
-			//);
+			//if((distance != 0.5F) && (distance != 0.0F)) {
+				//[>f<]printf(//logfile,
+					//"-----------------\n"
+					//"k: %d\n"
+					//"total: %.4f\n"
+					//"dist: %.4f\n"
+					//"predist: %.4f\n",
+					//k, totaldistance, distance, predist
+				//);
+			//}
 			measure_pos = add3(
 				ray_orig,
 				mult3s(
@@ -299,18 +333,15 @@ void render(SDL_Surface *screen, const int frame)
 			if(distance <= MIN_DISTANCE) {
 				//fprintf(logfile, "PLOT!\n");
 				//printf("d: %f\n", totaldistance);
-				printf("k: %d\n", k);
-				plot(
-					screen,
-					j, i,
-					colortoint(graytocolor(bclamp(
-					k * 20
-					//255.0F * (float)k / (float)steps
-					//0.01F / (totaldistance + 0.00003F)
-					//blinnphong(camera, measure_pos, ray_rot, light)
-					//distance <= 2.0F ? 0xffffff : 0x000000
-					)))
-				);
+				//printf("k: %d\n", k);
+				//vec3 norm;
+				//norm = mult3s(getnormal(measure_pos, 0.2F), 255.0F);
+				coords[coordslen] = j + i * screen->w;
+				values[coordslen] =
+					//(float)k;
+					(1.5F - (float)k / (float)steps) *
+					blinnphong(camera, measure_pos, ray_rot, light);
+				coordslen++;
 				break;
 			} else if(totaldistance >= BOUNDING_RADIUS
 				|| !isfinite(distance)) {
@@ -322,6 +353,34 @@ void render(SDL_Surface *screen, const int frame)
 		}
 	}
 	}
+
+	printf("done calculating array\n");
+
+	struct limits limit = getlimits(values, coordslen);
+
+	printf("done calculating limits\n");
+
+	for(i = 0; i < coordslen; i++) {
+		plot(
+			screen,
+			coords[i] % screen->w,
+			coords[i] / screen->h,
+			colortoint(graytocolor(bclamp(
+				scale(values[i], limit.min, limit.max, 0, 255)
+				+ random(-5, 5)
+			)))
+		);
+	}
+
+			//colortoint(graytocolor(bclamp(k * 6)))
+			//dot3(norm, light)
+			//255.0F * (float)k / (float)steps
+			//0.01F / (totaldistance + 0.00003F)
+			//blinnphong(camera, measure_pos, ray_rot, light)
+			//distance <= 2.0F ? 0xffffff : 0x000000
+
+	free(values);
+	free(coords);
 	return;
 }
 
@@ -329,13 +388,14 @@ void saveframe(SDL_Surface *screen)
 {
 	char filename[256] = "output/UNINITIALIZED.ppm";
 	unsigned long int timeint = time(NULL);
-	sprintf(filename, "../output/image%lu.ppm", timeint);
+	sprintf(filename, "../output/image%lu_f%d.ppm", timeint, frame);
+	printf("printing %s\n", filename);
 	int writestatus;
 	if(
 		(writestatus = writeppm(
 			filename,
-			SCREEN_WIDTH,
-			SCREEN_HEIGHT,
+			screen->w,
+			screen->h,
 			screen->pixels
 		)) != 0
 	) {
@@ -376,6 +436,7 @@ void saveframe(SDL_Surface *screen)
 
 	if(_access(hashfilename, 0) != -1) {
 		//file exists, delete img
+		printf("image already rendered, deleting\n");
 		if(unlink(filename) != 0) {
 			fprintf(logfile, "image delete error!\n");
 		}
@@ -412,7 +473,7 @@ int handleevents(SDL_Surface *screen)
 	return 0;
 }
 
-int WinMain(/*int argc, char* args[]*/)
+int main(int argc, char *argv[])
 {
 	printf("Hello!\n");
 	const time_t unixtime = time(NULL);
@@ -432,31 +493,60 @@ int WinMain(/*int argc, char* args[]*/)
 	initializelogfile();
 
 	//The window we'll be rendering to
-	SDL_Window* window = NULL;
+	SDL_Window *window = NULL;
 
 	//The surface contained by the window
-	SDL_Surface* screen = NULL;
+	SDL_Surface *screen = NULL;
 
-	//Initialize SDL
-	if(SDL_Init(SDL_INIT_VIDEO) < 0) {
-		printf("SDL could not initialize! SDL_Error: %s\n", SDL_GetError());
-	} else {
-		//Create window
-		window = SDL_CreateWindow(
-			"I C the Light",
-			SDL_WINDOWPOS_UNDEFINED,
-			SDL_WINDOWPOS_UNDEFINED,
-			SCREEN_WIDTH,
-			SCREEN_HEIGHT,
-			SDL_WINDOW_SHOWN
-		);
-		if(window == NULL) {
-			printf("Window could not be created! SDL_Error: %s\n", SDL_GetError());
+	char *window_arg = "window";
+
+	if(searchargs(argc, argv, window_arg) == 1) {
+		//Initialize SDL
+		if(SDL_Init(SDL_INIT_VIDEO) < 0) {
+			printf("SDL could not initialize! SDL_Error: %s\n", SDL_GetError());
 		} else {
-			//Get window surface
-			screen = SDL_GetWindowSurface(window);
+			//Create window
+			window = SDL_CreateWindow(
+				"I C the Light",
+				SDL_WINDOWPOS_UNDEFINED,
+				SDL_WINDOWPOS_UNDEFINED,
+				SCREEN_WIDTH,
+				SCREEN_HEIGHT,
+				SDL_WINDOW_SHOWN
+			);
+			if(window == NULL) {
+				printf("Window could not be created! SDL_Error: %s\n", SDL_GetError());
+			} else {
+				//Get window surface
+				screen = SDL_GetWindowSurface(window);
+			}
 		}
+	} else {
+		unsigned int rmask, gmask, bmask, amask;
+#define SCREEN_BIT_DEPTH 32
+#if SDL_BYTEORDER == SDL_BIG_ENDIAN
+		rmask = 0xff000000;
+		gmask = 0x00ff0000;
+		bmask = 0x0000ff00;
+		amask = 0x000000ff;
+#else
+		rmask = 0x000000ff;
+		gmask = 0x0000ff00;
+		bmask = 0x00ff0000;
+		amask = 0xff000000;
+#endif
+		screen = SDL_CreateRGBSurface(
+			0,
+			SCREEN_WIDTH, SCREEN_HEIGHT,
+			SCREEN_BIT_DEPTH, rmask, gmask, bmask, amask
+		);
 	}
+
+	if(window != NULL) {
+		SDL_FillRect(screen, NULL, 0x000000);
+		SDL_UpdateWindowSurface(window);
+	}
+
 	int quit = 0;
 	clock_t start, end;
 	double total;
@@ -468,7 +558,6 @@ int WinMain(/*int argc, char* args[]*/)
 		//this returns 1 if we need to quit
 		quit = handleevents(screen);
 
-		//SDL_Delay(16);
 		// render
 		//if(frame == 0) {
 			render(screen, frame);
@@ -476,7 +565,9 @@ int WinMain(/*int argc, char* args[]*/)
 		//}
 
 		//Update the surface
-		SDL_UpdateWindowSurface(window);
+		if(window != NULL) {
+			SDL_UpdateWindowSurface(window);
+		}
 
 		end = clock();
 		//if(frame%30 == 0) {
@@ -484,13 +575,17 @@ int WinMain(/*int argc, char* args[]*/)
 				////saveframe(screen);
 		//}
 		total = (double)(end - start) / CLOCKS_PER_SEC;
-		printf("%.4f FPS\n", 1 / total);
-		fprintf(logfile, "%.4f FPS\n", 1 / total);
+		printf("%.4f FPS = %.4f SPF\n", 1 / total, total);
 		frame++;
+		if(frame > FRAMES_IN_ROTATION + 1) {
+			quit = 1;
+		}
 	} while(!quit);
 
 	//Destroy window
-	SDL_DestroyWindow(window);
+	if(window != NULL) {
+		SDL_DestroyWindow(window);
+	}
 
 	//Quit SDL subsystems
 	SDL_Quit();

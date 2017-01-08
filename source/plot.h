@@ -1,6 +1,7 @@
 //functions for plotting points on an sdl surface
 
 #include <SDL/SDL.h>
+#include <stdio.h>
 
 #ifndef PLOT_H
 #define PLOT_H
@@ -44,7 +45,7 @@ int plot(
 		return 1;
 	}
 
-	((unsigned int*)screen->pixels)[x + y*screen->w] =
+	((unsigned int*)screen->pixels)[x + y * screen->w] =
 		color;
 
 	return 0;

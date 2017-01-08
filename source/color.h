@@ -32,6 +32,15 @@ struct rgbcolor inttocolor(unsigned int color)
 	return ret;
 }
 
+struct rgbcolor rgb(float r, float g, float b)
+{
+	struct rgbcolor ret;
+	ret.r = r;
+	ret.g = g;
+	ret.b = b;
+	return ret;
+}
+
 //returns the equivalent gray for any byte value 0-0xff
 struct rgbcolor graytocolor(byte gray)
 {

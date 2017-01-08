@@ -36,7 +36,7 @@ FILE *plotfile;
 //global distance estimator
 float de(vec3 pos)
 {
-	return distancejulia(pos, constq(-0.2F, 0.6F, 0.2F, 0.2F));
+	return distancejulia(pos, constq(-0.2F, 0.6F, 0.2F, 0.2F), 64);
 }
 
 char *getline(void)
@@ -88,14 +88,18 @@ int main(/*int argc, char* args[]*/)
 
 	initializelogfile();
 
-	float x, y, z;
+	//float x, y, z;
+	//int min, max;
 	while(1) {
-		x = getnumber("x = ");
-		y = getnumber("y = ");
-		z = getnumber("z = ");
-		printf("dist to julia set:\n\t%f\n",
-			de(const3(x, y, z))
-		);
+		//x = getnumber("x = ");
+		//y = getnumber("y = ");
+		//z = getnumber("z = ");
+		//printf("dist to julia set:\n\t%f\n",
+			//de(const3(x, y, z))
+		//);
+		//min = getnumber("min = ");
+		//max = getnumber("max = ");
+		printf("%d, ", random(-2, 2));
 	}
 
 	return 0;

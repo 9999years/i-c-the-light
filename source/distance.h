@@ -180,9 +180,8 @@ float distserpenski(vec3 pos)
 		//* pow(scale, -(float)n);
 }
 
-float distancejulia(vec3 pos, quaternion c)
+float distancejulia(vec3 pos, quaternion c, int iterations)
 {
-#define MAX_ITERATIONS 128
 	float distance;
 	int i;
 	//fprintf(logfile,
@@ -199,7 +198,7 @@ float distancejulia(vec3 pos, quaternion c)
 	quaternion qp = constq(1.0F, 0.0F, 0.0F, 0.0F);
 	quaternion tmp;
 	float last = -FLT_MAX;
-	for(i = 0; i < MAX_ITERATIONS; i++) {
+	for(i = 0; i < iterations; i++) {
 		//q' = 2*q*q'
 		tmp = multq(q, qp);
 		qp = multqs(tmp, 2.0F);
@@ -220,6 +219,7 @@ float distancejulia(vec3 pos, quaternion c)
 		//fprintf(logfile, "q':\n");
 		//dumpquaternion(qp);
 		//fprintf(logfile, "|q|: %f\n", last);
+
 		if(last > 16.0F)
 			break;
 	}
@@ -227,7 +227,7 @@ float distancejulia(vec3 pos, quaternion c)
 	//------------ = distance
 	//   2|q'|
 	float qmag = magnq(q);
-	distance = (qmag * log(dotq(q))) / (2.0F * magnq(qp));
+	distance = (qmag * log(qmag)) / (2.0F * magnq(qp));
 	//fprintf(logfile, "final distance:\n"
 		//"    %.2f\n", distance);
 	return distance;
