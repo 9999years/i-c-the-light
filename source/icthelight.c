@@ -1,10 +1,13 @@
-//repo here: https://github.com/9999years/i-c-the-light
+//repo: https://github.com/9999years/i-c-the-light
 //MIT/expat license
 //rebecca turner
 //consult ../readme.md
 
 //display
+//#include "fake_sdl.h"
+#ifndef FAKE_SDL_H
 #include <SDL/SDL.h>
+#endif
 #undef main
 //logging, file out
 #include <stdio.h>
@@ -27,8 +30,8 @@
 #include "logging.h"
 
 //Screen dimension constants
-#define SCREEN_WIDTH  2160
-#define SCREEN_HEIGHT 2160
+#define SCREEN_WIDTH  260
+#define SCREEN_HEIGHT 260
 
 //globals
 int frame = 0;
@@ -542,6 +545,11 @@ int main(int argc, char *argv[])
 		);
 	}
 
+	if(screen == NULL) {
+		printf("Render surface undefined, quitting!\n");
+		return -1;
+	}
+
 	if(window != NULL) {
 		SDL_FillRect(screen, NULL, 0x000000);
 		SDL_UpdateWindowSurface(window);
@@ -589,6 +597,10 @@ int main(int argc, char *argv[])
 
 	//Quit SDL subsystems
 	SDL_Quit();
+
+	if(screen != NULL) {
+		free(screen);
+	}
 
 	return 0;
 }

@@ -12,11 +12,12 @@ flags = [
 'c',
 '-IC:\c\include\SDL',
 '-LC:\c\lib64',
-'-lSDL2main -lSDL2',
 '-I',
 '.',
 '-I',
 'C:/C/x86_64-w64-mingw32/include',
+'-lmingw32',
+'-lSDL2main -lSDL2',
 ]
 
 compilation_database_folder = ''
