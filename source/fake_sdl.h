@@ -28,6 +28,10 @@
 
 #ifndef FAKE_SDL_H
 #define FAKE_SDL_H
+#ifdef USE_REAL_SDL
+#include <SDL/SDL.h>
+#undef main
+#else
 #ifndef SDL_QUIT
 
 typedef void *SDL_Window;
@@ -96,30 +100,15 @@ enum {
 	SDL_BYTEORDER,
 };
 
-int SDL_Quit()
-{
-	return 0;
-}
+int SDL_Quit();
 
-int SDL_UpdateWindowSurface()
-{
-	return 0;
-}
+int SDL_UpdateWindowSurface();
 
-int SDL_Init(int flags)
-{
-	return 0;
-}
+int SDL_Init(int flags);
 
-int SDL_DestroyWindow(SDL_Window *window)
-{
-	return 0;
-}
+int SDL_DestroyWindow(SDL_Window *window);
 
-char *SDL_GetError()
-{
-	return 0;
-}
+char *SDL_GetError();
 
 SDL_Surface *SDL_CreateRGBSurface(
 	unsigned int flags,
@@ -130,34 +119,7 @@ SDL_Surface *SDL_CreateRGBSurface(
 	unsigned int gmask,
 	unsigned int bmask,
 	unsigned int amask
-)
-{
-	SDL_Surface *surface;
-
-	(void)flags;
-
-	surface = (SDL_Surface *)calloc(1, sizeof(*surface));
-	if (surface == NULL) {
-		printf("Surface allocation failed! Out of memory.\n");
-		return NULL;
-	}
-
-	surface->format = 0;
-	surface->w = width;
-	surface->h = height;
-	surface->pitch = surface->w * sizeof(unsigned int);
-
-	if(surface->w && surface->h) {
-		surface->pixels = malloc(surface->h * surface->pitch);
-		if(surface->pixels == NULL) {
-			printf("Pixel allocation failed! Out of memory.\n");
-			return NULL;
-		}
-	}
-	surface->map = NULL;
-	surface->refcount = 1;
-	return surface;
-}
+);
 
 void *SDL_CreateWindow(
 	char *title,
@@ -166,77 +128,20 @@ void *SDL_CreateWindow(
 	unsigned int width,
 	unsigned int height,
 	unsigned int flags
-)
-{
-	printf("Fake SDL library used, window NOT being created\n");
-	unsigned int rmask, gmask, bmask, amask;
-#define SCREEN_BIT_DEPTH 32
-#if SDL_BYTEORDER == SDL_BIG_ENDIAN
-	rmask = 0xff000000;
-	gmask = 0x00ff0000;
-	bmask = 0x0000ff00;
-	amask = 0x000000ff;
-#else
-	rmask = 0x000000ff;
-	gmask = 0x0000ff00;
-	bmask = 0x00ff0000;
-	amask = 0xff000000;
-#endif
-	return SDL_CreateRGBSurface(
-		0,
-		width, height,
-		SCREEN_BIT_DEPTH,
-		rmask, gmask, bmask, amask
-	);
-}
+);
 
-void *SDL_GetWindowSurface(SDL_Window window)
-{
-	//it was a surface all along!
-	return (SDL_Surface *)window;
-}
+void *SDL_GetWindowSurface(SDL_Window window);
 
 int SDL_FillRect(
 	SDL_Surface *surface,
 	SDL_Rect *rect,
 	unsigned int color
-)
-{
-	//start x, y, end x, y, indicies
-	int sx, sy, ex, ey, i, j;
-	if(rect == NULL) {
-		sx = sy = 0;
-		ex = surface->w;
-		ey = surface->h;
-	}
-	for(i = sy; i < ey; i++) {
-	for(j = sx; j < ex; j++) {
-		((unsigned int *)surface->pixels)[j + i * surface->w] = color;
-	}
-	}
-	return 0;
-}
+);
 
-void SDL_Delay(unsigned int ms)
-{
-#ifdef Sleep
-	Sleep(ms);
-#elif defined(nanosleep)
-	int s = ms / 1000;
-	int ns = (ms % 1000) * 1000000;
-	struct timespec spec = {
-		tv_sec = (time_t)s;
-		tv_nsec = (long)ns;
-	};
-	nanosleep(spec, NULL);
-#endif
-	return;
-}
+void SDL_Delay(unsigned int ms);
 
-void *SDL_PollEvent(void *event)
-{
-	return NULL;
-}
+void *SDL_PollEvent(void *event);
 
-#endif
+#endif //SDL ALREADY INCLUDED
 #endif //FAKE_SDL_H
+#endif //REAL_SDL

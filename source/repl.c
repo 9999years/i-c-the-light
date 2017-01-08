@@ -3,35 +3,7 @@
 //rebecca turner
 //consult ../readme.md
 
-//logging, file out
-#include <stdio.h>
-#include <io.h>
-//rand
-#include <stdlib.h>
-//sin functions
-#include <math.h>
-//timestamp for file names
-#include <time.h>
-#include <string.h>
-
-//project files
-#include "common.h"
-//#include "color.h"
-//#include "ppm.h"
-//#include "line.h"
-#include "vector.h"
-#include "distance.h"
-#include "quaternion.h"
-#include "logging.h"
-
-//Screen dimension constants
-#define SCREEN_WIDTH 200
-#define SCREEN_HEIGHT 200
-
-//globals
-int frame = 0;
-FILE *logfile;
-FILE *plotfile;
+#include "repl.h"
 
 //global distance estimator
 float de(vec3 pos)

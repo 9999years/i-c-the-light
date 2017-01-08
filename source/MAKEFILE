@@ -6,7 +6,8 @@ SDL_LINKER_FLAGS = -lmingw32 -lSDL2main -lSDL2
 # ??
 NO_CONSOLE =# -mwindows
 
-icthelight: icthelight.c
+icthelight: main.c icthelight.c color.c common.c complex.c distance.c icthelight.c line.c logging.c plot.c ppm.c quaternion.c vector.c fake_sdl.c
+	ctags *.c *.h
 	$(CC) $? $(CFLAGS) $(SDL_LIBRARY) $(SDL_INCLUDE) $(SDL_LINKER_FLAGS) $(NO_CONSOLE) -o $@
 
 test: test.c
@@ -22,6 +23,7 @@ convert:
 clean:
 	del *.exe /q 2> nul
 	del TEST_PPM.ppm 2> nul
+	del tags 2> nul
 	del log\* /q 2> nul
 
 run:
