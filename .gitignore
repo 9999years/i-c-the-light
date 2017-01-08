@@ -3,8 +3,6 @@
 output/**
 !output/bounce.dir
 source/log/**
-ftpinfo.txt
-*.pyc
+source/tags
 **/SDL/*
 **/TEST_PPM.ppm
-source/null

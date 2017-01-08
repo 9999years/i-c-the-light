@@ -22,16 +22,14 @@
 * but honestly, except for SDL_CreateRGBSurface this file is entirely stub
 * functions, and even that is... minimal, at 22 lines.
 */
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
 
 #ifndef FAKE_SDL_H
 #define FAKE_SDL_H
-#ifdef USE_REAL_SDL
-#include <SDL/SDL.h>
-#undef main
-#else
+
 #ifndef SDL_QUIT
 
 typedef void *SDL_Window;
@@ -142,6 +140,7 @@ void SDL_Delay(unsigned int ms);
 
 void *SDL_PollEvent(void *event);
 
+#undef main
+
 #endif //SDL ALREADY INCLUDED
 #endif //FAKE_SDL_H
-#endif //REAL_SDL

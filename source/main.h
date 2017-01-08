@@ -3,12 +3,14 @@
 //rebecca turner
 //consult ../readme.md
 
-//render code
-#include "icthelight.h"
-#include "fake_sdl.h"
-
 #ifndef MAIN_H
 #define MAIN_H
+
+#define SCREEN_HEIGHT 250
+#define SCREEN_WIDTH  250
+
+//render code
+#include "icthelight.h"
 
 //globals
 FILE *plotfile;
@@ -17,5 +19,5 @@ void saveframe(SDL_Surface *screen);
 
 int handleevents(SDL_Surface *screen);
 
-int main(int argc, char *argv[]);
+//int main(int argc, char *argv[]);
 #endif //MAIN_H

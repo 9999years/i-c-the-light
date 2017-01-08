@@ -1,7 +1,8 @@
 //functions for plotting points on an sdl surface
 
-#include "fake_sdl.h"
 #include <stdio.h>
+
+#include "sdl.h"
 
 #ifndef PLOT_H
 #define PLOT_H

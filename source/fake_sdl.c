@@ -23,7 +23,9 @@
 * functions, and even that is... minimal, at 22 lines.
 */
 
-#include "fake_sdl.h"
+#include "sdl.h"
+
+#ifndef USE_REAL_SDL
 
 int SDL_Quit()
 {
@@ -85,6 +87,7 @@ SDL_Surface *SDL_CreateRGBSurface(
 	}
 	surface->map = NULL;
 	surface->refcount = 1;
+
 	return surface;
 }
 
@@ -97,7 +100,7 @@ void *SDL_CreateWindow(
 	unsigned int flags
 )
 {
-	printf("Fake SDL library used, window NOT being created\n");
+	printf("Fake SDL library used, creating virtual window.\n");
 	unsigned int rmask, gmask, bmask, amask;
 #define SCREEN_BIT_DEPTH 32
 #if SDL_BYTEORDER == SDL_BIG_ENDIAN
@@ -111,12 +114,14 @@ void *SDL_CreateWindow(
 	bmask = 0x00ff0000;
 	amask = 0xff000000;
 #endif
-	return SDL_CreateRGBSurface(
+	SDL_Surface *screen = SDL_CreateRGBSurface(
 		0,
 		width, height,
 		SCREEN_BIT_DEPTH,
 		rmask, gmask, bmask, amask
 	);
+
+	return (void *)screen;
 }
 
 void *SDL_GetWindowSurface(SDL_Window window)
@@ -166,3 +171,5 @@ void *SDL_PollEvent(void *event)
 {
 	return NULL;
 }
+
+#endif //USE_REAL_SDL

@@ -9,12 +9,12 @@ flags = [
 '-DNDEBUG',
 '-std=c99',
 '-xc',
-'-I.',
 '-LC:\c\lib64',
 '-IC:\c\include\SDL',
 '-IC:/C/x86_64-w64-mingw32/include',
 '-lmingw32',
 '-lSDL2main -lSDL2',
+'-I.',
 ]
 
 compilation_database_folder = ''

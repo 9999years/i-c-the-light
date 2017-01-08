@@ -4,7 +4,6 @@
 //consult ../readme.md
 
 //render code
-#define USE_REAL_SDL
 #include "main.h"
 
 void saveframe(SDL_Surface *screen)
@@ -105,16 +104,16 @@ int main(int argc, char *argv[])
 	);
 
 	printf(
-		"               , .\n"
-		"           \\.\\_____/./\n"
-		"         \\-.=^ -  '^=././\n"
-		"    ===\\-\\(/`  /#\\  *\\)/-/===\n"
-		"        <{.~  (#O#)   .}>\n"
-		"    ===/-/(\\  .\\#/  ~/)\\-\\===\n"
-		"        /-/*=-_____-=*\\^\\\n"
-		"           -/ /*~*\\^ \\\n"
-		"                  \\n"
-		"                                       \n"
+		"                  .V.\n"
+		"              \\.\\_____/./\n"
+		"            \\-.=^ -  '^=././\n"
+		"       ===\\-\\(/`  /#\\  *\\)/-/===\n"
+		" >=------  <{.~  (#O#)   .}>  ------=<\n"
+		"       ===/-/(\\  .\\#/  ~/)\\-\\===\n"
+		"           /-/*=-_____-=*\\^\\\n"
+		"              -/ /*~*\\^ \\\n"
+		"                   ^\n"
+		"                                        \n"
 		"╭─────────────────────────────────────╮\n"
 		"│ ·           ╷         ╷ ·     ╷     │\n"
 		"│ ╷   ╭─╮   ┼ ├─╮ ╭─╮   │ ╷ ╭─╮ ├─╮ ┼ │\n"
@@ -198,7 +197,6 @@ int main(int argc, char *argv[])
 		//poll for events, and handle the ones we care about.
 		//this returns 1 if we need to quit
 		quit = handleevents(screen);
-		quit = 1;
 
 		// render
 		//if(frame == 0) {
@@ -224,6 +222,8 @@ int main(int argc, char *argv[])
 		//}
 	} while(!quit);
 
+	printf("I feel free!\n");
+
 	//Destroy window
 	if(window != NULL) {
 		SDL_DestroyWindow(window);
@@ -235,6 +235,8 @@ int main(int argc, char *argv[])
 	if(screen != NULL) {
 		free(screen);
 	}
+
+	printf("Goodbye!\n");
 
 	return 0;
 }

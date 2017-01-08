@@ -115,7 +115,7 @@ void render(SDL_Surface *screen, const int lframe)
 #define MIN_DISTANCE 0.001F
 #define BOUNDING_RADIUS 100.0F
 
-	printf("initializing render scene, allocating\n");
+	printf("initializing render scene, allocating space\n");
 
 	const float timef = (float)(lframe * TAU) / FRAMES_IN_ROTATION;
 	unsigned long int timeint = time(NULL);
@@ -156,7 +156,7 @@ void render(SDL_Surface *screen, const int lframe)
 	//focal length of the camera
 	//longer = more zoomed in
 	float focallength = 20.0F;
-	//float focallength = frame * frame;
+	//float focallength = lframe * lframe;
 	//printf("f: %f\n", focallength);
 
 	//width of the camera (horiz. line at the center of the viewport)
@@ -324,7 +324,9 @@ void render(SDL_Surface *screen, const int lframe)
 
 	struct limits limit = getlimits(values, coordslen);
 
-	printf("done calculating limits\n");
+	printf("done calculating limits (min: %.3f, max: %.3f)\n",
+		limit.min, limit.max
+	);
 
 	for(i = 0; i < coordslen; i++) {
 		plot(

@@ -38,8 +38,8 @@ To compile with SDL, you’ll need a copy of SDL 2.0.4, which can be downloaded
 [here](https://www.libsdl.org/download-2.0.php). I don't expect this to change
 any time in the near future, so don't worry if this gets a bit out of date.
 
-To compile *without* SDL, uncomment `#include "fake_sdl.h"` in
-`source/icthelight.c` to add a set of stub functions that let I C the Light
+To compile *without* SDL, comment out `#define USE_REAL_SDL` in
+`source/sdl.h` to add a set of stub functions that let I C the Light
 compile without error (you will get a bunch of unused function parameter
 warnings, though). Obviously, a window won’t be created, but writing the images
 still works fine.
