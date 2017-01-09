@@ -8,38 +8,12 @@ typedef struct complex {
 	double b;
 } complex;
 
-double complexabs(complex in)
-{
-	return sqrt(in.a * in.a + in.b * in.b);
-}
+double complexabs(complex in);
 
-void complexmult(complex *out, complex a, complex b)
-{
-	(*out).a = a.a * b.a - a.b * b.b;
-	(*out).b = a.a * b.b + a.b * b.a;
-	return;
-}
+void complexmult(complex *out, complex a, complex b);
 
-void complexadd(complex *out, complex a, complex b)
-{
-	(*out).a = a.a + b.a;
-	(*out).b = a.b + b.b;
-	return;
-}
+void complexadd(complex *out, complex a, complex b);
 
-int mandlebrot(complex c, int i)
-{
-	complex tmp, z;
-	z = c;
-	while(i --> 0)
-	{
-		//square z & store in tmp, add c and store in z
-		complexmult(&tmp, z, z);
-		complexadd(&z, tmp, c);
-	}
-	float ret = complexabs(z);
-	if(!isfinite(ret))
-		ret = 0xff;
-	return ret >= 2.0F ? 0 : 1;
-}
+int mandlebrot(complex c, int i);
+
 #endif //COMPLEX_H

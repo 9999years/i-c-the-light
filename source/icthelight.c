@@ -1,212 +1,186 @@
-//I C the Light: a distance-estimating ray marcher
-//repo here: https://github.com/9999years/i-c-the-light
-//MIT/expat license
+//repo: https://github.com/9999years/i-c-the-light
 //rebecca turner
-//consult ../readme.md
-
-//display
-#include <SDL/SDL.h>
-//logging, file out
-#include <stdio.h>
-#include <io.h>
-//rand
-#include <stdlib.h>
-//sin functions
+#include "icthelight.h"
 #include <math.h>
-//timestamp for file names
-#include <time.h>
 
-//project files
-#include "color.h"
-#include "ppm.h"
-#include "line.h"
-#include "vector.h"
-#include "distance.h"
-
-//Screen dimension constants
-#define SCREEN_WIDTH 500
-#define SCREEN_HEIGHT 500
-
-void render(SDL_Surface *screen)
+//global distance estimator
+float de(vec2 pos, const int lframe, float r)
 {
-	int tick = SDL_GetTicks();
-	float time = (float)tick/200;
+	float timef = (float)((float)lframe * TAU) / FRAMES_IN_ROTATION;
+	vec2 a = const2(
+		50.0F + 100.0F * cos(timef),
+		50.0F + 100.0F * sin(timef)
+	);
+	timef += 0.5F;
+	vec2 b = const2(
+		300.0F + 150.0F * cos(timef),
+		300.0F + 150.0F * sin(timef)
+	);
+	return distline2(pos, a, b) - r;
+}
 
+//returns a normal
+//why does this work????
+vec2 getnormal(vec2 pos, float samplesize)
+{
+	printf("GETNORMAL IS NOT A THING\n");
+	return const2(0.0F, 0.0F);
+	//vec2 ret;
+	//vec2 xunit = {
+		//.x = samplesize,
+		//.y = 0.0F
+	//};
+	//vec2 yunit = {
+		//.x = 0.0F,
+		//.y = samplesize
+	//};
+	//ret.x = de(add2(pos, xunit), frame) - de(sub2(pos, xunit), frame);
+	//ret.y = de(add2(pos, yunit), frame) - de(sub2(pos, yunit), frame);
+	//return unit2(ret);
+}
+
+void render(SDL_Surface *screen, const int lframe)
+{
+	/* here's how im setting up the axes (right-handed)
+	 *      z
+	 *      |
+	 *      |
+	 *      |
+	 *      |
+	 *      |
+	 *      +----------- y
+	 *     /
+	 *    /
+	 *   /
+	 *  /
+	 * x
+	 */
+
+#define MAX_DISTANCE 10000.0F
+#define MIN_DISTANCE 1.0F
+#define BOUNDING_RADIUS 10000.0F
+
+	printf("initializing render scene, allocating space\n");
+
+	//const float timef = (float)(lframe * TAU) / FRAMES_IN_ROTATION;
+	//unsigned long int timeint = time(NULL);
+	//printf("time: %f for %lu\n", timef, timeint);
+	//SDL_FillRect(screen, NULL, 0xffffff);
 	SDL_FillRect(screen, NULL, 0x000000);
 
-	vec2 c, a;
-	//c.x = screen->w/2;
-	//c.y = screen->h/2;// + 150 * sin((float)tick/512);
-	c.x = 80  + 15 * cos(time);
-	c.y = 120 + 15 * sin(time);
-	time += 1;
-	a.x = 375 + 35 * cos(time);
-	a.y = 400 + 35 * sin(time);
+	//stores values to calculate colors
+	//i can set exposure by figuring out the minimum/maximum of this array
+	float *values = (float *)malloc(sizeof(float) * screen->w * screen->h);
+	//the coordinates of matching keys in `values`, for plotting
+	int *coords = (int *)malloc(sizeof(int) * screen->w * screen->h);
+	//the length of both of those arrays
+	int coordslen = 0;
 
-	int i, j, hits = 0;
-	const float threshold = 1.0F;
-	float dist;
-	vec2 point;
-	//O(scary) but actually fine
-	//no but seriously the deepest loop gets hit like 1.5 mil times
-	for(i = 0; i < screen->h; i++) {
-		for(j = 0; j < screen->w; j++) {
-			point.x = j;
-			point.y = i;
-			hits++;
-			//if it's far out, skip ahead a bit
-			dist = distline2(point, c, a);
-			if(dist > threshold) {
-				//plot(screen, j, i, 0xBB00BB);
-				j += floor(dist - threshold);
-				continue;
+	if(values == NULL) {
+		printf("no memory for values!\n");
+		return;
+	}
+
+	if(coords == NULL) {
+		printf("no memory for keys!\n");
+		return;
+	}
+
+	//ensure there's a minimum point for the exposure
+	values[coordslen] = 0;
+	coords[coordslen] = 0;
+	coordslen++;
+
+	//distance from measure_pos
+	float distance;
+	//total distance travelled, i hope i hope i hope
+	//float totaldistance;
+
+	//preview value
+	float predist;
+
+	//steps to march
+	const int steps = lframe;
+
+	printf("beginning render loop\n");
+
+	int x, y, k;
+	for(y = 0; y < screen->h; y++) {
+		//fprintf(logfile, "NEW RAY!\n");
+		//new sample, new distance
+		distance = 0.0F;
+		for(x = 0, k = 0; x < screen->w && k < steps; k++) {
+			predist = de(
+				const2(
+					(float)x,
+					(float)y
+				), 0,
+				20.0F
+			);
+
+			distance =
+				fmin(predist, MAX_DISTANCE);
+
+			//if((i % 10 == 0) && (j % 10 == 0))
+				//fprintf(plotfile, "%d\t%d\t%f\n",
+					//i, j, totaldistance);
+
+			//fprintf(logfile, "step %d, distance: %f\n",
+				//k, distance);
+
+			if(distance <= MIN_DISTANCE) {
+				//fprintf(logfile, "PLOT!\n");
+				//printf("d: %f\n", totaldistance);
+				//printf("k: %d\n", k);
+				//vec3 norm;
+				//norm = mult3s(getnormal(measure_pos, 0.2F), 255.0F);
+				coords[coordslen] =
+					x + y * screen->w;
+				values[coordslen] =
+					1.0F;
+				coordslen++;
+				x++;
+			} else {
+				coords[coordslen] =
+					x + y * screen->w;
+				values[coordslen] =
+					//(float)k;
+					0.5F;
+				coordslen++;
+				x += distance;
 			}
-			//for each pixel, multisample
-			//printf("(%d, %d): %d\n", j, i, hits);
-			//if(dist > 10)
-				//continue;
-			plot(
-				screen,
-				j, i,
-				0xFFFFFF
-				);
-			//nothing left to do if we’ve already hit the line
-			//if(hits == sampsqr)
-				//break;
 		}
 	}
-	printf("hits: %d\nspots: %d\nfrac: %f", hits, 250000, (float)hits/250000.0F);
-	return;
-}
 
-void saveframe(SDL_Surface *screen)
-{
-	char filename[256] = "output/UNINITIALIZED.ppm";
-	unsigned long int timeint = time(NULL);
-	sprintf(filename, "../output/image%lu.ppm", timeint);
-	if(
-		writeppm(
-			filename,
-			SCREEN_WIDTH,
-			SCREEN_HEIGHT,
-			screen->pixels
-			) != 0
-	) {
-		printf("image write error!\n");
-		return;
-	}
-	char shacmd[256];
-	sprintf(shacmd, "sha256sum %s", filename);
-	FILE *file = popen(shacmd, "r");
-	if(file == NULL) {
-		printf("failed to get image hash!\n");
-		return;
-	}
-	//the hash is 64 characters but we need a 0 at the end too
-	char sha[68];
+	printf("done calculating array\n");
+
+	struct limits limit = getlimits(values, coordslen);
+
+	printf("done calculating limits (min: %.3f, max: %.3f)\n",
+		limit.min, limit.max
+	);
+
 	int i;
-	char c;
-	for(i = 0; (i < 64) && (c != EOF) && (c != 0x20); i++) {
-		sha[i] = c = fgetc(file);
+	for(i = 0; i < coordslen; i++) {
+		plot(
+			screen,
+			coords[i] % screen->w,
+			coords[i] / screen->h,
+			colortoint(graytocolor(bclamp(
+				scale(values[i], limit.min, limit.max, 0, 255)
+				//+ random(-5, 5)
+			)))
+		);
 	}
-	sha[i++] = 0;
-	printf("sha: %s\n", sha);
-	pclose(file);
 
-	char hashfilename[256];
-	sprintf(hashfilename, "../output/hash/%s", sha);
+			//colortoint(graytocolor(bclamp(k * 6)))
+			//dot3(norm, light)
+			//255.0F * (float)k / (float)steps
+			//0.01F / (totaldistance + 0.00003F)
+			//blinnphong(camera, measure_pos, ray_rot, light)
+			//distance <= 2.0F ? 0xffffff : 0x000000
 
-	if(_access(hashfilename, 0) != -1) {
-		//file exists, delete img
-		if(unlink(filename) != 0) {
-			printf("image delete error!\n");
-		}
-	} else {
-		FILE *hashfile = fopen(hashfilename, "w");
-		if(hashfile == NULL)
-			printf("hash file write error!\nfilename: %s\n", hashfilename);
-		fclose(hashfile);
-	}
+	free(values);
+	free(coords);
 	return;
-}
-
-int handleevents(SDL_Surface *screen)
-{
-	SDL_Event event;
-	while((SDL_PollEvent(&event))) {
-		switch(event.type) {
-		case SDL_KEYUP:
-			// if escape is pressed, quit
-			if((event.key.keysym.sym == SDLK_ESCAPE) || (event.key.keysym.sym == SDLK_q)) {
-				return 1;
-			} else if(event.key.keysym.sym == SDLK_s) {
-				saveframe(screen);
-			}
-			break;
-
-		case SDL_QUIT:
-			return 1;
-		}
-	}
-	return 0;
-}
-
-int WinMain(/*int argc, char* args[]*/)
-{
-	printf("hello!\n");
-	//The window we'll be rendering to
-	SDL_Window* window = NULL;
-
-	//The surface contained by the window
-	SDL_Surface* screen = NULL;
-
-	//Initialize SDL
-	if(SDL_Init(SDL_INIT_VIDEO) < 0) {
-		printf("SDL could not initialize! SDL_Error: %s\n", SDL_GetError());
-	} else {
-		//Create window
-		window = SDL_CreateWindow("I C the Light", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN);
-		if(window == NULL) {
-			printf("Window could not be created! SDL_Error: %s\n", SDL_GetError());
-		} else {
-			//Get window surface
-			screen = SDL_GetWindowSurface(window);
-		}
-	}
-	int quit = 0;
-	int frame = 0;
-	clock_t start, end;
-	double total;
-	while (!quit) {
-		start = clock();
-		frame++;
-
-		//SDL_Delay(16);
-		// render
-		render(screen);
-
-
-		//Update the surface
-		SDL_UpdateWindowSurface(window);
-
-		// poll for events, and handle the ones we care about.
-		quit = handleevents(screen);
-
-		end = clock();
-		if(frame%30 == 0) {
-			if(frame == 0) {
-				saveframe(screen);
-			}
-			total = (double)(end - start) / CLOCKS_PER_SEC;
-			printf("%.4f FPS\n", 1 / total);
-		}
-	}
-
-	//Destroy window
-	SDL_DestroyWindow(window);
-
-	//Quit SDL subsystems
-	SDL_Quit();
-
-	return 0;
 }

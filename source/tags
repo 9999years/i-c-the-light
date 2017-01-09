@@ -1,0 +1,283 @@
+!_TAG_FILE_FORMAT	2	/extended format; --format=1 will not append ;" to lines/
+!_TAG_FILE_SORTED	1	/0=unsorted, 1=sorted, 2=foldcase/
+!_TAG_PROGRAM_AUTHOR	Universal Ctags Team	//
+!_TAG_PROGRAM_NAME	Universal Ctags	/Derived from Exuberant Ctags/
+!_TAG_PROGRAM_URL	https://ctags.io/	/official site/
+!_TAG_PROGRAM_VERSION	0.0.0	//
+ARRAYSIZE	test.h	/^#define ARRAYSIZE(/;"	d
+BOUNDING_RADIUS	icthelight.c	/^#define BOUNDING_RADIUS /;"	d	file:
+CHANNELS	color.h	/^#define CHANNELS /;"	d
+COLOR_BLACK	test.h	/^#define COLOR_BLACK /;"	d
+COLOR_BLUE	test.h	/^#define COLOR_BLUE /;"	d
+COLOR_H	color.h	/^#define COLOR_H$/;"	d
+COLOR_RED	test.h	/^#define COLOR_RED /;"	d
+COLOR_WHITE	test.h	/^#define COLOR_WHITE /;"	d
+COMMON_H	common.h	/^#define COMMON_H$/;"	d
+COMPLEX_H	complex.h	/^#define COMPLEX_H$/;"	d
+DISTANCE_H	distance.h	/^#define DISTANCE_H$/;"	d
+FAKE_SDL_H	fake_sdl.h	/^#define FAKE_SDL_H$/;"	d
+FRAMES_IN_ROTATION	icthelight.h	/^#define FRAMES_IN_ROTATION /;"	d
+HALF_PI	common.h	/^#define HALF_PI /;"	d
+ICTHELIGHT_H	icthelight.h	/^#define ICTHELIGHT_H$/;"	d
+LINE_H	line.h	/^#define LINE_H$/;"	d
+LOGGING_H	logging.h	/^#define LOGGING_H$/;"	d
+MAIN_H	main.h	/^#define MAIN_H$/;"	d
+MAX_DISTANCE	icthelight.c	/^#define MAX_DISTANCE /;"	d	file:
+MIN_DISTANCE	icthelight.c	/^#define MIN_DISTANCE /;"	d	file:
+PI	common.h	/^#define PI /;"	d
+PI_SQ	common.h	/^#define PI_SQ /;"	d
+PLOT_H	plot.h	/^#define PLOT_H$/;"	d
+PPM_FILE_OPEN_FAILURE	ppm.h	/^#define PPM_FILE_OPEN_FAILURE /;"	d
+PPM_H	ppm.h	/^#define PPM_H$/;"	d
+PPM_WRITE_ALL_BLACK	ppm.h	/^#define PPM_WRITE_ALL_BLACK /;"	d
+QUARTER_PI	common.h	/^#define QUARTER_PI /;"	d
+QUATERNION_H	quaternion.h	/^#define QUATERNION_H$/;"	d
+REPL_H	repl.h	/^#define REPL_H$/;"	d
+SCREEN_BIT_DEPTH	fake_sdl.c	/^#define SCREEN_BIT_DEPTH /;"	d	file:
+SCREEN_BIT_DEPTH	main.c	/^#define SCREEN_BIT_DEPTH /;"	d	file:
+SCREEN_HEIGHT	main.h	/^#define SCREEN_HEIGHT /;"	d
+SCREEN_WIDTH	main.h	/^#define SCREEN_WIDTH /;"	d
+SDLK_ESCAPE	fake_sdl.h	/^	SDLK_ESCAPE,$/;"	e	enum:__anonf93c33540103
+SDLK_a	fake_sdl.h	/^	SDLK_a, SDLK_b, SDLK_c, SDLK_d, SDLK_e, SDLK_f, SDLK_g, SDLK_h, SDLK_i,$/;"	e	enum:__anonf93c33540103
+SDLK_b	fake_sdl.h	/^	SDLK_a, SDLK_b, SDLK_c, SDLK_d, SDLK_e, SDLK_f, SDLK_g, SDLK_h, SDLK_i,$/;"	e	enum:__anonf93c33540103
+SDLK_c	fake_sdl.h	/^	SDLK_a, SDLK_b, SDLK_c, SDLK_d, SDLK_e, SDLK_f, SDLK_g, SDLK_h, SDLK_i,$/;"	e	enum:__anonf93c33540103
+SDLK_d	fake_sdl.h	/^	SDLK_a, SDLK_b, SDLK_c, SDLK_d, SDLK_e, SDLK_f, SDLK_g, SDLK_h, SDLK_i,$/;"	e	enum:__anonf93c33540103
+SDLK_e	fake_sdl.h	/^	SDLK_a, SDLK_b, SDLK_c, SDLK_d, SDLK_e, SDLK_f, SDLK_g, SDLK_h, SDLK_i,$/;"	e	enum:__anonf93c33540103
+SDLK_f	fake_sdl.h	/^	SDLK_a, SDLK_b, SDLK_c, SDLK_d, SDLK_e, SDLK_f, SDLK_g, SDLK_h, SDLK_i,$/;"	e	enum:__anonf93c33540103
+SDLK_g	fake_sdl.h	/^	SDLK_a, SDLK_b, SDLK_c, SDLK_d, SDLK_e, SDLK_f, SDLK_g, SDLK_h, SDLK_i,$/;"	e	enum:__anonf93c33540103
+SDLK_h	fake_sdl.h	/^	SDLK_a, SDLK_b, SDLK_c, SDLK_d, SDLK_e, SDLK_f, SDLK_g, SDLK_h, SDLK_i,$/;"	e	enum:__anonf93c33540103
+SDLK_i	fake_sdl.h	/^	SDLK_a, SDLK_b, SDLK_c, SDLK_d, SDLK_e, SDLK_f, SDLK_g, SDLK_h, SDLK_i,$/;"	e	enum:__anonf93c33540103
+SDLK_j	fake_sdl.h	/^	SDLK_j, SDLK_k, SDLK_l, SDLK_m, SDLK_n, SDLK_o, SDLK_p, SDLK_q, SDLK_r,$/;"	e	enum:__anonf93c33540103
+SDLK_k	fake_sdl.h	/^	SDLK_j, SDLK_k, SDLK_l, SDLK_m, SDLK_n, SDLK_o, SDLK_p, SDLK_q, SDLK_r,$/;"	e	enum:__anonf93c33540103
+SDLK_l	fake_sdl.h	/^	SDLK_j, SDLK_k, SDLK_l, SDLK_m, SDLK_n, SDLK_o, SDLK_p, SDLK_q, SDLK_r,$/;"	e	enum:__anonf93c33540103
+SDLK_m	fake_sdl.h	/^	SDLK_j, SDLK_k, SDLK_l, SDLK_m, SDLK_n, SDLK_o, SDLK_p, SDLK_q, SDLK_r,$/;"	e	enum:__anonf93c33540103
+SDLK_n	fake_sdl.h	/^	SDLK_j, SDLK_k, SDLK_l, SDLK_m, SDLK_n, SDLK_o, SDLK_p, SDLK_q, SDLK_r,$/;"	e	enum:__anonf93c33540103
+SDLK_o	fake_sdl.h	/^	SDLK_j, SDLK_k, SDLK_l, SDLK_m, SDLK_n, SDLK_o, SDLK_p, SDLK_q, SDLK_r,$/;"	e	enum:__anonf93c33540103
+SDLK_p	fake_sdl.h	/^	SDLK_j, SDLK_k, SDLK_l, SDLK_m, SDLK_n, SDLK_o, SDLK_p, SDLK_q, SDLK_r,$/;"	e	enum:__anonf93c33540103
+SDLK_q	fake_sdl.h	/^	SDLK_j, SDLK_k, SDLK_l, SDLK_m, SDLK_n, SDLK_o, SDLK_p, SDLK_q, SDLK_r,$/;"	e	enum:__anonf93c33540103
+SDLK_r	fake_sdl.h	/^	SDLK_j, SDLK_k, SDLK_l, SDLK_m, SDLK_n, SDLK_o, SDLK_p, SDLK_q, SDLK_r,$/;"	e	enum:__anonf93c33540103
+SDLK_s	fake_sdl.h	/^	SDLK_s, SDLK_t, SDLK_u, SDLK_v, SDLK_w, SDLK_x, SDLK_y, SDLK_z,$/;"	e	enum:__anonf93c33540103
+SDLK_t	fake_sdl.h	/^	SDLK_s, SDLK_t, SDLK_u, SDLK_v, SDLK_w, SDLK_x, SDLK_y, SDLK_z,$/;"	e	enum:__anonf93c33540103
+SDLK_u	fake_sdl.h	/^	SDLK_s, SDLK_t, SDLK_u, SDLK_v, SDLK_w, SDLK_x, SDLK_y, SDLK_z,$/;"	e	enum:__anonf93c33540103
+SDLK_v	fake_sdl.h	/^	SDLK_s, SDLK_t, SDLK_u, SDLK_v, SDLK_w, SDLK_x, SDLK_y, SDLK_z,$/;"	e	enum:__anonf93c33540103
+SDLK_w	fake_sdl.h	/^	SDLK_s, SDLK_t, SDLK_u, SDLK_v, SDLK_w, SDLK_x, SDLK_y, SDLK_z,$/;"	e	enum:__anonf93c33540103
+SDLK_x	fake_sdl.h	/^	SDLK_s, SDLK_t, SDLK_u, SDLK_v, SDLK_w, SDLK_x, SDLK_y, SDLK_z,$/;"	e	enum:__anonf93c33540103
+SDLK_y	fake_sdl.h	/^	SDLK_s, SDLK_t, SDLK_u, SDLK_v, SDLK_w, SDLK_x, SDLK_y, SDLK_z,$/;"	e	enum:__anonf93c33540103
+SDLK_z	fake_sdl.h	/^	SDLK_s, SDLK_t, SDLK_u, SDLK_v, SDLK_w, SDLK_x, SDLK_y, SDLK_z,$/;"	e	enum:__anonf93c33540103
+SDL_BIG_EDIAN	fake_sdl.h	/^	SDL_BIG_EDIAN,$/;"	e	enum:__anonf93c33540103
+SDL_BYTEORDER	fake_sdl.h	/^	SDL_BYTEORDER,$/;"	e	enum:__anonf93c33540103
+SDL_CreateRGBSurface	fake_sdl.c	/^SDL_Surface *SDL_CreateRGBSurface($/;"	f	typeref:typename:SDL_Surface *
+SDL_CreateWindow	fake_sdl.c	/^void *SDL_CreateWindow($/;"	f	typeref:typename:void *
+SDL_Delay	fake_sdl.c	/^void SDL_Delay(unsigned int ms)$/;"	f	typeref:typename:void
+SDL_DestroyWindow	fake_sdl.c	/^int SDL_DestroyWindow(SDL_Window *window)$/;"	f	typeref:typename:int
+SDL_Event	fake_sdl.h	/^typedef union SDL_Event$/;"	u
+SDL_Event	fake_sdl.h	/^} SDL_Event;$/;"	t	typeref:union:SDL_Event
+SDL_FillRect	fake_sdl.c	/^int SDL_FillRect($/;"	f	typeref:typename:int
+SDL_GetError	fake_sdl.c	/^char *SDL_GetError()$/;"	f	typeref:typename:char *
+SDL_GetWindowSurface	fake_sdl.c	/^void *SDL_GetWindowSurface(SDL_Window window)$/;"	f	typeref:typename:void *
+SDL_INIT_VIDEO	fake_sdl.h	/^	SDL_INIT_VIDEO,$/;"	e	enum:__anonf93c33540103
+SDL_Init	fake_sdl.c	/^int SDL_Init(int flags)$/;"	f	typeref:typename:int
+SDL_KEYDOWN	fake_sdl.h	/^	SDL_KEYDOWN,$/;"	e	enum:__anonf93c33540103
+SDL_KeyboardEvent	fake_sdl.h	/^typedef struct SDL_KeyboardEvent {$/;"	s
+SDL_KeyboardEvent	fake_sdl.h	/^} SDL_KeyboardEvent;$/;"	t	typeref:struct:SDL_KeyboardEvent
+SDL_Keysym	fake_sdl.h	/^typedef struct SDL_Keysym {$/;"	s
+SDL_Keysym	fake_sdl.h	/^} SDL_Keysym;$/;"	t	typeref:struct:SDL_Keysym
+SDL_PollEvent	fake_sdl.c	/^void *SDL_PollEvent(void *event)$/;"	f	typeref:typename:void *
+SDL_QUIT	fake_sdl.h	/^	SDL_QUIT,$/;"	e	enum:__anonf93c33540103
+SDL_Quit	fake_sdl.c	/^int SDL_Quit()$/;"	f	typeref:typename:int
+SDL_Rect	fake_sdl.h	/^typedef struct SDL_Rect {$/;"	s
+SDL_Rect	fake_sdl.h	/^} SDL_Rect;$/;"	t	typeref:struct:SDL_Rect
+SDL_Surface	fake_sdl.h	/^typedef struct SDL_Surface {$/;"	s
+SDL_Surface	fake_sdl.h	/^} SDL_Surface;$/;"	t	typeref:struct:SDL_Surface
+SDL_UpdateWindowSurface	fake_sdl.c	/^int SDL_UpdateWindowSurface()$/;"	f	typeref:typename:int
+SDL_WINDOWPOS_UNDEFINED	fake_sdl.h	/^	SDL_WINDOWPOS_UNDEFINED,$/;"	e	enum:__anonf93c33540103
+SDL_WINDOW_SHOWN	fake_sdl.h	/^	SDL_WINDOW_SHOWN,$/;"	e	enum:__anonf93c33540103
+SDL_Window	fake_sdl.h	/^typedef void *SDL_Window;$/;"	t	typeref:typename:void *
+TAU	common.h	/^#define TAU /;"	d
+TESTING	test.h	/^#define TESTING(/;"	d
+TEST_H	test.h	/^#define TEST_H$/;"	d
+USE_REAL_SDL	sdl.h	/^#define USE_REAL_SDL$/;"	d
+VECTOR_H	vector.h	/^#define VECTOR_H$/;"	d
+WinMain	test.c	/^int WinMain(\/*int argc, char *argv[]*\/)$/;"	f	typeref:typename:int
+__anonf93c33540103	fake_sdl.h	/^enum {$/;"	g
+a	complex.h	/^	double a;$/;"	m	struct:complex	typeref:typename:double
+a	quaternion.h	/^	float a;$/;"	m	struct:quaternion	typeref:typename:float
+absvec2	vector.c	/^vec2 absvec2(vec2 a)$/;"	f	typeref:typename:vec2
+absvec3	vector.c	/^vec3 absvec3(vec3 a)$/;"	f	typeref:typename:vec3
+add2	vector.c	/^vec2 add2(vec2 a, vec2 b)$/;"	f	typeref:typename:vec2
+add3	vector.c	/^vec3 add3(vec3 a, vec3 b)$/;"	f	typeref:typename:vec3
+add3s	vector.c	/^vec3 add3s(vec3 a, float b)$/;"	f	typeref:typename:vec3
+addcolor	color.c	/^struct rgbcolor addcolor(struct rgbcolor a, struct rgbcolor b)$/;"	f	typeref:struct:rgbcolor
+addq	quaternion.c	/^quaternion addq(quaternion one, quaternion two)$/;"	f	typeref:typename:quaternion
+avg2	vector.c	/^vec2 avg2(vec2 a, vec2 b)$/;"	f	typeref:typename:vec2
+avg3	vector.c	/^vec3 avg3(vec3 a, vec3 b)$/;"	f	typeref:typename:vec3
+avgcolor	color.c	/^struct rgbcolor avgcolor(struct rgbcolor a, struct rgbcolor b)$/;"	f	typeref:struct:rgbcolor
+b	color.h	/^	byte b;$/;"	m	struct:rgbcolor	typeref:typename:byte
+b	complex.h	/^	double b;$/;"	m	struct:complex	typeref:typename:double
+b	quaternion.h	/^	float b;$/;"	m	struct:quaternion	typeref:typename:float
+bclamp	color.c	/^byte bclamp(float value)$/;"	f	typeref:typename:byte
+byte	color.h	/^typedef unsigned char byte;$/;"	t	typeref:typename:unsigned char
+c	quaternion.h	/^	float c;$/;"	m	struct:quaternion	typeref:typename:float
+clip_rect	fake_sdl.h	/^	SDL_Rect clip_rect;$/;"	m	struct:SDL_Surface	typeref:typename:SDL_Rect
+colortoint	color.c	/^unsigned int colortoint(struct rgbcolor color)$/;"	f	typeref:typename:unsigned int
+complex	complex.h	/^typedef struct complex {$/;"	s
+complex	complex.h	/^} complex;$/;"	t	typeref:struct:complex
+complexabs	complex.c	/^double complexabs(complex in)$/;"	f	typeref:typename:double
+complexadd	complex.c	/^void complexadd(complex *out, complex a, complex b)$/;"	f	typeref:typename:void
+complexmult	complex.c	/^void complexmult(complex *out, complex a, complex b)$/;"	f	typeref:typename:void
+conjugateq	quaternion.c	/^quaternion conjugateq(quaternion in)$/;"	f	typeref:typename:quaternion
+const2	vector.c	/^vec2 const2(float x, float y)$/;"	f	typeref:typename:vec2
+const3	vector.c	/^vec3 const3(float x, float y, float z)$/;"	f	typeref:typename:vec3
+constq	quaternion.c	/^quaternion constq(float r, float a, float b, float c)$/;"	f	typeref:typename:quaternion
+de	icthelight.c	/^float de(vec2 pos, const int lframe, float r)$/;"	f	typeref:typename:float
+de	repl.c	/^float de(vec3 pos)$/;"	f	typeref:typename:float
+dist2	vector.c	/^float dist2(vec2 a, vec2 b)$/;"	f	typeref:typename:float
+dist3	vector.c	/^float dist3(vec3 a, vec3 b)$/;"	f	typeref:typename:float
+distancejulia	distance.c	/^float distancejulia(vec3 pos, quaternion c, int iterations)$/;"	f	typeref:typename:float
+distbox	distance.c	/^float distbox(vec3 p, vec3 b)$/;"	f	typeref:typename:float
+distcircle	distance.c	/^float distcircle(vec2 p, vec2 c, float r)$/;"	f	typeref:typename:float
+distground	distance.c	/^float distground(vec3 p)$/;"	f	typeref:typename:float
+distline2	distance.c	/^float distline2(vec2 p, vec2 a, vec2 b)$/;"	f	typeref:typename:float
+distmandlebulb	distance.c	/^float distmandlebulb(vec3 pos, int iterations)$/;"	f	typeref:typename:float
+distserpenski	distance.c	/^float distserpenski(vec3 pos)$/;"	f	typeref:typename:float
+distsphere	distance.c	/^float distsphere(vec3 p, vec3 c, float r)$/;"	f	typeref:typename:float
+distsqr2	vector.c	/^float distsqr2(vec2 a, vec2 b)$/;"	f	typeref:typename:float
+distsqr3	vector.c	/^float distsqr3(vec3 a, vec3 b)$/;"	f	typeref:typename:float
+disttorus	distance.c	/^float disttorus(vec3 p, vec3 c, float thickness, float radius)$/;"	f	typeref:typename:float
+div2	vector.c	/^vec2 div2(vec2 a, vec2 b)$/;"	f	typeref:typename:vec2
+div2s	vector.c	/^vec2 div2s(vec2 a, float s)$/;"	f	typeref:typename:vec2
+div3	vector.c	/^vec3 div3(vec3 a, vec3 b)$/;"	f	typeref:typename:vec3
+div3s	vector.c	/^vec3 div3s(vec3 a, float s)$/;"	f	typeref:typename:vec3
+dot2	vector.c	/^float dot2(vec2 a, vec2 b)$/;"	f	typeref:typename:float
+dot3	vector.c	/^float dot3(vec3 a, vec3 b)$/;"	f	typeref:typename:float
+dotq	quaternion.c	/^float dotq(quaternion in)$/;"	f	typeref:typename:float
+drawline	line.c	/^int drawline($/;"	f	typeref:typename:int
+dump3	vector.c	/^void dump3(vec3 a)$/;"	f	typeref:typename:void
+dumpquaternion	quaternion.c	/^void dumpquaternion(quaternion in)$/;"	f	typeref:typename:void
+fakesin	common.c	/^float fakesin(float x)$/;"	f	typeref:typename:float
+fclamp	common.c	/^float fclamp(float val, float fmin, float fmax)$/;"	f	typeref:typename:float
+flags	fake_sdl.h	/^	unsigned int flags;$/;"	m	struct:SDL_Surface	typeref:typename:unsigned int
+format	fake_sdl.h	/^	unsigned int format;$/;"	m	struct:SDL_Surface	typeref:typename:unsigned int
+frame	icthelight.h	/^int frame;$/;"	v	typeref:typename:int
+frame	repl.h	/^int frame = 0;$/;"	v	typeref:typename:int
+fromdirection2	vector.c	/^vec2 fromdirection2(float xy, float magn)$/;"	f	typeref:typename:vec2
+fromdirection3	vector.c	/^vec3 fromdirection3(float xy, float yz, float magn)$/;"	f	typeref:typename:vec3
+g	color.h	/^	byte g;$/;"	m	struct:rgbcolor	typeref:typename:byte
+getlimits	common.c	/^struct limits getlimits(float *values, int length)$/;"	f	typeref:struct:limits
+getline	repl.c	/^char *getline(void)$/;"	f	typeref:typename:char *
+getnormal	icthelight.c	/^vec2 getnormal(vec2 pos, float samplesize)$/;"	f	typeref:typename:vec2
+getnumber	repl.c	/^double getnumber(char *message)$/;"	f	typeref:typename:double
+getpixel	plot.c	/^unsigned int getpixel($/;"	f	typeref:typename:unsigned int
+graytocolor	color.c	/^struct rgbcolor graytocolor(byte gray)$/;"	f	typeref:struct:rgbcolor
+h	fake_sdl.h	/^	int h;$/;"	m	struct:SDL_Rect	typeref:typename:int
+h	fake_sdl.h	/^	int w, h;$/;"	m	struct:SDL_Surface	typeref:typename:int
+handleevents	main.c	/^int handleevents(SDL_Surface *screen)$/;"	f	typeref:typename:int
+initializelogfile	logging.c	/^int initializelogfile()$/;"	f	typeref:typename:int
+inttocolor	color.c	/^struct rgbcolor inttocolor(unsigned int color)$/;"	f	typeref:struct:rgbcolor
+inv2	vector.c	/^vec2 inv2(vec2 in)$/;"	f	typeref:typename:vec2
+inv3	vector.c	/^vec3 inv3(vec3 in)$/;"	f	typeref:typename:vec3
+invq	quaternion.c	/^quaternion invq(quaternion in)$/;"	f	typeref:typename:quaternion
+key	fake_sdl.h	/^    SDL_KeyboardEvent key;$/;"	m	union:SDL_Event	typeref:typename:SDL_KeyboardEvent
+keysym	fake_sdl.h	/^	SDL_Keysym keysym;$/;"	m	struct:SDL_KeyboardEvent	typeref:typename:SDL_Keysym
+lerp	common.c	/^float lerp(float a, float b, float b_interp)$/;"	f	typeref:typename:float
+lerpcolor	color.c	/^struct rgbcolor lerpcolor(struct rgbcolor a, struct rgbcolor b, float b_interp)$/;"	f	typeref:struct:rgbcolor
+limits	common.h	/^struct limits {$/;"	s
+limits	common.h	/^} limits;$/;"	v	typeref:struct:limits
+lock_data	fake_sdl.h	/^	void *lock_data;$/;"	m	struct:SDL_Surface	typeref:typename:void *
+locked	fake_sdl.h	/^	int locked;$/;"	m	struct:SDL_Surface	typeref:typename:int
+logfile	distance.h	/^FILE *logfile;$/;"	v	typeref:typename:FILE *
+logfile	logging.h	/^FILE *logfile;$/;"	v	typeref:typename:FILE *
+magn2	vector.c	/^float magn2(vec2 a)$/;"	f	typeref:typename:float
+magn3	vector.c	/^float magn3(vec3 a)$/;"	f	typeref:typename:float
+magnq	quaternion.c	/^float magnq(quaternion in)$/;"	f	typeref:typename:float
+main	main.c	/^int main(int argc, char *argv[])$/;"	f	typeref:typename:int
+main	repl.c	/^int main(\/*int argc, char* args[]*\/)$/;"	f	typeref:typename:int
+mandlebrot	complex.c	/^int mandlebrot(complex c, int i)$/;"	f	typeref:typename:int
+map	fake_sdl.h	/^	void *map;$/;"	m	struct:SDL_Surface	typeref:typename:void *
+max	common.c	/^float max(float a, float b)$/;"	f	typeref:typename:float
+max	common.h	/^	float max;$/;"	m	struct:limits	typeref:typename:float
+maxvec2	vector.c	/^vec2 maxvec2(vec2 a, vec2 b)$/;"	f	typeref:typename:vec2
+maxvec2s	vector.c	/^vec2 maxvec2s(vec2 a, float b)$/;"	f	typeref:typename:vec2
+maxvec3	vector.c	/^vec3 maxvec3(vec3 a, vec3 b)$/;"	f	typeref:typename:vec3
+maxvec3s	vector.c	/^vec3 maxvec3s(vec3 a, float b)$/;"	f	typeref:typename:vec3
+min	common.c	/^float min(float a, float b)$/;"	f	typeref:typename:float
+min	common.h	/^	float min;$/;"	m	struct:limits	typeref:typename:float
+minvec2	vector.c	/^vec2 minvec2(vec2 a, vec2 b)$/;"	f	typeref:typename:vec2
+minvec2s	vector.c	/^vec2 minvec2s(vec2 a, float b)$/;"	f	typeref:typename:vec2
+minvec3	vector.c	/^vec3 minvec3(vec3 a, vec3 b)$/;"	f	typeref:typename:vec3
+minvec3s	vector.c	/^vec3 minvec3s(vec3 a, float b)$/;"	f	typeref:typename:vec3
+mod	fake_sdl.h	/^	unsigned int mod;$/;"	m	struct:SDL_Keysym	typeref:typename:unsigned int
+mult2	vector.c	/^vec2 mult2(vec2 a, vec2 b)$/;"	f	typeref:typename:vec2
+mult2s	vector.c	/^vec2 mult2s(vec2 a, float s)$/;"	f	typeref:typename:vec2
+mult3	vector.c	/^vec3 mult3(vec3 a, vec3 b)$/;"	f	typeref:typename:vec3
+mult3s	vector.c	/^vec3 mult3s(vec3 a, float s)$/;"	f	typeref:typename:vec3
+multq	quaternion.c	/^quaternion multq(quaternion one, quaternion two)$/;"	f	typeref:typename:quaternion
+multqs	quaternion.c	/^quaternion multqs(quaternion one, float two)$/;"	f	typeref:typename:quaternion
+opi	distance.c	/^float opi(float a, float b)$/;"	f	typeref:typename:float
+oprepeat3	distance.c	/^float oprepeat3(\/*vec3 point, vec3 period*\/)$/;"	f	typeref:typename:float
+ops	distance.c	/^float ops(float a, float b)$/;"	f	typeref:typename:float
+opu	distance.c	/^float opu(float a, float b)$/;"	f	typeref:typename:float
+opwobble2	distance.c	/^float opwobble2(vec2 point, float orig, float freq, float amp)$/;"	f	typeref:typename:float
+opwobble3	distance.c	/^float opwobble3(vec3 point, float orig, float freq, float amp)$/;"	f	typeref:typename:float
+padding	fake_sdl.h	/^    unsigned int padding[56];$/;"	m	union:SDL_Event	typeref:typename:unsigned int[56]
+padding2	fake_sdl.h	/^	unsigned int padding2;$/;"	m	struct:SDL_KeyboardEvent	typeref:typename:unsigned int
+padding3	fake_sdl.h	/^	unsigned int padding3;$/;"	m	struct:SDL_KeyboardEvent	typeref:typename:unsigned int
+perp2	vector.c	/^vec2 perp2(vec2 in)$/;"	f	typeref:typename:vec2
+perp3	vector.c	/^vec3 perp3(vec3 a, vec3 b)$/;"	f	typeref:typename:vec3
+pitch	fake_sdl.h	/^	int pitch;$/;"	m	struct:SDL_Surface	typeref:typename:int
+pixels	fake_sdl.h	/^	void *pixels;$/;"	m	struct:SDL_Surface	typeref:typename:void *
+plot	plot.c	/^int plot($/;"	f	typeref:typename:int
+plotfile	logging.h	/^FILE *plotfile;$/;"	v	typeref:typename:FILE *
+plotfile	main.h	/^FILE *plotfile;$/;"	v	typeref:typename:FILE *
+powq	quaternion.c	/^quaternion powq(quaternion in, int power)$/;"	f	typeref:typename:quaternion
+printscreen	test.c	/^void printscreen(SDL_Surface *screen, unsigned int exclude)$/;"	f	typeref:typename:void
+quaternion	quaternion.h	/^struct quaternion$/;"	s
+quaternion	quaternion.h	/^typedef struct quaternion quaternion;$/;"	t	typeref:struct:quaternion
+r	color.h	/^	byte r;$/;"	m	struct:rgbcolor	typeref:typename:byte
+r	quaternion.h	/^	float r;$/;"	m	struct:quaternion	typeref:typename:float
+randf	common.c	/^float randf(float min, float max) {$/;"	f	typeref:typename:float
+random	common.c	/^int random(int min, int max) {$/;"	f	typeref:typename:int
+refcount	fake_sdl.h	/^	int refcount;$/;"	m	struct:SDL_Surface	typeref:typename:int
+render	icthelight.c	/^void render(SDL_Surface *screen, const int lframe)$/;"	f	typeref:typename:void
+repeat	fake_sdl.h	/^	unsigned int repeat;$/;"	m	struct:SDL_KeyboardEvent	typeref:typename:unsigned int
+rgb	color.c	/^struct rgbcolor rgb(float r, float g, float b)$/;"	f	typeref:struct:rgbcolor
+rgbcolor	color.h	/^struct rgbcolor {$/;"	s
+rgbcolor	color.h	/^} rgbcolor;$/;"	v	typeref:struct:rgbcolor
+saveframe	main.c	/^void saveframe(SDL_Surface *screen)$/;"	f	typeref:typename:void
+scale	common.c	/^float scale(float val, float valmin, float valmax, float min, float max)$/;"	f	typeref:typename:float
+scancode	fake_sdl.h	/^	int scancode;$/;"	m	struct:SDL_Keysym	typeref:typename:int
+sdltests	test.c	/^void sdltests(SDL_Surface *screen, SDL_Window *window, int width, int height)$/;"	f	typeref:typename:void
+searchargs	common.c	/^int searchargs(int argc, char *argv[], char *find)$/;"	f	typeref:typename:int
+shifthue	color.c	/^struct rgbcolor shifthue(struct rgbcolor in, const float fHue)$/;"	f	typeref:struct:rgbcolor
+sqrq	quaternion.c	/^quaternion sqrq(quaternion in)$/;"	f	typeref:typename:quaternion
+state	fake_sdl.h	/^	unsigned int state;$/;"	m	struct:SDL_KeyboardEvent	typeref:typename:unsigned int
+sub2	vector.c	/^vec2 sub2(vec2 a, vec2 b)$/;"	f	typeref:typename:vec2
+sub3	vector.c	/^vec3 sub3(vec3 a, vec3 b)$/;"	f	typeref:typename:vec3
+sub3s	vector.c	/^vec3 sub3s(vec3 a, float b)$/;"	f	typeref:typename:vec3
+subq	quaternion.c	/^quaternion subq(quaternion one, quaternion two)$/;"	f	typeref:typename:quaternion
+sym	fake_sdl.h	/^	int sym;$/;"	m	struct:SDL_Keysym	typeref:typename:int
+testsection	test.c	/^void testsection(char name[])$/;"	f	typeref:typename:void
+through2	vector.c	/^vec2 through2(vec2 a, vec2 b)$/;"	f	typeref:typename:vec2
+through3	vector.c	/^vec3 through3(vec3 a, vec3 b)$/;"	f	typeref:typename:vec3
+timestamp	fake_sdl.h	/^	unsigned int timestamp;$/;"	m	struct:SDL_KeyboardEvent	typeref:typename:unsigned int
+type	fake_sdl.h	/^	unsigned int type;$/;"	m	struct:SDL_KeyboardEvent	typeref:typename:unsigned int
+type	fake_sdl.h	/^    unsigned int type;$/;"	m	union:SDL_Event	typeref:typename:unsigned int
+unit2	vector.c	/^vec2 unit2(vec2 a)$/;"	f	typeref:typename:vec2
+unit3	vector.c	/^vec3 unit3(vec3 a)$/;"	f	typeref:typename:vec3
+userdata	fake_sdl.h	/^	void *userdata;$/;"	m	struct:SDL_Surface	typeref:typename:void *
+vec2	vector.h	/^struct vec2$/;"	s
+vec2	vector.h	/^typedef struct vec2 vec2;$/;"	t	typeref:struct:vec2
+vec3	vector.h	/^struct vec3$/;"	s
+vec3	vector.h	/^typedef struct vec3 vec3;$/;"	t	typeref:struct:vec3
+vec4	vector.h	/^typedef struct vec4 vec4;$/;"	t	typeref:struct:vec4
+w	fake_sdl.h	/^	int w, h;$/;"	m	struct:SDL_Surface	typeref:typename:int
+w	fake_sdl.h	/^	int w;$/;"	m	struct:SDL_Rect	typeref:typename:int
+windowID	fake_sdl.h	/^	unsigned int windowID;$/;"	m	struct:SDL_KeyboardEvent	typeref:typename:unsigned int
+writeppm	ppm.c	/^int writeppm($/;"	f	typeref:typename:int
+x	fake_sdl.h	/^	int x;$/;"	m	struct:SDL_Rect	typeref:typename:int
+x	vector.h	/^	float x;$/;"	m	struct:vec2	typeref:typename:float
+x	vector.h	/^	float x;$/;"	m	struct:vec3	typeref:typename:float
+y	fake_sdl.h	/^	int y;$/;"	m	struct:SDL_Rect	typeref:typename:int
+y	vector.h	/^	float y;$/;"	m	struct:vec2	typeref:typename:float
+y	vector.h	/^	float y;$/;"	m	struct:vec3	typeref:typename:float
+z	vector.h	/^	float z;$/;"	m	struct:vec3	typeref:typename:float

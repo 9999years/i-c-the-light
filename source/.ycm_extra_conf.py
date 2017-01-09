@@ -3,20 +3,18 @@ import ycm_core
 
 flags = [
 '-Wall',
-# '-Wextra',
+#'-Wextra',
 '-Werror',
 '-fexceptions',
 '-DNDEBUG',
 '-std=c99',
-'-x',
-'c',
-'-IC:\c\include\SDL',
+'-xc',
 '-LC:\c\lib64',
+'-IC:\c\include\SDL',
+'-IC:/C/x86_64-w64-mingw32/include',
+'-lmingw32',
 '-lSDL2main -lSDL2',
-'-I',
-'.',
-'-I',
-'C:/C/x86_64-w64-mingw32/include',
+'-I.',
 ]
 
 compilation_database_folder = ''
