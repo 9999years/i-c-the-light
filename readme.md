@@ -48,8 +48,8 @@ To run, you’ll need a copy of `SDL2.dll` to live in the same directory as the
 executable, which can be found in the runtime binaries section
 [here](https://www.libsdl.org/download-2.0.php).
 
-If you compiled with SDL, run with `icthelight window` to generate a window for
-output display.
+If you compiled with SDL, run with `--window` or `-w` to generate a
+window for output display.
 
 ## Branches
 

@@ -64,16 +64,16 @@ float scale(float val, float valmin, float valmax, float min, float max)
 }
 
 //is `find` in `argv[]`?
-//returns 1 if yes, 0 if no
+//returns index if yes, -1 if no
 int searchargs(int argc, char *argv[], char *find)
 {
 	int i;
 	for(i = 0; i < argc; i++) {
 		if(strcmp(argv[i], find) == 0) {
-			return 1;
+			return i;
 		}
 	}
-	return 0;
+	return -1;
 }
 
 struct limits getlimits(float *values, int length)

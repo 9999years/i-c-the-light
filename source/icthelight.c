@@ -132,7 +132,7 @@ void render(SDL_Surface *screen, const int lframe)
 	//const float tworoottwo = sqrt(2.0F) / 2.0F;
 	//how big the viewport is
 	const float viewport_size = 2.75F;
-	SDL_FillRect(screen, NULL, 0xffffff);
+	SDL_FillRect(screen, NULL, 0xaaeeff);
 	//SDL_FillRect(screen, NULL, 0x000000);
 
 	//stores values to calculate colors
@@ -168,8 +168,6 @@ void render(SDL_Surface *screen, const int lframe)
 	vec3 viewport_width = const3(
 		viewport_size * costime,
 		viewport_size * sintime,
-		//viewport_size * tworoottwo,
-		//viewport_size * tworoottwo,
 		0.0F
 	);
 
@@ -235,7 +233,7 @@ void render(SDL_Surface *screen, const int lframe)
 		c.r, c.a, c.b, c.c
 	);
 
-	printf("rendering values\n");
+	printf("rendering values (%dx%d)\n", screen->w, screen->h);
 
 	int i, j, k;
 	for(i = 0; i < screen->h; i++) {
@@ -265,8 +263,6 @@ void render(SDL_Surface *screen, const int lframe)
 			camera,
 			add3(ray_through, viewport_ofs)
 		));
-
-		//continue;
 
 		for(k = 0; k < steps; k++) {
 			measure_pos = add3(
@@ -306,12 +302,15 @@ void render(SDL_Surface *screen, const int lframe)
 	);
 
 	for(i = 0; i < coordslen; i++) {
+		//plot the i-th coord on the screen
 		plot(
 			screen,
 			coords[i] % screen->w,
 			coords[i] / screen->h,
+			//turn the value from min to max to a byte color
 			colortoint(graytocolor(bclamp(
 				scale(values[i], limit.min, limit.max, 0, 255)
+				//add a bit of noise
 				+ random(-5, 5)
 			)))
 		);
@@ -326,6 +325,7 @@ void render(SDL_Surface *screen, const int lframe)
 
 	}
 
+	//clear your mind
 	free(values);
 	free(coords);
 	return;

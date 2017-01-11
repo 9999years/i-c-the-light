@@ -18,6 +18,10 @@ convert:
 	mogrify -format png ../output/*.ppm
 	del ..\output\*.ppm > nul 2> null
 
+#for the windows users in the crowd
+cp:
+	chcp 65001
+
 clean:
 	del *.exe /q 2> nul
 	del TEST_PPM.ppm 2> nul
