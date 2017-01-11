@@ -6,8 +6,8 @@
 #ifndef MAIN_H
 #define MAIN_H
 
-#define SCREEN_HEIGHT 250
-#define SCREEN_WIDTH  250
+#define SCREEN_HEIGHT 750
+#define SCREEN_WIDTH  750
 
 //render code
 #include "icthelight.h"

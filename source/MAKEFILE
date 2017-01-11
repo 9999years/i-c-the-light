@@ -14,9 +14,6 @@ icthelight: main.c icthelight.c color.c common.c complex.c distance.c icthelight
 test: test.c
 	$(CC) $? $(CFLAGS) $(SDL_LIBRARY) $(NO_CONSOLE) $(SDL_INCLUDE) $(SDL_LINKER_FLAGS) -o $@
 
-incrementbuildversion: incrementbuildversion.c
-	$(CC) $? $(CFLAGS) -o $@
-
 convert:
 	mogrify -format png ../output/*.ppm
 	del ..\output\*.ppm > nul 2> null
@@ -26,10 +23,3 @@ clean:
 	del TEST_PPM.ppm 2> nul
 	del tags 2> nul
 	del log\* /q 2> nul
-
-run:
-	chcp 65001
-	.\icthelight
-
-repl: repl.c
-	$(CC) $? $(CFLAGS) -o $@

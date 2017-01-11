@@ -2,11 +2,14 @@
 //rebecca turner
 #include "icthelight.h"
 
+//file-wide set constant
+quaternion c;
+
 //global distance estimator
 float de(vec3 pos)
 {
 	//quaternion c = constq(-0.2F, 0.6F, 0.2F, 0.2F);
-	quaternion c = constq(-0.137F, -0.630F, -0.475F, -0.046);
+	//quaternion c = constq(-0.137F, -0.630F, -0.475F, -0.046);
 	//quaternion c = constq(-0.213F, -0.0410F, -0.563F, -0.560);
 	return distancejulia(pos, c, 64);
 	//return distserpenski(pos);
@@ -90,7 +93,6 @@ float blinnphong(vec3 cam, vec3 pos, vec3 rot, vec3 light)
 		dot3(light, normal) * diffuse_intensity
 		+ pow(dot3(normal, halfway), alpha) * specular_intensity;
 	//ret *= randf(0.0F, 1.F);
-	//printf("ret: %f\n", ret);
 	return ret;
 }
 
@@ -115,9 +117,14 @@ void render(SDL_Surface *screen, const int lframe)
 #define MIN_DISTANCE 0.001F
 #define BOUNDING_RADIUS 100.0F
 
-	printf("initializing render scene, allocating space\n");
+	printf(
+	"\n\n"
+"====== %.5d ==================================================================="
+	"\n", lframe
+	);
 
-	const float timef = (float)(lframe * TAU) / FRAMES_IN_ROTATION;
+	//const float timef = (float)(lframe * TAU) / FRAMES_IN_ROTATION;
+	const float timef = randf(0.0F, TAU);
 	unsigned long int timeint = time(NULL);
 	printf("time: %f for %lu\n", timef, timeint);
 	const float sintime = sin(timef);
@@ -156,8 +163,6 @@ void render(SDL_Surface *screen, const int lframe)
 	//focal length of the camera
 	//longer = more zoomed in
 	float focallength = 20.0F;
-	//float focallength = lframe * lframe;
-	//printf("f: %f\n", focallength);
 
 	//width of the camera (horiz. line at the center of the viewport)
 	vec3 viewport_width = const3(
@@ -195,8 +200,6 @@ void render(SDL_Surface *screen, const int lframe)
 			focallength
 		)
 	);
-	//printf("cam:\n");
-	//dump3(camera);
 
 	//direction for the ray to travel in
 	vec3 ray_rot;
@@ -221,12 +224,22 @@ void render(SDL_Surface *screen, const int lframe)
 	//steps to march
 	const int steps = 512;
 
-	printf("beginning render loop\n");
+	c = constq(
+		randf(-1.0F, 1.0F),
+		randf(-1.0F, 1.0F),
+		randf(-1.0F, 1.0F),
+		randf(-1.0F, 1.0F)
+	);
+
+	printf("quaternion is <%.6f, %.6f, %.6f, %.6f>\n",
+		c.r, c.a, c.b, c.c
+	);
+
+	printf("rendering values\n");
 
 	int i, j, k;
 	for(i = 0; i < screen->h; i++) {
 	for(j = 0; j < screen->w; j++) {
-		//fprintf(logfile, "NEW RAY!\n");
 		//new sample, new distance
 		distance = 0.0F;
 		totaldistance = 0.0F;
@@ -247,34 +260,15 @@ void render(SDL_Surface *screen, const int lframe)
 		//where the ray starts (on the viewport)
 		ray_orig = add3(ray_through, viewport_ofs);
 
-		//printf("ray start pos:\n");
-		//dump3(ray_orig);
-
 		//a unit vec from the camera through the viewport
 		ray_rot = unit3(through3(
 			camera,
 			add3(ray_through, viewport_ofs)
 		));
 
-		//fprintf(plotfile, "%f\t%f\t%f\n",
-			//ray_rot.x,
-			//ray_rot.y,
-			//ray_rot.z
-			//);
-
 		//continue;
 
 		for(k = 0; k < steps; k++) {
-			//if((distance != 0.5F) && (distance != 0.0F)) {
-				//[>f<]printf(//logfile,
-					//"-----------------\n"
-					//"k: %d\n"
-					//"total: %.4f\n"
-					//"dist: %.4f\n"
-					//"predist: %.4f\n",
-					//k, totaldistance, distance, predist
-				//);
-			//}
 			measure_pos = add3(
 				ray_orig,
 				mult3s(
@@ -286,22 +280,9 @@ void render(SDL_Surface *screen, const int lframe)
 			predist = de(measure_pos);
 
 			totaldistance += distance =
-				//fclamp(de(measure_pos), MIN_DISTANCE, MAX_DISTANCE);
 				fmin(predist, MAX_DISTANCE);
 
-			//if((i % 10 == 0) && (j % 10 == 0))
-				//fprintf(plotfile, "%d\t%d\t%f\n",
-					//i, j, totaldistance);
-
-			//fprintf(logfile, "step %d, distance: %f\n",
-				//k, distance);
-
 			if(distance <= MIN_DISTANCE) {
-				//fprintf(logfile, "PLOT!\n");
-				//printf("d: %f\n", totaldistance);
-				//printf("k: %d\n", k);
-				//vec3 norm;
-				//norm = mult3s(getnormal(measure_pos, 0.2F), 255.0F);
 				coords[coordslen] = j + i * screen->w;
 				values[coordslen] =
 					//(float)k;
@@ -312,19 +293,15 @@ void render(SDL_Surface *screen, const int lframe)
 			} else if(totaldistance >= BOUNDING_RADIUS
 				|| !isfinite(distance)) {
 				//we're done here
-				//fprintf(logfile, "LIMIT EXCEEDED, BREAK!\n");
 				break;
 			}
-			//SDL_Delay(200);
 		}
 	}
 	}
 
-	printf("done calculating array\n");
-
 	struct limits limit = getlimits(values, coordslen);
 
-	printf("done calculating limits (min: %.3f, max: %.3f)\n",
+	printf("limits: min: %.3f, max: %.3f)\n",
 		limit.min, limit.max
 	);
 
@@ -338,14 +315,16 @@ void render(SDL_Surface *screen, const int lframe)
 				+ random(-5, 5)
 			)))
 		);
-	}
-
+			//various other render methods
+			//kept here for... posteriority?
 			//colortoint(graytocolor(bclamp(k * 6)))
 			//dot3(norm, light)
 			//255.0F * (float)k / (float)steps
 			//0.01F / (totaldistance + 0.00003F)
 			//blinnphong(camera, measure_pos, ray_rot, light)
 			//distance <= 2.0F ? 0xffffff : 0x000000
+
+	}
 
 	free(values);
 	free(coords);

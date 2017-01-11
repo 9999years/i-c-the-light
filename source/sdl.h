@@ -1,5 +1,5 @@
 //toggle this line to toggle sdl inclusion
-//#define USE_REAL_SDL
+#define USE_REAL_SDL
 
 #ifdef USE_REAL_SDL
 //#pragma message "compiling with REAL sdl"

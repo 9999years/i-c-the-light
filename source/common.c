@@ -18,7 +18,7 @@ int random(int min, int max) {
 
 float randf(float min, float max) {
 	float range = max - min;
-	return (rand() / RAND_MAX) * range + min;
+	return ((float)rand() / (float)RAND_MAX) * range + min;
 }
 
 //I Can't Believe It's Not Sin(x)
