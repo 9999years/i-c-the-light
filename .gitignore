@@ -1,6 +1,8 @@
 *.exe
 *.dll
-output/*
-ftpinfo.txt
+output/**
+!output/bounce.dir
+source/log/**
+source/tags
 **/SDL/*
 **/TEST_PPM.ppm
