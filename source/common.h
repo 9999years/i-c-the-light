@@ -52,6 +52,9 @@ float scale(float val, float valmin, float valmax, float min, float max);
 //returns 1 if yes, 0 if no
 int searchargs(int argc, char *argv[], char *find);
 
+//useful for a long and short arg pair
+int searchargspair(int argc, char *argv[], char *findone, char *findtwo);
+
 struct limits getlimits(float *values, int length);
 
 #endif //COMMON_H

@@ -6,9 +6,6 @@
 //render code
 #include "main.h"
 
-char outfile_base[256];
-int convert_immediately;
-
 void saveframe(SDL_Surface *screen)
 {
 	char filename[256] = "UNINITIALIZED.ppm";
@@ -75,7 +72,7 @@ void saveframe(SDL_Surface *screen)
 		fclose(hashfile);
 	}
 
-	if(convert_immediately) {
+	if(flags & CONVERT_IMMEDIATELY) {
 		printf("converting ppm to png\n");
 		char mogrifycmd[512];
 		sprintf(mogrifycmd, "mogrify -format png %s", filename);
@@ -91,6 +88,106 @@ void saveframe(SDL_Surface *screen)
 		}
 	}
 	return;
+}
+
+void printhelp()
+{
+	printf(
+"I C the Light help:\n\n"
+
+"-w or --window: Request a window. (Does nothing if I C the Light was compiled\n"
+"    without SDL.)\n\n"
+
+"-r or --resolution: Specifies resolution via next argument, in wxh format.\n"
+"    e.g. ./icthelight -r 500x500\n\n"
+
+"-s or --scale: Specifies resolution scaling. (If you know you want a smooth\n"
+"    500x500 image, use -r 500x500 -s 2 to render at 1000x1000.)\n\n"
+
+"-o or --output: Output directory (where images are written).\n"
+"    ../output/ by default, must have a hash/ subdirectory.\n\n"
+
+"-c or --convert: Convert the .ppm output to .png after saving. Might take up\n"
+"    a little bit of time, requires mogrify to be in your PATH\n\n"
+
+"-i or --iterations: Specify an iteration count. Default 64\n\n"
+
+"-q or --quaternion: Specify a quaternion to render.\n"
+"    Format: 'Float, Float, Float, Float', where a Float consists of numbers\n"
+"    0-9, with an optional decimal (.) or leading negation sign (-).\n"
+"    All other characters are ignored, so make sure you don't write in\n"
+"    garbage for no reason.\n\n"
+
+"-e or --exit: Exit after rendering one frame.\n\n"
+
+"--nobanner: Don't show my beautiful, glorious banner that I made by hand,\n"
+"    and love with all of my heart. Put all that glorious work to waste for your\n"
+"    selfish desires\n\n"
+
+"--help: Shows this text and then quits.\n\n"
+
+"../readme.md, becca.ooo/i-c-the-light, or github.com/9999years/i-c-the-light\n"
+"might have more information.\n"
+	);
+	return;
+}
+
+quaternion parsequaternion(char *str)
+{
+	enum quaternion_indexes {
+		QUATERNION_R,
+		QUATERNION_A,
+		QUATERNION_B,
+		QUATERNION_C
+	};
+	int i, j = 0, k;
+	float tmp;
+	k = QUATERNION_R;
+	char number_str[64] = "\0";
+	quaternion ret = constq(0.0F, 0.0F, 0.0F, 0.0F);
+	for(i = 0; k <= QUATERNION_C; i++) {
+		if(
+			((str[i] >= 0x30) && //0
+			(str[i] <= 0x39)) || //9
+			(str[i] == 0x2e)  || //.
+			(str[i] == 0x2d)     //-
+		) {
+			//build string out of numbers
+			number_str[j] = str[i];
+			j++;
+		} else if(
+			(str[i] == 0x2c) ||
+			(str[i] == 0)
+		) {
+			//comma or end
+			//"finalize" string, reset index
+			number_str[j + 1] = '\0';
+			j = 0;
+			//parse number, set to next quat index
+			tmp = strtof(number_str, NULL);
+			switch(k) {
+			case QUATERNION_R:
+				ret.r = tmp;
+				break;
+			case QUATERNION_A:
+				ret.a = tmp;
+				break;
+			case QUATERNION_B:
+				ret.b = tmp;
+				break;
+			case QUATERNION_C:
+				ret.c = tmp;
+				break;
+			}
+			//increment quat index
+			k++;
+			if(str[i] == 0) {
+				//dont fuck the memory
+				break;
+			}
+		}
+	}
+	return ret;
 }
 
 int handleevents(SDL_Surface *screen)
@@ -118,62 +215,44 @@ int main(int argc, char *argv[])
 {
 	printf("Hello!\n");
 	const time_t unixtime = time(NULL);
-	printf( "I C the Light by Rebecca Turner (MIT/Expat)\n"
-		"%s\n"
-		"See --help\n", ctime(&unixtime)
-	);
+
+	if(searchargs(argc, argv, "--nobanner") == -1) {
+		printf( "I C the Light by Rebecca Turner (MIT/Expat)\n"
+			"See --help\n"
+		);
+
+		printf(
+			"                  .V.\n"
+			"              \\.\\_____/./\n"
+			"            \\-.=^ -  '^=././\n"
+			"       ===\\-\\(/`  /#\\  *\\)/-/===\n"
+			" >=------  <{.~  (#O#)   .}>  ------=<\n"
+			"       ===/-/(\\  .\\#/  ~/)\\-\\===\n"
+			"           /-/*=-_____-=*\\^\\\n"
+			"              -/ /*~*\\^ \\\n"
+			"                   ^\n"
+			"                                        \n"
+			"╭─────────────────────────────────────╮\n"
+			"│ ·           ╷         ╷ ·     ╷     │\n"
+			"│ ╷   ╭─╮   ┼ ├─╮ ╭─╮   │ ╷ ╭─╮ ├─╮ ┼ │\n"
+			"│ │   │     │ │ │ ├─┘   │ │ ╰─╯ │ │ │ │\n"
+			"│ ╵   ╰─╯   ╰ ╵ ╵ ╰─╯   ╵ ╵ ╰─╮ ╵ ╵ ╰ │\n"
+			"╰───────────────────────────╰─╯───────╯\n"
+			"                                       \n"
+		);
+	}
+
+	if(searchargs(argc, argv, "--help") != -1) {
+		printhelp();
+		return 0;
+	}
 
 	//don't want stuff to be the same every time...
 	srand(unixtime);
 
-	printf(
-		"                  .V.\n"
-		"              \\.\\_____/./\n"
-		"            \\-.=^ -  '^=././\n"
-		"       ===\\-\\(/`  /#\\  *\\)/-/===\n"
-		" >=------  <{.~  (#O#)   .}>  ------=<\n"
-		"       ===/-/(\\  .\\#/  ~/)\\-\\===\n"
-		"           /-/*=-_____-=*\\^\\\n"
-		"              -/ /*~*\\^ \\\n"
-		"                   ^\n"
-		"                                        \n"
-		"╭─────────────────────────────────────╮\n"
-		"│ ·           ╷         ╷ ·     ╷     │\n"
-		"│ ╷   ╭─╮   ┼ ├─╮ ╭─╮   │ ╷ ╭─╮ ├─╮ ┼ │\n"
-		"│ │   │     │ │ │ ├─┘   │ │ ╰─╯ │ │ │ │\n"
-		"│ ╵   ╰─╯   ╰ ╵ ╵ ╰─╯   ╵ ╵ ╰─╮ ╵ ╵ ╰ │\n"
-		"╰───────────────────────────╰─╯───────╯\n"
-		"                                       \n"
-	);
-
-	if(searchargs(argc, argv, "--help") != -1) {
-		printf(
-"I C the Light help:\n\n"
-
-"-w or --window: Request a window. (Does nothing if I C the Light was compiled\n"
-"    without SDL.)\n\n"
-
-"-r or --resolution: Specifies resolution via next argument, in wxh format.\n"
-"    e.g. ./icthelight -r 500x500\n\n"
-
-"-s or --scale: Specifies resolution scaling. (If you know you want a smooth\n"
-"    500x500 image, use -r 500x500 -s 2 to render at 1000x1000.)\n\n"
-
-"-o or --output: Output directory (where images are written).\n"
-"    ../output/ by default, must have a hash/ subdirectory.\n\n"
-
-"-c or --convert: Convert the .ppm output to .png after saving. Might take up\n"
-"    a little bit of time, requires mogrify to be in your PATH\n\n"
-
-"--help: Shows this text and then quits.\n\n"
-
-"../readme.md, becca.ooo/i-c-the-light, or github.com/9999years/i-c-the-light\n"
-"might have more information.\n"
-		);
-		return 0;
-	}
-
 	frame = 0;
+
+	flags = 0x0000;
 
 	initializelogfile();
 
@@ -187,8 +266,7 @@ int main(int argc, char *argv[])
 	int width, height;
 
 	int inx =
-		searchargs(argc, argv, "-r") &
-		searchargs(argc, argv, "--resolution");
+		searchargspair(argc, argv, "-r", "--resolution");
 	if(inx != -1) {
 		//should allow up to 5-digits each side
 		char resolution_input[16];
@@ -221,10 +299,9 @@ int main(int argc, char *argv[])
 	}
 
 	inx =
-		searchargs(argc, argv, "-s") &
-		searchargs(argc, argv, "--scale");
+		searchargspair(argc, argv, "-s", "--scale");
 	if(inx != -1) {
-		//god help you if 8 chars is too little????
+		//god help you if 16 chars is too little????
 		char scale_input[16];
 		strcpy(scale_input, argv[inx + 1]);
 		if(scale_input == NULL) {
@@ -250,8 +327,31 @@ int main(int argc, char *argv[])
 	}
 
 	inx =
-		searchargs(argc, argv, "-o") &
-		searchargs(argc, argv, "--output");
+		searchargspair(argc, argv, "-q", "--quaternion");
+	if(inx != -1) {
+		juliaconstant = parsequaternion(argv[inx + 1]);
+		flags = flags | USER_QUATERNION;
+	}
+
+	inx =
+		searchargspair(argc, argv, "-i", "--iterations");
+	if(inx != -1) {
+		//god help you if 16 chars is too little????
+		char iterations_input[16];
+		strcpy(iterations_input, argv[inx + 1]);
+		if(iterations_input == NULL) {
+			printf("couldn't get a scale! try again with a "
+				"better argument.\n");
+			return -1;
+		}
+		//already a global, for better or worse
+		iterations = strtod(iterations_input, NULL);
+	} else {
+		iterations = 128;
+	}
+
+	inx =
+		searchargspair(argc, argv, "-o", "--output");
 	if(inx != -1) {
 		strcpy(outfile_base, argv[inx + 1]);
 	} else {
@@ -259,18 +359,20 @@ int main(int argc, char *argv[])
 	}
 
 	inx =
-		searchargs(argc, argv, "-c") &
-		searchargs(argc, argv, "--convert");
+		searchargspair(argc, argv, "-c", "--convert");
 	if(inx != -1) {
-		convert_immediately = 1;
-	} else {
-		convert_immediately = 0;
+		flags = flags | CONVERT_IMMEDIATELY;
+	}
+
+	inx =
+		searchargspair(argc, argv, "-e", "--exit");
+	if(inx != -1) {
+		flags = flags | QUIT_IMMEDIATELY;
 	}
 
 	//set up the window
 	if(
-		(searchargs(argc, argv, "-w") != -1) ||
-		(searchargs(argc, argv, "--window") != -1)
+		searchargspair(argc, argv, "-w", "--window") != -1
 	) {
 		//Initialize SDL
 		if(SDL_Init(SDL_INIT_VIDEO) < 0) {
@@ -322,22 +424,19 @@ int main(int argc, char *argv[])
 		SDL_UpdateWindowSurface(window);
 	}
 
-	int quit = 0;
+	int quit;
 	clock_t start, end;
 	double total;
 	do {
 		start = clock();
-		//printf("frame: %d\n", frame);
 
 		//poll for events, and handle the ones we care about.
 		//this returns 1 if we need to quit
 		quit = handleevents(screen);
 
 		// render
-		//if(frame == 0) {
-			render(screen, frame);
-			saveframe(screen);
-		//}
+		render(screen, frame);
+		saveframe(screen);
 
 		//Update the surface
 		if(window != NULL) {
@@ -345,17 +444,13 @@ int main(int argc, char *argv[])
 		}
 
 		end = clock();
-		//if(frame%30 == 0) {
-			////if(frame == 0)
-				////saveframe(screen);
-		//}
 		total = (double)(end - start) / CLOCKS_PER_SEC;
 		printf("%.4f FPS = %.4f SPF\n", 1 / total, total);
 		frame++;
 		//if(frame > FRAMES_IN_ROTATION + 1) {
 			//quit = 1;
 		//}
-	} while(!quit);
+	} while(!quit && (~flags & QUIT_IMMEDIATELY));
 
 	printf("I feel free!\n");
 

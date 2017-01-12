@@ -26,14 +26,21 @@
 #include "quaternion.h"
 #include "logging.h"
 #include "plot.h"
+#include "flags.h"
 
 #ifndef ICTHELIGHT_H
 #define ICTHELIGHT_H
 
 #define FRAMES_IN_ROTATION 60.0F
 
-//global
+//frame count, usually passed as lframe to functions
 int frame;
+
+//julia constant
+quaternion juliaconstant;
+
+//iteration count
+int iterations;
 
 //global distance estimator
 float de(vec3 pos);

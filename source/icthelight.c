@@ -2,16 +2,13 @@
 //rebecca turner
 #include "icthelight.h"
 
-//file-wide set constant
-quaternion c;
-
 //global distance estimator
 float de(vec3 pos)
 {
 	//quaternion c = constq(-0.2F, 0.6F, 0.2F, 0.2F);
 	//quaternion c = constq(-0.137F, -0.630F, -0.475F, -0.046);
 	//quaternion c = constq(-0.213F, -0.0410F, -0.563F, -0.560);
-	return distancejulia(pos, c, 64);
+	return distancejulia(pos, juliaconstant, iterations);
 	//return distserpenski(pos);
 	//return
 		//opu(
@@ -113,9 +110,9 @@ void render(SDL_Surface *screen, const int lframe)
 	 * x
 	 */
 
-#define MAX_DISTANCE 0.1F
+#define MAX_DISTANCE 0.5F
 #define MIN_DISTANCE 0.001F
-#define BOUNDING_RADIUS 100.0F
+#define BOUNDING_RADIUS 3.0F
 
 	printf(
 	"\n\n"
@@ -222,15 +219,20 @@ void render(SDL_Surface *screen, const int lframe)
 	//steps to march
 	const int steps = 512;
 
-	c = constq(
-		randf(-1.0F, 1.0F),
-		randf(-1.0F, 1.0F),
-		randf(-1.0F, 1.0F),
-		randf(-1.0F, 1.0F)
-	);
+	if(~flags & USER_QUATERNION) {
+		juliaconstant = constq(
+			randf(-1.0F, 1.0F),
+			randf(-1.0F, 1.0F),
+			randf(-1.0F, 1.0F),
+			randf(-1.0F, 1.0F)
+		);
+	}
 
 	printf("quaternion is <%.6f, %.6f, %.6f, %.6f>\n",
-		c.r, c.a, c.b, c.c
+		juliaconstant.r,
+		juliaconstant.a,
+		juliaconstant.b,
+		juliaconstant.c
 	);
 
 	printf("rendering values (%dx%d)\n", screen->w, screen->h);

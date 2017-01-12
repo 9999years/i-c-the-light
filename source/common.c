@@ -76,6 +76,14 @@ int searchargs(int argc, char *argv[], char *find)
 	return -1;
 }
 
+//two at a time
+int searchargspair(int argc, char *argv[], char *findone, char *findtwo)
+{
+	return
+		searchargs(argc, argv, findone) &
+		searchargs(argc, argv, findtwo);
+}
+
 struct limits getlimits(float *values, int length)
 {
 	struct limits ret;

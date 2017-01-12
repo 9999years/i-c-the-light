@@ -6,14 +6,15 @@
 #ifndef MAIN_H
 #define MAIN_H
 
-#define SCREEN_HEIGHT 750
-#define SCREEN_WIDTH  750
+#define SCREEN_HEIGHT 500
+#define SCREEN_WIDTH  500
 
 //render code
 #include "icthelight.h"
 
 //globals
-FILE *plotfile;
+//base path for file  writing
+char outfile_base[256];
 
 void saveframe(SDL_Surface *screen);
 
