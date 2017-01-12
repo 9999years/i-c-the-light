@@ -7,9 +7,6 @@
 #ifndef PLOT_H
 #define PLOT_H
 
-#ifndef PLOT_H
-#define PLOT_H
-
 unsigned int getpixel(
 	SDL_Surface *screen,
 	int x, int y

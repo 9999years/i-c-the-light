@@ -27,6 +27,7 @@
 #include "logging.h"
 #include "plot.h"
 #include "flags.h"
+#include "complex.h"
 
 #ifndef ICTHELIGHT_H
 #define ICTHELIGHT_H

@@ -10,7 +10,7 @@ void saveframe(SDL_Surface *screen)
 {
 	char filename[256] = "UNINITIALIZED.ppm";
 	unsigned long int timeint = time(NULL);
-	sprintf(filename, "%s/image%lu_f%d.ppm", outfile_base, timeint, frame);
+	sprintf(filename, "%s/f%d.ppm", outfile_base, frame);
 	printf("printing %s\n", filename);
 	int writestatus;
 	if(

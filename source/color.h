@@ -5,9 +5,6 @@
 #ifndef COLOR_H
 #define COLOR_H
 
-#ifndef COLOR_H
-#define COLOR_H
-
 #define CHANNELS 3
 
 typedef unsigned char byte;

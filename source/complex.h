@@ -16,4 +16,6 @@ void complexadd(complex *out, complex a, complex b);
 
 int mandlebrot(complex c, int i);
 
+float distmandlebrot(complex c, int iterations);
+
 #endif //COMPLEX_H
