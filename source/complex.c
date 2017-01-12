@@ -29,13 +29,13 @@ int mandelbrot(complex c, int i)
 		complexmult(&tmp, z, z);
 		complexadd(&z, tmp, c);
 	}
-	float ret = complexabs(z);
+	double ret = complexabs(z);
 	if(!isfinite(ret))
 		ret = 0xff;
 	return ret >= 2.0F ? 0 : 1;
 }
 
-float distmandelbrot(complex c, int iterations)
+double distmandelbrot(complex c, int iterations)
 {
 	complex z  = {.a = 0.0F, .b = 0.0F};
 	complex dz = {.a = 0.0F, .b = 0.0F};

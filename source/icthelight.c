@@ -84,9 +84,14 @@ void render(SDL_Surface *screen, const int lframe)
 "====== %.5d ==================================================================="
 	"\n", lframe
 	);
-	float width = 60.0F / ((float)frame + 20.0F);
-	float aspect = (float)screen->w / (float)screen->h;
-	float height = width / aspect;
+	//double width = 60.0F / ((double)frame + 20.0F);
+	//         3
+	//w = -----------
+	//         (x/20 - 5)
+	//    1 + 2
+	double width = 3.0F / (1.0F + pow(2.0F, (double)lframe / 20.0F - 5.0F));
+	double aspect = (double)screen->w / (double)screen->h;
+	double height = width / aspect;
 
 	complex center = {
 		.a = -0.743643135F,
@@ -102,18 +107,19 @@ void render(SDL_Surface *screen, const int lframe)
 	//clear screen
 	SDL_FillRect(screen, NULL, 0x000000);
 
-	//const float threshold = 0.1F;
+	//const double threshold = 0.1F;
 	complex point;
-	float dist;
+	double dist;
 	int i, j;
 	for(i = 0; i < screen->h; i++) {
 	for(j = 0; j < screen->w; j++) {
-		point.a = scale((float)j, 0, screen->w,
+		point.a = scale((double)j, 0, screen->w,
 			center.a - width, center.a + width);
-		point.b = scale((float)i, 0, screen->h,
+		point.b = scale((double)i, 0, screen->h,
 			center.b - height, center.b + height);
 		dist = distmandelbrot(point, iterations);
 		if(dist >= 0.0) {
+			//check the distance estimate against the iterative approach to weed out holes
 			dist = mandelbrot(point, iterations) ? 0.0F : dist;
 			plot(screen, j, i,
 				colortoint(graytocolor(bclamp(

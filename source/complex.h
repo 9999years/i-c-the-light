@@ -16,6 +16,6 @@ void complexadd(complex *out, complex a, complex b);
 
 int mandelbrot(complex c, int i);
 
-float distmandelbrot(complex c, int iterations);
+double distmandelbrot(complex c, int iterations);
 
 #endif //COMPLEX_H

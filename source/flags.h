@@ -25,4 +25,6 @@
 
 int flags;
 
+#define FLAG(F) (flags & F)
+
 #endif //FLAGS_H
