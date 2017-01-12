@@ -19,7 +19,7 @@ void complexadd(complex *out, complex a, complex b)
 	return;
 }
 
-int mandlebrot(complex c, int i)
+int mandelbrot(complex c, int i)
 {
 	complex tmp, z;
 	z = c;
@@ -35,7 +35,7 @@ int mandlebrot(complex c, int i)
 	return ret >= 2.0F ? 0 : 1;
 }
 
-float distmandlebrot(complex c, int iterations)
+float distmandelbrot(complex c, int iterations)
 {
 	complex z  = {.a = 0.0F, .b = 0.0F};
 	complex dz = {.a = 0.0F, .b = 0.0F};

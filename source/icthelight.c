@@ -84,9 +84,10 @@ void render(SDL_Surface *screen, const int lframe)
 "====== %.5d ==================================================================="
 	"\n", lframe
 	);
-	float width = 3.0F - (float)frame / 500;
+	float width = 60.0F / ((float)frame + 20.0F);
 	float aspect = (float)screen->w / (float)screen->h;
 	float height = width / aspect;
+
 	complex center = {
 		.a = -0.743643135F,
 		.b = 0.131825963F
@@ -98,6 +99,9 @@ void render(SDL_Surface *screen, const int lframe)
 	iterations = ((256 + 2 * frame) / 4) * 4;
 	printf("iterations: %d\n", iterations);
 
+	//clear screen
+	SDL_FillRect(screen, NULL, 0x000000);
+
 	//const float threshold = 0.1F;
 	complex point;
 	float dist;
@@ -108,11 +112,12 @@ void render(SDL_Surface *screen, const int lframe)
 			center.a - width, center.a + width);
 		point.b = scale((float)i, 0, screen->h,
 			center.b - height, center.b + height);
-		dist = distmandlebrot(point, iterations);
-		if(dist > 0.0) {
+		dist = distmandelbrot(point, iterations);
+		if(dist >= 0.0) {
+			dist = mandelbrot(point, iterations) ? 0.0F : dist;
 			plot(screen, j, i,
 				colortoint(graytocolor(bclamp(
-				90000.0F * (dist / width)
+				100000.0F * (dist / width)
 				)))
 			);
 		}
