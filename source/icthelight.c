@@ -110,9 +110,9 @@ void render(SDL_Surface *screen, const int lframe)
 	 * x
 	 */
 
-#define MAX_DISTANCE 0.5F
+#define MAX_DISTANCE 0.1F
 #define MIN_DISTANCE 0.001F
-#define BOUNDING_RADIUS 3.0F
+#define BOUNDING_RADIUS 5.0F
 
 	printf(
 	"\n\n"
@@ -123,7 +123,7 @@ void render(SDL_Surface *screen, const int lframe)
 	//const float timef = (float)(lframe * TAU) / FRAMES_IN_ROTATION;
 	const float timef = randf(0.0F, TAU);
 	unsigned long int timeint = time(NULL);
-	printf("time: %f for %lu\n", timef, timeint);
+	printf("time: %f\n", timef);
 	const float sintime = sin(timef);
 	const float costime = cos(timef);
 	//const float tworoottwo = sqrt(2.0F) / 2.0F;
@@ -278,7 +278,7 @@ void render(SDL_Surface *screen, const int lframe)
 			predist = de(measure_pos);
 
 			totaldistance += distance =
-				fmin(predist, MAX_DISTANCE);
+				fmin(predist, MAX_DISTANCE) * 0.8F;
 
 			if(distance <= MIN_DISTANCE) {
 				coords[coordslen] = j + i * screen->w;
