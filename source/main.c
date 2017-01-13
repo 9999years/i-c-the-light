@@ -33,45 +33,49 @@ void saveframe(SDL_Surface *screen)
 		}
 		return;
 	}
-	char shacmd[256];
-	sprintf(shacmd, "sha256sum %s", filename);
-	FILE *file = popen(shacmd, "r");
-	if(file == NULL) {
-		fprintf(logfile, "failed to get image hash!\n");
-		return;
-	}
-	//the hash is 64 characters but we need a 0 at the end too
-	char sha[68];
-	int i;
-	char c;
-	for(i = 0; (i < 64) && (c != EOF) && (c != 0x20); i++) {
-		sha[i] = c = fgetc(file);
-	}
-	sha[i++] = 0;
-	printf("SHA: %s\n", sha);
-	fprintf(logfile, "SHA: %s\n", sha);
-	pclose(file);
 
-	char hashfilename[256];
-	sprintf(hashfilename, "%s/hash/%s", outfile_base, sha);
-
-	if(_access(hashfilename, 0) != -1) {
-		//file exists, delete img
-		printf("image already rendered, deleting\n");
-		if(unlink(filename) != 0) {
-			printf("image delete error!\n");
+	FILE *file;
+	if(!FLAG(NO_HASH)) {
+		char shacmd[256];
+		sprintf(shacmd, "sha256sum %s", filename);
+		file = popen(shacmd, "r");
+		if(file == NULL) {
+			fprintf(logfile, "failed to get image hash!\n");
+			return;
 		}
-	} else {
-		FILE *hashfile = fopen(hashfilename, "w");
-		if(hashfile == NULL)
-			printf(
-				"hash file write error!\nfilename: %s\n",
-				hashfilename
-			);
-		fclose(hashfile);
+		//the hash is 64 characters but we need a 0 at the end too
+		char sha[68];
+		int i;
+		char c;
+		for(i = 0; (i < 64) && (c != EOF) && (c != 0x20); i++) {
+			sha[i] = c = fgetc(file);
+		}
+		sha[i++] = 0;
+		printf("SHA: %s\n", sha);
+		fprintf(logfile, "SHA: %s\n", sha);
+		pclose(file);
+
+		char hashfilename[256];
+		sprintf(hashfilename, "%s/hash/%s", outfile_base, sha);
+
+		if(_access(hashfilename, 0) != -1) {
+			//file exists, delete img
+			printf("image already rendered, deleting\n");
+			if(unlink(filename) != 0) {
+				printf("image delete error!\n");
+			}
+		} else {
+			FILE *hashfile = fopen(hashfilename, "w");
+			if(hashfile == NULL)
+				printf(
+					"hash file write error!\nfilename: %s\n",
+					hashfilename
+				);
+			fclose(hashfile);
+		}
 	}
 
-	if(flags & CONVERT_IMMEDIATELY) {
+	if(FLAG(CONVERT_IMMEDIATELY)) {
 		printf("converting ppm to png\n");
 		char mogrifycmd[512];
 		sprintf(mogrifycmd, "mogrify -format png %s", filename);
@@ -120,6 +124,8 @@ void printhelp()
 "-e or --exit: Exit after rendering one frame.\n\n"
 
 "--frame: Specify a starting frame. Can be useful for re-starting a render.\n\n"
+
+"--nohash: Don't hash images to check for collisions.\n\n"
 
 "--nobanner: Don't show my beautiful, glorious banner that I made by hand,\n"
 "    and love with all of my heart. Put all that glorious work to waste for your\n"
@@ -264,8 +270,7 @@ int main(int argc, char *argv[])
 	//screen w/h
 	int width, height;
 
-	int inx =
-		searchargspair(argc, argv, "-r", "--resolution");
+	int inx = searchargspair(argc, argv, "-r", "--resolution");
 	if(inx != -1) {
 		//should allow up to 5-digits each side
 		char resolution_input[16];
@@ -297,8 +302,7 @@ int main(int argc, char *argv[])
 		height = SCREEN_WIDTH;
 	}
 
-	inx =
-		searchargspair(argc, argv, "-s", "--scale");
+	inx = searchargspair(argc, argv, "-s", "--scale");
 	if(inx != -1) {
 		//god help you if 16 chars is too little????
 		char scale_input[16];
@@ -325,15 +329,13 @@ int main(int argc, char *argv[])
 		return -1;
 	}
 
-	inx =
-		searchargspair(argc, argv, "-q", "--quaternion");
+	inx = searchargspair(argc, argv, "-q", "--quaternion");
 	if(inx != -1) {
 		juliaconstant = parsequaternion(argv[inx + 1]);
-		flags = flags | USER_QUATERNION;
+		FLAGSET(USER_QUATERNION);
 	}
 
-	inx =
-		searchargspair(argc, argv, "-i", "--iterations");
+	inx = searchargspair(argc, argv, "-i", "--iterations");
 	if(inx != -1) {
 		//god help you if 16 chars is too little????
 		char iterations_input[16];
@@ -349,8 +351,7 @@ int main(int argc, char *argv[])
 		iterations = 128;
 	}
 
-	inx =
-		searchargs(argc, argv, "--frame");
+	inx = searchargs(argc, argv, "--frame");
 	if(inx != -1) {
 		//god help you if 16 chars is too little????
 		char frame_input[16];
@@ -366,24 +367,26 @@ int main(int argc, char *argv[])
 		frame = 0;
 	}
 
-	inx =
-		searchargspair(argc, argv, "-o", "--output");
+	inx = searchargs(argc, argv, "--nohash");
+	if(inx != -1) {
+		FLAGSET(NO_HASH);
+	}
+
+	inx = searchargspair(argc, argv, "-o", "--output");
 	if(inx != -1) {
 		strcpy(outfile_base, argv[inx + 1]);
 	} else {
 		strcpy(outfile_base, "../output/");
 	}
 
-	inx =
-		searchargspair(argc, argv, "-c", "--convert");
+	inx = searchargspair(argc, argv, "-c", "--convert");
 	if(inx != -1) {
-		flags = flags | CONVERT_IMMEDIATELY;
+		FLAGSET(CONVERT_IMMEDIATELY);
 	}
 
-	inx =
-		searchargspair(argc, argv, "-e", "--exit");
+	inx = searchargspair(argc, argv, "-e", "--exit");
 	if(inx != -1) {
-		flags = flags | QUIT_IMMEDIATELY;
+		FLAGSET(QUIT_IMMEDIATELY);
 	}
 
 	//set up the window
@@ -463,10 +466,10 @@ int main(int argc, char *argv[])
 		total = (double)(end - start) / CLOCKS_PER_SEC;
 		printf("%.4f FPS = %.4f SPF\n", 1 / total, total);
 		frame++;
-		//if(frame > FRAMES_IN_ROTATION + 1) {
-			//quit = 1;
-		//}
-	} while(!quit && (~flags & QUIT_IMMEDIATELY));
+		if(frame > ANIMATION_LENGTH + 1) {
+			break;
+		}
+	} while(!quit && !FLAG(QUIT_IMMEDIATELY));
 
 	printf("I feel free!\n");
 

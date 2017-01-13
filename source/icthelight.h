@@ -32,7 +32,7 @@
 #ifndef ICTHELIGHT_H
 #define ICTHELIGHT_H
 
-#define FRAMES_IN_ROTATION 60.0F
+#define ANIMATION_LENGTH 400.0F
 
 //frame count, usually passed as lframe to functions
 int frame;

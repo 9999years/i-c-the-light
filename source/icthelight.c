@@ -89,7 +89,40 @@ void render(SDL_Surface *screen, const int lframe)
 	//w = -----------
 	//         (x/20 - 5)
 	//    1 + 2
-	double width = 3.0F / (1.0F + pow(2.0F, (double)lframe / 20.0F - 5.0F));
+	//double width = 3.0F / (1.0F + pow(2.0F, (double)lframe / 20.0F - 5.0F));
+	//double width = HEIGHT
+		//* sin(
+			//(PI * (double)lframe) / ANIMATION_LENGTH + HALF_PI
+		//) + BASELINE_OFFSET;
+
+	//low bottom sin from (x1, y1) to (x2, y2)
+	//
+	//                            π(x - x1)     π        2
+	//       (y1 - y2) * ( sin( ( --------- ) + - ) + 1 )
+	//                             x2 - x1      2
+	// f(x) = -------------------------------------------- + y2
+	//                             4
+	//
+	//1: (0, 3)
+	//2: (400, 0.00003)
+	//specialized case where x1 = 0 lets us cut out some crud
+	//         π(x - x1)               πx
+	//notably, --------- simplifies to --
+	//          x2 - x1                x2
+	//
+
+#define y1 3.0F
+#define y2 0.00004F
+#define WIDTH_RANGE 2.99996F
+
+	//i SWEAR this works
+	double width = (
+		WIDTH_RANGE * pow(
+			sin((PI * (float)lframe) / ANIMATION_LENGTH + HALF_PI)
+			+ 1.0F,
+		2.0F)
+		) / 4.0F + y2;
+
 	double aspect = (double)screen->w / (double)screen->h;
 	double height = width / aspect;
 
@@ -123,7 +156,7 @@ void render(SDL_Surface *screen, const int lframe)
 			dist = mandelbrot(point, iterations) ? 0.0F : dist;
 			plot(screen, j, i,
 				colortoint(graytocolor(bclamp(
-				100000.0F * (dist / width)
+				300000.0F * (dist / width)
 				)))
 			);
 		}
