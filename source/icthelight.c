@@ -8,19 +8,17 @@ float de(vec3 pos)
 	//quaternion c = constq(-0.2F, 0.6F, 0.2F, 0.2F);
 	//quaternion c = constq(-0.137F, -0.630F, -0.475F, -0.046);
 	//quaternion c = constq(-0.213F, -0.0410F, -0.563F, -0.560);
-	return distancejulia(pos, juliaconstant, iterations);
+	//return distancejulia(pos, juliaconstant, iterations);
 	//return distserpenski(pos);
-	//return
-		//opu(
+	return
 		//disttorus(pos, const3(0.0F, 0.0F, 0.0F), 2.0F, 5.5F);
 		//distsphere(pos, const3(50.0F, 0.0F, 50.0F), 10.0F);
-		//opwobble3(
-			//pos,
-			//distsphere(pos, const3(0.0F, 0.0F, 0.0F), 15.0F),
-			//3.0F,
-			//10.0F
-			//);
-		//);
+		opwobble3(
+			pos,
+			distsphere(pos, const3(0.0F, 0.0F, 0.0F), 1.0F),
+			0.3F,
+			0.8F
+		);
 		//distsphere(pos, sphere, 10.0F);
 }
 
@@ -120,15 +118,16 @@ void render(SDL_Surface *screen, const int lframe)
 	"\n", lframe
 	);
 
-	//const float timef = (float)(lframe * TAU) / FRAMES_IN_ROTATION;
-	const float timef = randf(0.0F, TAU);
+	const float timef = (float)(lframe * TAU) / FRAMES_IN_ROTATION;
+	//const float timef = randf(0.0F, TAU);
 	unsigned long int timeint = time(NULL);
 	printf("time: %f\n", timef);
 	const float sintime = sin(timef);
 	const float costime = cos(timef);
 	//const float tworoottwo = sqrt(2.0F) / 2.0F;
 	//how big the viewport is
-	const float viewport_size = 2.75F;
+	//const float viewport_size = 2.75F;
+	const float viewport_size = 3.5F;
 	SDL_FillRect(screen, NULL, 0xaaeeff);
 	//SDL_FillRect(screen, NULL, 0x000000);
 
@@ -214,7 +213,8 @@ void render(SDL_Surface *screen, const int lframe)
 	//preview value
 	float predist;
 
-	vec3 light = fromdirection3(timef + 1.0F, timef, 1.0F);
+	//vec3 light = fromdirection3(timef + 1.0F, timef, 1.0F);
+	vec3 light = fromdirection3(1.6F, 0.6F, 1.0F);
 
 	//steps to march
 	const int steps = 512;
@@ -313,7 +313,7 @@ void render(SDL_Surface *screen, const int lframe)
 			colortoint(graytocolor(bclamp(
 				scale(values[i], limit.min, limit.max, 0, 255)
 				//add a bit of noise
-				+ random(-5, 5)
+				+ random(-3, 3)
 			)))
 		);
 			//various other render methods
