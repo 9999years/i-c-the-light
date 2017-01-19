@@ -9,8 +9,7 @@
 void saveframe(SDL_Surface *screen)
 {
 	char filename[256] = "UNINITIALIZED.ppm";
-	unsigned long int timeint = time(NULL);
-	sprintf(filename, "%s/image%lu_f%d.ppm", outfile_base, timeint, frame);
+	sprintf(filename, "%s/f%d.ppm", outfile_base, frame);
 	printf("printing %s\n", filename);
 	int writestatus;
 	if(
@@ -34,56 +33,60 @@ void saveframe(SDL_Surface *screen)
 		}
 		return;
 	}
-	char shacmd[256];
-	sprintf(shacmd, "sha256sum %s", filename);
-	FILE *file = popen(shacmd, "r");
-	if(file == NULL) {
-		fprintf(logfile, "failed to get image hash!\n");
-		return;
-	}
-	//the hash is 64 characters but we need a 0 at the end too
-	char sha[68];
-	int i;
-	char c;
-	for(i = 0; (i < 64) && (c != EOF) && (c != 0x20); i++) {
-		sha[i] = c = fgetc(file);
-	}
-	sha[i++] = 0;
-	printf("SHA: %s\n", sha);
-	fprintf(logfile, "SHA: %s\n", sha);
-	pclose(file);
 
-	char hashfilename[256];
-	sprintf(hashfilename, "%s/hash/%s", outfile_base, sha);
-
-	if(_access(hashfilename, 0) != -1) {
-		//file exists, delete img
-		printf("image already rendered, deleting\n");
-		if(unlink(filename) != 0) {
-			fprintf(logfile, "image delete error!\n");
+	FILE *file;
+	if(!FLAG(NO_HASH)) {
+		char shacmd[256];
+		sprintf(shacmd, "sha256sum %s", filename);
+		file = popen(shacmd, "r");
+		if(file == NULL) {
+			fprintf(logfile, "failed to get image hash!\n");
+			return;
 		}
-	} else {
-		FILE *hashfile = fopen(hashfilename, "w");
-		if(hashfile == NULL)
-			fprintf(logfile,
-				"hash file write error!\nfilename: %s\n",
-				hashfilename
-			);
-		fclose(hashfile);
+		//the hash is 64 characters but we need a 0 at the end too
+		char sha[68];
+		int i;
+		char c;
+		for(i = 0; (i < 64) && (c != EOF) && (c != 0x20); i++) {
+			sha[i] = c = fgetc(file);
+		}
+		sha[i++] = 0;
+		printf("SHA: %s\n", sha);
+		fprintf(logfile, "SHA: %s\n", sha);
+		pclose(file);
+
+		char hashfilename[256];
+		sprintf(hashfilename, "%s/hash/%s", outfile_base, sha);
+
+		if(_access(hashfilename, 0) != -1) {
+			//file exists, delete img
+			printf("image already rendered, deleting\n");
+			if(unlink(filename) != 0) {
+				printf("image delete error!\n");
+			}
+		} else {
+			FILE *hashfile = fopen(hashfilename, "w");
+			if(hashfile == NULL)
+				printf(
+					"hash file write error!\nfilename: %s\n",
+					hashfilename
+				);
+			fclose(hashfile);
+		}
 	}
 
-	if(flags & CONVERT_IMMEDIATELY) {
+	if(FLAG(CONVERT_IMMEDIATELY)) {
 		printf("converting ppm to png\n");
 		char mogrifycmd[512];
 		sprintf(mogrifycmd, "mogrify -format png %s", filename);
 		file = popen(mogrifycmd, "r");
 		if(file == NULL) {
-			fprintf(logfile, "failed to get image hash!\n");
+			printf("failed to get image hash!\n");
 			return;
 		}
 		pclose(file);
 		if(unlink(filename) != 0) {
-			fprintf(logfile, "ppm delete error!\n");
+			printf("ppm delete error!\n");
 			return;
 		}
 	}
@@ -95,22 +98,27 @@ void printhelp()
 	printf(
 "I C the Light help:\n\n"
 
-"-w or --window: Request a window. (Does nothing if I C the Light was compiled\n"
-"    without SDL.)\n\n"
-
-"-r or --resolution: Specifies resolution via next argument, in wxh format.\n"
-"    e.g. ./icthelight -r 500x500\n\n"
-
-"-s or --scale: Specifies resolution scaling. (If you know you want a smooth\n"
-"    500x500 image, use -r 500x500 -s 2 to render at 1000x1000.)\n\n"
-
-"-o or --output: Output directory (where images are written).\n"
-"    ../output/ by default, must have a hash/ subdirectory.\n\n"
+"-a or --antialiasing: Use SSAA to render a smoother image. Will cause render"
+"    times to increase linearly. Positive integer values only.\n\n"
 
 "-c or --convert: Convert the .ppm output to .png after saving. Might take up\n"
 "    a little bit of time, requires mogrify to be in your PATH\n\n"
 
+"-e or --exit: Exit after rendering one frame.\n\n"
+
+"--frame: Specify a starting frame. Can be useful for re-starting a render.\n\n"
+
+"--help: Shows this text and then quits.\n\n"
+
 "-i or --iterations: Specify an iteration count. Default 64\n\n"
+
+"--nobanner: Don't show my beautiful, glorious banner that I made by hand,\n"
+"    and love with all of my heart. Put all that glorious work to waste.\n\n"
+
+"--nohash: Don't hash images to check for collisions.\n\n"
+
+"-o or --output: Output directory (where images are written).\n"
+"    ./output/ by default, must have a hash/ subdirectory.\n\n"
 
 "-q or --quaternion: Specify a quaternion to render.\n"
 "    Format: 'Float, Float, Float, Float', where a Float consists of numbers\n"
@@ -118,13 +126,14 @@ void printhelp()
 "    All other characters are ignored, so make sure you don't write in\n"
 "    garbage for no reason.\n\n"
 
-"-e or --exit: Exit after rendering one frame.\n\n"
+"-r or --resolution: Specifies resolution via next argument, in wxh format.\n"
+"    e.g. ./icthelight -r 500x500\n\n"
 
-"--nobanner: Don't show my beautiful, glorious banner that I made by hand,\n"
-"    and love with all of my heart. Put all that glorious work to waste for your\n"
-"    selfish desires\n\n"
+"-s or --scale: Specifies resolution scaling. (e.g. -r 500x500 -s 2 will render\n"
+"    a 1000x1000 image.) Will also accept fractional values, for draft renders.\n\n"
 
-"--help: Shows this text and then quits.\n\n"
+"-w or --window: Request a window. (Does nothing if I C the Light was compiled\n"
+"    without SDL.)\n\n"
 
 "../readme.md, becca.ooo/i-c-the-light, or github.com/9999years/i-c-the-light\n"
 "might have more information.\n"
@@ -222,16 +231,16 @@ int main(int argc, char *argv[])
 		);
 
 		printf(
-			"                  .V.\n"
-			"              \\.\\_____/./\n"
-			"            \\-.=^ -  '^=././\n"
-			"       ===\\-\\(/`  /#\\  *\\)/-/===\n"
-			" >=------  <{.~  (#O#)   .}>  ------=<\n"
-			"       ===/-/(\\  .\\#/  ~/)\\-\\===\n"
-			"           /-/*=-_____-=*\\^\\\n"
-			"              -/ /*~*\\^ \\\n"
-			"                   ^\n"
-			"                                        \n"
+			"                  .V.                  \n"
+			"              \\.\\_____/./            \n"
+			"            \\-.=^ -  '^=././          \n"
+			"       ===\\-\\(/`  /#\\  *\\)/-/===   \n"
+			" >=------  <{.~  (#O#)   .}>  ------=< \n"
+			"       ===/-/(\\  .\\#/  ~/)\\-\\===   \n"
+			"           /-/*=-_____-=*\\^\\         \n"
+			"              -/ /*~*\\^ \\            \n"
+			"                   ^                   \n"
+			"                                       \n"
 			"╭─────────────────────────────────────╮\n"
 			"│ ·           ╷         ╷ ·     ╷     │\n"
 			"│ ╷   ╭─╮   ┼ ├─╮ ╭─╮   │ ╷ ╭─╮ ├─╮ ┼ │\n"
@@ -250,8 +259,6 @@ int main(int argc, char *argv[])
 	//don't want stuff to be the same every time...
 	srand(unixtime);
 
-	frame = 0;
-
 	flags = 0x0000;
 
 	initializelogfile();
@@ -265,8 +272,7 @@ int main(int argc, char *argv[])
 	//screen w/h
 	int width, height;
 
-	int inx =
-		searchargspair(argc, argv, "-r", "--resolution");
+	int inx = searchargspair(argc, argv, "-r", "--resolution");
 	if(inx != -1) {
 		//should allow up to 5-digits each side
 		char resolution_input[16];
@@ -298,8 +304,7 @@ int main(int argc, char *argv[])
 		height = SCREEN_WIDTH;
 	}
 
-	inx =
-		searchargspair(argc, argv, "-s", "--scale");
+	inx = searchargspair(argc, argv, "-s", "--scale");
 	if(inx != -1) {
 		//god help you if 16 chars is too little????
 		char scale_input[16];
@@ -326,15 +331,21 @@ int main(int argc, char *argv[])
 		return -1;
 	}
 
-	inx =
-		searchargspair(argc, argv, "-q", "--quaternion");
+	inx = searchargspair(argc, argv, "-a", "--antialiasing");
 	if(inx != -1) {
-		juliaconstant = parsequaternion(argv[inx + 1]);
-		flags = flags | USER_QUATERNION;
+		//already a global, for better or worse
+		antialias = strtod(argv[inx + 1]);
+	} else {
+		antialias = 1;
 	}
 
-	inx =
-		searchargspair(argc, argv, "-i", "--iterations");
+	inx = searchargspair(argc, argv, "-q", "--quaternion");
+	if(inx != -1) {
+		juliaconstant = parsequaternion(argv[inx + 1]);
+		FLAGSET(USER_QUATERNION);
+	}
+
+	inx = searchargspair(argc, argv, "-i", "--iterations");
 	if(inx != -1) {
 		//god help you if 16 chars is too little????
 		char iterations_input[16];
@@ -350,24 +361,42 @@ int main(int argc, char *argv[])
 		iterations = 128;
 	}
 
-	inx =
-		searchargspair(argc, argv, "-o", "--output");
+	inx = searchargs(argc, argv, "--frame");
+	if(inx != -1) {
+		//god help you if 16 chars is too little????
+		char frame_input[16];
+		strcpy(frame_input, argv[inx + 1]);
+		if(frame_input == NULL) {
+			printf("couldn't get a frame! try again with a "
+				"better argument.\n");
+			return -1;
+		}
+		//already a global, for better or worse
+		frame = strtod(frame_input, NULL);
+	} else {
+		frame = 0;
+	}
+
+	inx = searchargs(argc, argv, "--nohash");
+	if(inx != -1) {
+		FLAGSET(NO_HASH);
+	}
+
+	inx = searchargspair(argc, argv, "-o", "--output");
 	if(inx != -1) {
 		strcpy(outfile_base, argv[inx + 1]);
 	} else {
 		strcpy(outfile_base, "../output/");
 	}
 
-	inx =
-		searchargspair(argc, argv, "-c", "--convert");
+	inx = searchargspair(argc, argv, "-c", "--convert");
 	if(inx != -1) {
-		flags = flags | CONVERT_IMMEDIATELY;
+		FLAGSET(CONVERT_IMMEDIATELY);
 	}
 
-	inx =
-		searchargspair(argc, argv, "-e", "--exit");
+	inx = searchargspair(argc, argv, "-e", "--exit");
 	if(inx != -1) {
-		flags = flags | QUIT_IMMEDIATELY;
+		FLAGSET(QUIT_IMMEDIATELY);
 	}
 
 	//set up the window
@@ -447,10 +476,10 @@ int main(int argc, char *argv[])
 		total = (double)(end - start) / CLOCKS_PER_SEC;
 		printf("%.4f FPS = %.4f SPF\n", 1 / total, total);
 		frame++;
-		//if(frame > FRAMES_IN_ROTATION + 1) {
-			//quit = 1;
-		//}
-	} while(!quit && (~flags & QUIT_IMMEDIATELY));
+		if(frame > ANIMATION_LENGTH + 1) {
+			break;
+		}
+	} while(!quit && !FLAG(QUIT_IMMEDIATELY));
 
 	printf("I feel free!\n");
 

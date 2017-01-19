@@ -22,7 +22,11 @@
 #define CONVERT_IMMEDIATELY B0
 #define USER_QUATERNION B1
 #define QUIT_IMMEDIATELY B2
+#define NO_HASH B15
 
 int flags;
+
+#define FLAG(F) (flags & F)
+#define FLAGSET(F) flags = (flags | F)
 
 #endif //FLAGS_H

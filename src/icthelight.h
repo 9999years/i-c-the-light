@@ -18,6 +18,7 @@
 #include "sdl.h"
 
 //project files
+#include "globals.h"
 #include "common.h"
 #include "color.h"
 #include "ppm.h"
@@ -27,20 +28,12 @@
 #include "logging.h"
 #include "plot.h"
 #include "flags.h"
+#include "complex.h"
 
 #ifndef ICTHELIGHT_H
 #define ICTHELIGHT_H
 
-#define FRAMES_IN_ROTATION 60.0F
-
-//frame count, usually passed as lframe to functions
-int frame;
-
-//julia constant
-quaternion juliaconstant;
-
-//iteration count
-int iterations;
+#define ANIMATION_LENGTH 400.0F
 
 //global distance estimator
 float de(vec3 pos);
