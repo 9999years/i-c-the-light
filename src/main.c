@@ -6,10 +6,11 @@
 //render code
 #include "main.h"
 
-void saveframe(SDL_Surface *screen)
+void saveframe(SDL_Surface *screen, byte opacity)
 {
 	char filename[256] = "UNINITIALIZED.ppm";
-	sprintf(filename, "%s/f%d.ppm", outfile_base, frame);
+	unsigned long int timeint = time(NULL);
+	sprintf(filename, "%s/image%lu_f%d.ppm", outfile_base, timeint, frame);
 	printf("printing %s\n", filename);
 	int writestatus;
 	if(
@@ -334,7 +335,14 @@ int main(int argc, char *argv[])
 	inx = searchargspair(argc, argv, "-a", "--antialiasing");
 	if(inx != -1) {
 		//already a global, for better or worse
-		antialias = strtod(argv[inx + 1]);
+		antialias = strtod(argv[inx + 1], NULL);
+		if(antialias < 1) {
+			printf(
+				"Bad antialiasing value!\n"
+				"Cya!\n"
+			);
+			return -1;
+		}
 	} else {
 		antialias = 1;
 	}
@@ -386,7 +394,7 @@ int main(int argc, char *argv[])
 	if(inx != -1) {
 		strcpy(outfile_base, argv[inx + 1]);
 	} else {
-		strcpy(outfile_base, "../output/");
+		strcpy(outfile_base, "./output/");
 	}
 
 	inx = searchargspair(argc, argv, "-c", "--convert");

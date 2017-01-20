@@ -18,7 +18,6 @@
 #include "sdl.h"
 
 //project files
-#include "globals.h"
 #include "common.h"
 #include "color.h"
 #include "ppm.h"
@@ -29,6 +28,7 @@
 #include "plot.h"
 #include "flags.h"
 #include "complex.h"
+#include "globals.h"
 
 #ifndef ICTHELIGHT_H
 #define ICTHELIGHT_H

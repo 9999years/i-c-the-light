@@ -6,7 +6,8 @@ int writeppm(
 	char *filename,
 	int width,
 	int height,
-	unsigned int image[]
+	unsigned int image[],
+	unsigned char opacity[]
 )
 {
 	//run through image, check to make sure it's not all black
@@ -30,14 +31,22 @@ int writeppm(
 		printf("file open failure!\n");
 		return PPM_FILE_OPEN_FAILURE;
 	}
-	fprintf(file, "P3\n%d %d\n%d\n", width, height, 0xff);
-	struct rgbcolor pixel;
+	fprintf(file,
+		"P7\n"
+		"WIDTH %d\n"
+		"HEIGHT %d\n"
+		"DEPTH 4"
+		"MAXVAL 65535\n"
+		"TUPLTYPE RGBA_ALPHA\n"
+		"ENDHDR\n",
+		width, height
+	);
 	for(i = 0; i < height; i++) {
 		for(j = 0; j < width; j++) {
-			pixel = inttocolor(image[j + i*width]);
-			fprintf(file, "%d ", pixel.r);
-			fprintf(file, "%d ", pixel.g);
-			fprintf(file, "%d ", pixel.b);
+			fprintf(file, "%x%x ",
+				image  [j + i*width],
+				opacity[j + i*width]
+			);
 		}
 		fprintf(file, "\n");
 	}

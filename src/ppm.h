@@ -13,6 +13,7 @@ int writeppm(
 	char *filename,
 	int width,
 	int height,
-	unsigned int image[]
+	unsigned int image[],
+	unsigned char opacity[]
 );
 #endif //PPM_H

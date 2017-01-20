@@ -5,7 +5,23 @@
 //global distance estimator
 float de(vec3 pos)
 {
+	//quaternion c = constq(-0.2F, 0.6F, 0.2F, 0.2F);
+	//quaternion c = constq(-0.137F, -0.630F, -0.475F, -0.046);
+	//quaternion c = constq(-0.213F, -0.0410F, -0.563F, -0.560);
 	return distancejulia(pos, juliaconstant, iterations);
+	//return distserpenski(pos);
+	//return
+		//opu(
+		//disttorus(pos, const3(0.0F, 0.0F, 0.0F), 2.0F, 5.5F);
+		//distsphere(pos, const3(50.0F, 0.0F, 50.0F), 10.0F);
+		//opwobble3(
+			//pos,
+			//distsphere(pos, const3(0.0F, 0.0F, 0.0F), 15.0F),
+			//3.0F,
+			//10.0F
+			//);
+		//);
+		//distsphere(pos, sphere, 10.0F);
 }
 
 //returns a normal
@@ -79,89 +95,242 @@ float blinnphong(vec3 cam, vec3 pos, vec3 rot, vec3 light)
 
 void render(SDL_Surface *screen, const int lframe)
 {
+	/* here's how im setting up the axes (right-handed)
+	 *      z
+	 *      |
+	 *      |
+	 *      |
+	 *      |
+	 *      |
+	 *      +----------- y
+	 *     /
+	 *    /
+	 *   /
+	 *  /
+	 * x
+	 */
+
+#define MAX_DISTANCE 0.1F
+#define MIN_DISTANCE 0.001F
+#define BOUNDING_RADIUS 5.0F
+
 	printf(
 	"\n\n"
 "====== %.5d ==================================================================="
 	"\n", lframe
 	);
-	//double width = 60.0F / ((double)frame + 20.0F);
-	//         3
-	//w = -----------
-	//         (x/20 - 5)
-	//    1 + 2
-	//double width = 3.0F / (1.0F + pow(2.0F, (double)lframe / 20.0F - 5.0F));
-	//double width = HEIGHT
-		//* sin(
-			//(PI * (double)lframe) / ANIMATION_LENGTH + HALF_PI
-		//) + BASELINE_OFFSET;
 
-	//low bottom sin from (x1, y1) to (x2, y2)
-	//
-	//                            π(x - x1)     π        2
-	//       (y1 - y2) * ( sin( ( --------- ) + - ) + 1 )
-	//                             x2 - x1      2
-	// f(x) = -------------------------------------------- + y2
-	//                             4
-	//
-	//1: (0, 3)
-	//2: (400, 0.00003)
-	//specialized case where x1 = 0 lets us cut out some crud
-	//         π(x - x1)               πx
-	//notably, --------- simplifies to --
-	//          x2 - x1                x2
-	//
+	//const float timef = (float)(lframe * TAU) / FRAMES_IN_ROTATION;
+	const float timef = randf(0.0F, TAU);
+	unsigned long int timeint = time(NULL);
+	printf("time: %f\n", timef);
+	const float sintime = sin(timef);
+	const float costime = cos(timef);
+	//const float tworoottwo = sqrt(2.0F) / 2.0F;
+	//how big the viewport is
+	const float viewport_size = 2.75F;
+	SDL_FillRect(screen, NULL, 0xaaeeff);
+	//SDL_FillRect(screen, NULL, 0x000000);
 
-#define y1 3.0F
-#define y2 0.00004F
-#define WIDTH_RANGE 2.99996F
+	//stores values to calculate colors
+	//i can set exposure by figuring out the minimum/maximum of this array
+	float *values = (float *)malloc(sizeof(float) * screen->w * screen->h);
+	//the coordinates of matching keys in `values`, for plotting
+	int *coords = (int *)malloc(sizeof(int) * screen->w * screen->h);
+	//the length of both of those arrays
+	int coordslen = 0;
 
-	//i SWEAR this works
-	double width = (
-		WIDTH_RANGE * pow(
-			sin((PI * (float)lframe) / ANIMATION_LENGTH + HALF_PI)
-			+ 1.0F,
-		2.0F)
-		) / 4.0F + y2;
+	if(values == NULL) {
+		printf("no memory for values!\n");
+		return;
+	}
+	if(coords == NULL) {
+		printf("no memory for keys!\n");
+		return;
+	}
 
-	double aspect = (double)screen->w / (double)screen->h;
-	double height = width / aspect;
+	float pixelvalues[antialias];
 
-	complex center = {
-		.a = -0.743643135F,
-		.b = 0.131825963F
-	};
+	//screen aspect ratio
+	//const float aspect = (float)screen->w / (float)screen->h;
 
-	printf("w / h: %f / %f\n", width, height);
+	//portion of viewport to render
+	//this is multiplied by the viewport vectors to get a point on the
+	//viewport the ray is shot through
+	float wfrac, hfrac;
 
-	//probably rounds to the nearest 4
-	iterations = ((256 + 2 * frame) / 4) * 4;
-	printf("iterations: %d\n", iterations);
+	//focal length of the camera
+	//longer = more zoomed in
+	float focallength = 20.0F;
 
-	//clear screen
-	SDL_FillRect(screen, NULL, 0x000000);
+	//width of the camera (horiz. line at the center of the viewport)
+	vec3 viewport_width = const3(
+		viewport_size * costime,
+		viewport_size * sintime,
+		0.0F
+	);
 
-	//const double threshold = 0.1F;
-	complex point;
-	double dist;
-	int i, j;
+	//height of the camera (vert. line at the center of the viewport)
+	vec3 viewport_height = const3(0.0F, 0.0F, viewport_size);
+
+	//offset of the center of the viewport from the origin
+	//essentially the camera position
+	vec3 viewport_ofs = const3(
+		2.0F * cos(timef - HALF_PI),
+		2.0F * sin(timef - HALF_PI),
+		0.0F
+	);
+
+
+	//point the ray will travel through, other than the camera
+	vec3 ray_through;
+
+	//camera
+	//the rays are shot from here through the viewport
+	//it's backwards and perpendicular from the plane
+	//containing the viewport
+	//viewport_ofs + (perp to the w & height of the vp) * focal len
+	vec3 camera = add3(
+		viewport_ofs,
+		mult3s(
+			unit3(perp3(viewport_width, viewport_height)),
+			focallength
+		)
+	);
+
+	//direction for the ray to travel in
+	vec3 ray_rot;
+
+	//the current position to be measured by the distance estimator
+	//generally camera + distance in the direction of ray_rot
+	vec3 measure_pos;
+
+	//ray origin (location on the viewport plane)
+	vec3 ray_orig;
+
+	//distance from measure_pos
+	float distance;
+	//total distance travelled, i hope i hope i hope
+	float totaldistance;
+
+	//preview value
+	float predist;
+
+	vec3 light = fromdirection3(timef + 1.0F, timef, 1.0F);
+
+	//steps to march
+	const int steps = 512;
+
+	if(!FLAG(USER_QUATERNION)) {
+		juliaconstant = constq(
+			randf(-1.0F, 1.0F),
+			randf(-1.0F, 1.0F),
+			randf(-1.0F, 1.0F),
+			randf(-1.0F, 1.0F)
+		);
+	}
+
+	printf("quaternion is <%.6f, %.6f, %.6f, %.6f>\n",
+		juliaconstant.r,
+		juliaconstant.a,
+		juliaconstant.b,
+		juliaconstant.c
+	);
+
+	printf("rendering values (%dx%d)\n", screen->w, screen->h);
+
+	int i, j, k;
 	for(i = 0; i < screen->h; i++) {
 	for(j = 0; j < screen->w; j++) {
-		point.a = scale((double)j, 0, screen->w,
-			center.a - width, center.a + width);
-		point.b = scale((double)i, 0, screen->h,
-			center.b - height, center.b + height);
-		dist = distmandelbrot(point, iterations);
-		if(dist >= 0.0) {
-			//check the distance estimate against the iterative approach to weed out holes
-			dist = mandelbrot(point, iterations) ? 0.0F : dist;
-			plot(screen, j, i,
-				colortoint(graytocolor(bclamp(
-				300000.0F * (dist / width)
-				)))
+		//new sample, new distance
+		distance = 0.0F;
+		totaldistance = 0.0F;
+
+		//what portion of the viewport are we rendering to?
+		//-0.5 to 0.5 because viewport_ofs represents the center
+		//of the viewport and viewport_width and _height represent
+		//whole, not half widths of the viewport size
+		wfrac = scale(j, 0, screen->w, -0.5F, 0.5F);
+		hfrac = scale(i, 0, screen->h, -0.5F, 0.5F);
+
+		//multiply that by width / height to get a real location
+		ray_through = add3(
+			mult3s(viewport_width, wfrac),
+			mult3s(viewport_height, hfrac)
+		);
+
+		//where the ray starts (on the viewport)
+		ray_orig = add3(ray_through, viewport_ofs);
+
+		//a unit vec from the camera through the viewport
+		ray_rot = unit3(through3(
+			camera,
+			add3(ray_through, viewport_ofs)
+		));
+
+		for(k = 0; k < steps; k++) {
+			measure_pos = add3(
+				ray_orig,
+				mult3s(
+					ray_rot,
+					totaldistance
+				)
 			);
+
+			predist = de(measure_pos);
+
+			totaldistance += distance =
+				fmin(predist, MAX_DISTANCE) * 0.8F;
+
+			if(distance <= MIN_DISTANCE) {
+				coords[coordslen] = j + i * screen->w;
+				values[coordslen] =
+					//(float)k;
+					(1.5F - (float)k / (float)steps) *
+					blinnphong(camera, measure_pos, ray_rot, light);
+				coordslen++;
+				break;
+			} else if(totaldistance >= BOUNDING_RADIUS
+				|| !isfinite(distance)) {
+				//we're done here
+				break;
+			}
 		}
 	}
 	}
 
+	struct limits limit = getlimits(values, coordslen);
+
+	printf("limits: min: %.3f, max: %.3f)\n",
+		limit.min, limit.max
+	);
+
+	for(i = 0; i < coordslen; i++) {
+		//plot the i-th coord on the screen
+		plot(
+			screen,
+			coords[i] % screen->w,
+			coords[i] / screen->h,
+			//turn the value from min to max to a byte color
+			colortoint(graytocolor(bclamp(
+				scale(values[i], limit.min, limit.max, 0, 255)
+				//add a bit of noise
+				+ random(-5, 5)
+			)))
+		);
+			//various other render methods
+			//kept here for... posteriority?
+			//colortoint(graytocolor(bclamp(k * 6)))
+			//dot3(norm, light)
+			//255.0F * (float)k / (float)steps
+			//0.01F / (totaldistance + 0.00003F)
+			//blinnphong(camera, measure_pos, ray_rot, light)
+			//distance <= 2.0F ? 0xffffff : 0x000000
+
+	}
+
+	//clear your mind
+	free(values);
+	free(coords);
 	return;
 }

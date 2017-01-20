@@ -100,3 +100,15 @@ struct limits getlimits(float *values, int length)
 	}
 	return ret;
 }
+
+float averageArray(int length, float *arr)
+{
+	float ret = 0.0F;
+	int i;
+	for(i = 0; i < length; i++) {
+		//sum the array
+		ret += arr[i];
+	}
+	//return avg.
+	return ret / (float)length;
+}

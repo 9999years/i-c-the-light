@@ -57,4 +57,6 @@ int searchargspair(int argc, char *argv[], char *findone, char *findtwo);
 
 struct limits getlimits(float *values, int length);
 
+float averageArray(int length, float *arr);
+
 #endif //COMMON_H
