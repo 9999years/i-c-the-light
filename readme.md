@@ -2,6 +2,8 @@
 
 ### a distance estimating ray marcher written in C
 
+![quaternion julia set rendered with I C the Light](https://becca.ooo/i-c-the-light/resources/julia.jpg)
+
 On ray marching (from [Syntopia](http://blog.hvidtfeldts.net/index.php/2011/06/distance-estimated-3d-fractals-part-i/)):
 
 > Classic raytracing shoots one (or more) rays per pixel and calculates where the
