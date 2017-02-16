@@ -6,7 +6,7 @@
 //render code
 #include "main.h"
 
-void saveframe(SDL_Surface *screen, byte opacity)
+void saveframe(Screen_Surface *screen, byte opacity)
 {
 	char filename[256] = "UNINITIALIZED.ppm";
 	unsigned long int timeint = time(NULL);
@@ -133,9 +133,6 @@ void printhelp()
 "-s or --scale: Specifies resolution scaling. (e.g. -r 500x500 -s 2 will render\n"
 "    a 1000x1000 image.) Will also accept fractional values, for draft renders.\n\n"
 
-"-w or --window: Request a window. (Does nothing if I C the Light was compiled\n"
-"    without SDL.)\n\n"
-
 "../readme.md, becca.ooo/i-c-the-light, or github.com/9999years/i-c-the-light\n"
 "might have more information.\n"
 	);
@@ -200,27 +197,6 @@ quaternion parsequaternion(char *str)
 	return ret;
 }
 
-int handleevents(SDL_Surface *screen)
-{
-	SDL_Event event;
-	while((SDL_PollEvent(&event))) {
-		switch(event.type) {
-		case SDL_KEYDOWN:
-			// if escape is pressed, quit
-			if((event.key.keysym.sym == SDLK_ESCAPE) || (event.key.keysym.sym == SDLK_q)) {
-				return 1;
-			} else if(event.key.keysym.sym == SDLK_s) {
-				saveframe(screen);
-			}
-			break;
-
-		case SDL_QUIT:
-			return 1;
-		}
-	}
-	return 0;
-}
-
 int main(int argc, char *argv[])
 {
 	printf("Hello!\n");
@@ -264,11 +240,8 @@ int main(int argc, char *argv[])
 
 	initializelogfile();
 
-	//The window we'll be rendering to
-	SDL_Window *window = NULL;
-
 	//The surface contained by the window
-	SDL_Surface *screen = NULL;
+	Screen_Surface *screen = NULL;
 
 	//screen w/h
 	int width, height;
@@ -408,57 +381,11 @@ int main(int argc, char *argv[])
 	}
 
 	//set up the window
-	if(
-		searchargspair(argc, argv, "-w", "--window") != -1
-	) {
-		//Initialize SDL
-		if(SDL_Init(SDL_INIT_VIDEO) < 0) {
-			printf("SDL could not initialize! SDL_Error: %s\n", SDL_GetError());
-		} else {
-			//Create window
-			window = SDL_CreateWindow(
-				"I C the Light",
-				SDL_WINDOWPOS_UNDEFINED,
-				SDL_WINDOWPOS_UNDEFINED,
-				width, height,
-				SDL_WINDOW_SHOWN
-			);
-			if(window == NULL) {
-				printf("Window could not be created! SDL_Error: %s\n", SDL_GetError());
-			} else {
-				//Get window surface
-				screen = SDL_GetWindowSurface(window);
-			}
-		}
-	} else {
-		unsigned int rmask, gmask, bmask, amask;
-#define SCREEN_BIT_DEPTH 32
-#if SDL_BYTEORDER == SDL_BIG_ENDIAN
-		rmask = 0xff000000;
-		gmask = 0x00ff0000;
-		bmask = 0x0000ff00;
-		amask = 0x000000ff;
-#else
-		rmask = 0x000000ff;
-		gmask = 0x0000ff00;
-		bmask = 0x00ff0000;
-		amask = 0xff000000;
-#endif
-		screen = SDL_CreateRGBSurface(
-			0,
-			width, height,
-			SCREEN_BIT_DEPTH, rmask, gmask, bmask, amask
-		);
-	}
+	screen = Screen_CreateRGBSurface(width, height);
 
 	if(screen == NULL) {
 		printf("Render surface undefined, quitting!\n");
 		return -1;
-	}
-
-	if(window != NULL) {
-		SDL_FillRect(screen, NULL, 0x000000);
-		SDL_UpdateWindowSurface(window);
 	}
 
 	int quit;
@@ -477,7 +404,7 @@ int main(int argc, char *argv[])
 
 		//Update the surface
 		if(window != NULL) {
-			SDL_UpdateWindowSurface(window);
+			Screen_UpdateWindowSurface(window);
 		}
 
 		end = clock();
@@ -491,15 +418,8 @@ int main(int argc, char *argv[])
 
 	printf("I feel free!\n");
 
-	//Destroy window
-	if(window != NULL) {
-		SDL_DestroyWindow(window);
-	}
-
-	//Quit SDL subsystems
-	SDL_Quit();
-
 	if(screen != NULL) {
+		free(screen->pixels);
 		free(screen);
 	}
 
