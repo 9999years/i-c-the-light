@@ -329,6 +329,13 @@ int main(int argc, char *argv[])
 		return -1;
 	}
 
+	inx = searchargspair(argc, argv, "-a", "--antialiasing");
+	if(inx != -1) {
+		//already a global, for better or worse
+		antialias = strtod(argv[inx + 1], NULL);
+	} else {
+		antialias = 1;
+	}
 	inx = searchargspair(argc, argv, "-q", "--quaternion");
 	if(inx != -1) {
 		juliaconstant = parsequaternion(argv[inx + 1]);
@@ -376,7 +383,7 @@ int main(int argc, char *argv[])
 	if(inx != -1) {
 		strcpy(outfile_base, argv[inx + 1]);
 	} else {
-		strcpy(outfile_base, "../output/");
+		strcpy(outfile_base, "./output/");
 	}
 
 	inx = searchargspair(argc, argv, "-c", "--convert");

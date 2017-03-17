@@ -3,7 +3,6 @@
 //rebecca turner
 //consult ../readme.md
 
-
 //logging, file out
 #include <stdio.h>
 #include <io.h>
@@ -18,12 +17,13 @@
 #include "sdl.h"
 
 //project files
+#include "quaternion.h"
+#include "globals.h"
 #include "common.h"
 #include "color.h"
 #include "ppm.h"
 #include "vector.h"
 #include "distance.h"
-#include "quaternion.h"
 #include "logging.h"
 #include "plot.h"
 #include "flags.h"

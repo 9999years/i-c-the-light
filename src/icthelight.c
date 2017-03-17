@@ -5,7 +5,8 @@
 //global distance estimator
 float de(vec3 pos)
 {
-	return distancejulia(pos, juliaconstant, iterations);
+	//return distancejulia(pos, juliaconstant, iterations);
+	return distsphere(pos, 1.0F) + opwobble3(pos, 3.33F, 0.8F);
 }
 
 //returns a normal

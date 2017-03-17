@@ -1,7 +1,7 @@
 *.exe
 *.dll
-output/**
-!output/bounce.dir
+src/output/**
+!src/output/bounce.dir
 src/log/**
 src/tags
 src/null

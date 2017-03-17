@@ -60,10 +60,10 @@ float distbox(vec3 p, vec3 b)
 	);
 }
 
-//point, center, radius
-float distsphere(vec3 p, vec3 c, float r)
+//point, radius
+float distsphere(vec3 p, float r)
 {
-	return (dist3(p, c) - r);
+	return (magn3(p) - r);
 }
 
 //TODO make the center param do something
@@ -102,21 +102,19 @@ float opi(float a, float b)
 }
 
 //displace a point by a wobbly sine shape
-float opwobble2(vec2 point, float orig, float freq, float amp)
+float opwobble2(vec2 point, float freq, float amp)
 {
 	return amp
 		* sin(point.x / freq)
-		* sin(point.y / freq)
-		+ orig;
+		* sin(point.y / freq);
 }
 
-float opwobble3(vec3 point, float orig, float freq, float amp)
+float opwobble3(vec3 point, float freq, float amp)
 {
 	return amp
 		* sin(point.x / freq)
 		* sin(point.y / freq)
-		* sin(point.z / freq)
-		+ orig;
+		* sin(point.z / freq);
 }
 
 float oprepeat3(/*vec3 point, vec3 period*/)
