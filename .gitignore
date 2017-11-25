@@ -2,7 +2,7 @@
 *.dll
 output/**
 !output/bounce.dir
-source/log/**
-source/tags
+src/log/**
+src/tags
 **/SDL/*
 **/TEST_PPM.ppm
