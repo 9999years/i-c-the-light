@@ -1,9 +1,9 @@
-#include <SDL/SDL.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <assert.h>
 #include <time.h>
 #include "color.h"
+#include "surface.h"
 #include "line.h"
 #include "ppm.h"
 #include "vector.h"
@@ -19,11 +19,11 @@
 #define ARRAYSIZE(arr) (sizeof(arr) / sizeof(arr[0]))
 #define TESTING(function) printf("\nTESTING %s:\n", function);
 
-void printscreen(SDL_Surface *screen, unsigned int exclude);
+void printscreen(surface *screen, unsigned int exclude);
 
 void testsection(char name[]);
 
-void sdltests(SDL_Surface *screen, SDL_Window *window, int width, int height);
+void screentests(surface *screen, window *window, int width, int height);
 
 int main(/*int argc, char *argv[]*/);
 

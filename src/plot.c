@@ -1,9 +1,10 @@
-//functions for plotting points on an sdl surface
+//functions for plotting points on a surface
 
+#include <math.h>
 #include "plot.h"
 
 unsigned int getpixel(
-	SDL_Surface *screen,
+	surface *screen,
 	int x, int y
 )
 {
@@ -24,7 +25,7 @@ unsigned int getpixel(
 }
 
 int plot(
-	SDL_Surface *screen,
+	surface *screen,
 	int x, int y,
 	unsigned int color
 )

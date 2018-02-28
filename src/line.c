@@ -3,7 +3,7 @@
 #include "plot.h"
 
 int drawline(
-	SDL_Surface *screen,
+	surface *screen,
 	int x,
 	int y,
 	int endx,

@@ -6,7 +6,7 @@
 #define LINE_H
 
 int drawline(
-	SDL_Surface *screen,
+	surface *screen,
 	int x,
 	int y,
 	int endx,

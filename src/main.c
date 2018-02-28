@@ -6,7 +6,7 @@
 //render code
 #include "main.h"
 
-void saveframe(SDL_Surface *screen)
+void saveframe(surface *screen)
 {
 	char filename[256] = "UNINITIALIZED.ppm";
 	unsigned long int timeint = time(NULL);
@@ -94,9 +94,6 @@ void printhelp()
 {
 	printf(
 "I C the Light help:\n\n"
-
-"-w or --window: Request a window. (Does nothing if I C the Light was compiled\n"
-"    without SDL.)\n\n"
 
 "-r or --resolution: Specifies resolution via next argument, in wxh format.\n"
 "    e.g. ./icthelight -r 500x500\n\n"
@@ -190,27 +187,6 @@ quaternion parsequaternion(char *str)
 	return ret;
 }
 
-int handleevents(SDL_Surface *screen)
-{
-	SDL_Event event;
-	while((SDL_PollEvent(&event))) {
-		switch(event.type) {
-		case SDL_KEYDOWN:
-			// if escape is pressed, quit
-			if((event.key.keysym.sym == SDLK_ESCAPE) || (event.key.keysym.sym == SDLK_q)) {
-				return 1;
-			} else if(event.key.keysym.sym == SDLK_s) {
-				saveframe(screen);
-			}
-			break;
-
-		case SDL_QUIT:
-			return 1;
-		}
-	}
-	return 0;
-}
-
 int main(int argc, char *argv[])
 {
 	printf("Hello!\n");
@@ -256,11 +232,8 @@ int main(int argc, char *argv[])
 
 	initializelogfile();
 
-	//The window we'll be rendering to
-	SDL_Window *window = NULL;
-
 	//The surface contained by the window
-	SDL_Surface *screen = NULL;
+	surface *screen = NULL;
 
 	//screen w/h
 	int width, height;
@@ -371,77 +344,23 @@ int main(int argc, char *argv[])
 	}
 
 	//set up the window
-	if(
-		searchargspair(argc, argv, "-w", "--window") != -1
-	) {
-		//Initialize SDL
-		if(SDL_Init(SDL_INIT_VIDEO) < 0) {
-			printf("SDL could not initialize! SDL_Error: %s\n", SDL_GetError());
-		} else {
-			//Create window
-			window = SDL_CreateWindow(
-				"I C the Light",
-				SDL_WINDOWPOS_UNDEFINED,
-				SDL_WINDOWPOS_UNDEFINED,
-				width, height,
-				SDL_WINDOW_SHOWN
-			);
-			if(window == NULL) {
-				printf("Window could not be created! SDL_Error: %s\n", SDL_GetError());
-			} else {
-				//Get window surface
-				screen = SDL_GetWindowSurface(window);
-			}
-		}
-	} else {
-		unsigned int rmask, gmask, bmask, amask;
-#define SCREEN_BIT_DEPTH 32
-#if SDL_BYTEORDER == SDL_BIG_ENDIAN
-		rmask = 0xff000000;
-		gmask = 0x00ff0000;
-		bmask = 0x0000ff00;
-		amask = 0x000000ff;
-#else
-		rmask = 0x000000ff;
-		gmask = 0x0000ff00;
-		bmask = 0x00ff0000;
-		amask = 0xff000000;
-#endif
-		screen = SDL_CreateRGBSurface(
-			0,
-			width, height,
-			SCREEN_BIT_DEPTH, rmask, gmask, bmask, amask
-		);
-	}
-
+	//Initialize surface
+	screen = new_surface(width, height, 0);
 	if(screen == NULL) {
-		printf("Render surface undefined, quitting!\n");
+		printf("Surface could not be created!\n");
 		return -1;
 	}
 
-	if(window != NULL) {
-		SDL_FillRect(screen, NULL, 0x000000);
-		SDL_UpdateWindowSurface(window);
-	}
+	fillRect(screen, NULL, 0x000000);
 
-	int quit;
 	clock_t start, end;
 	double total;
 	do {
 		start = clock();
 
-		//poll for events, and handle the ones we care about.
-		//this returns 1 if we need to quit
-		quit = handleevents(screen);
-
 		// render
 		render(screen, frame);
 		saveframe(screen);
-
-		//Update the surface
-		if(window != NULL) {
-			SDL_UpdateWindowSurface(window);
-		}
 
 		end = clock();
 		total = (double)(end - start) / CLOCKS_PER_SEC;
@@ -450,17 +369,9 @@ int main(int argc, char *argv[])
 		//if(frame > FRAMES_IN_ROTATION + 1) {
 			//quit = 1;
 		//}
-	} while(!quit && (~flags & QUIT_IMMEDIATELY));
+	} while(!FLAG(flags & QUIT_IMMEDIATELY));
 
 	printf("I feel free!\n");
-
-	//Destroy window
-	if(window != NULL) {
-		SDL_DestroyWindow(window);
-	}
-
-	//Quit SDL subsystems
-	SDL_Quit();
 
 	if(screen != NULL) {
 		free(screen);

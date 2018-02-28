@@ -93,7 +93,7 @@ float blinnphong(vec3 cam, vec3 pos, vec3 rot, vec3 light)
 	return ret;
 }
 
-void render(SDL_Surface *screen, const int lframe)
+void render(surface *screen, const int lframe)
 {
 	/* here's how im setting up the axes (right-handed)
 	 *      z
@@ -129,8 +129,8 @@ void render(SDL_Surface *screen, const int lframe)
 	//const float tworoottwo = sqrt(2.0F) / 2.0F;
 	//how big the viewport is
 	const float viewport_size = 2.75F;
-	SDL_FillRect(screen, NULL, 0xaaeeff);
-	//SDL_FillRect(screen, NULL, 0x000000);
+	fillRect(screen, NULL, 0xaaeeff);
+	//fillRect(screen, NULL, 0x000000);
 
 	//stores values to calculate colors
 	//i can set exposure by figuring out the minimum/maximum of this array

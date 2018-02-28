@@ -16,9 +16,9 @@
 //base path for file  writing
 char outfile_base[256];
 
-void saveframe(SDL_Surface *screen);
+void saveframe(surface *screen);
 
-int handleevents(SDL_Surface *screen);
+int handleevents(surface *screen);
 
 //int main(int argc, char *argv[]);
 #endif //MAIN_H

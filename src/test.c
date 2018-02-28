@@ -1,6 +1,6 @@
 #include "test.h"
 
-void printscreen(SDL_Surface *screen, unsigned int exclude)
+void printscreen(surface *screen, unsigned int exclude)
 {
 	int i, j;
 	unsigned int color;
@@ -27,14 +27,14 @@ void testsection(char name[])
 	);
 }
 
-void sdltests(SDL_Surface *screen, SDL_Window *window, int width, int height)
+void screescreensts(surface *screen, window *window, int width, int height)
 {
-	SDL_FillRect(screen, NULL, COLOR_WHITE);
+	fillRect(screen, NULL, COLOR_WHITE);
 
 	char coords[9];
 
 	printf(
-		"SDL initialization success!\n"
+		"screen initialization success!\n"
 	);
 
 	TESTING("getpixel (single test)");
@@ -148,9 +148,9 @@ void sdltests(SDL_Surface *screen, SDL_Window *window, int width, int height)
 		!= 0)
 		printf("image write error!\n");
 	//printscreen(screen, 0x000000);
-	SDL_UpdateWindowSurface(window);
+	updateWindowSurface(window);
 	//printf("5 sec delay\n");
-	//SDL_Delay(5000);
+	//delay(5000);
 	//printf("done!\n");
 }
 
@@ -287,34 +287,20 @@ int WinMain(/*int argc, char *argv[]*/)
 
 	testsection("plot.h");
 	{
-		printf("initializing SDL --- a window may appear\n");
-
-		SDL_Window* window = NULL;
-		SDL_Surface* screen = NULL;
-		if(SDL_Init(SDL_INIT_VIDEO) < 0) {
-			printf( "SDL could not initialize!\n"
-				"Note that this is probably a problem with your environment rather than a failed test.\n"
-				"SDL_Error: %s\n",
-				SDL_GetError());
+		surface* screen = NULL;
+		//Create window
+		int width = 120, height = 10;
+		screen = new_surface(width, height, 0);
+		if(screen == NULL) {
+			printf( "Window could not be initialized!\n"
+				"Note that this is probably a problem with your"
+				" environment rather than a failed test.\n")
 		} else {
-			//Create window
-			int width = 120, height = 10;
-			window = SDL_CreateWindow("Unit Tests", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, width, height, SDL_WINDOW_SHOWN);
-			if(window == NULL) {
-				printf( "Window could not be initialized!\n"
-					"Note that this is probably a problem with your environment rather than a failed test.\n"
-					"SDL_Error: %s\n",
-					SDL_GetError());
-			} else {
-				//Get window surface
-				screen = SDL_GetWindowSurface(window);
-				sdltests(screen, window, width, height);
-				//printf("width: %d\nheight: %d\n", screen->w, screen->h);
-				//fill black
-			}
+			//Get window surface
+			screentests(screen, window, width, height);
+			//printf("width: %d\nheight: %d\n", screen->w, screen->h);
+			//fill black
 		}
-		SDL_DestroyWindow(window);
-		SDL_Quit();
 	}
 
 	testsection("vector.h");

@@ -15,7 +15,7 @@
 #include <time.h>
 
 //display
-#include "sdl.h"
+#include "surface.h"
 
 //project files
 #include "common.h"
@@ -55,5 +55,5 @@ vec3 getnormal(vec3 pos, float samplesize);
 //can usually be found with )
 float blinnphong(vec3 cam, vec3 pos, vec3 rot, vec3 light);
 
-void render(SDL_Surface *screen, const int frame);
+void render(surface *screen, const int frame);
 #endif //ICTHELIGHT_H

@@ -5,7 +5,7 @@ INCLUDE_CURRENT =  -I.
 NO_CONSOLE = -mwindows
 RM=rm
 
-icthelight: main.c icthelight.c color.c common.c complex.c distance.c icthelight.c logging.c plot.c ppm.c quaternion.c vector.c
+icthelight: main.c icthelight.c color.c common.c complex.c distance.c icthelight.c logging.c plot.c ppm.c quaternion.c vector.c surface.c
 	ctags *.c *.h
 	$(CC) $(CFLAGS) $(INCLUDE_CURRENT) -o $@ $^
 
