@@ -29,7 +29,7 @@ Supplementary information and reference links can be found at
 
 ### Code
 
-The code lives in `source/`, as you might expect. The render loop and `main()`
+The code lives in `src/`, as you might expect. The render loop and `main()`
 are in `icthelight.c`.
 
 Images will be written to `output/`.
